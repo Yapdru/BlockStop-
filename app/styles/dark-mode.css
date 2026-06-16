@@ -1,0 +1,72 @@
+:root {
+  --color-light-bg: #ffffff;
+  --color-light-bg-secondary: #f3f4f6;
+  --color-light-text: #1f2937;
+  --color-light-text-secondary: #6b7280;
+  --color-light-border: #e5e7eb;
+  --color-light-surface: #f9fafb;
+
+  --color-dark-bg: #111827;
+  --color-dark-bg-secondary: #1f2937;
+  --color-dark-text: #f3f4f6;
+  --color-dark-text-secondary: #d1d5db;
+  --color-dark-border: #374151;
+  --color-dark-surface: #0f172a;
+
+  /* Transition times */
+  --transition-default: all 200ms ease-in-out;
+  --transition-fast: all 100ms ease-in-out;
+  --transition-slow: all 300ms ease-in-out;
+}
+
+html {
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+/* Light mode (default) */
+body {
+  background-color: var(--color-light-bg);
+  color: var(--color-light-text);
+  transition: var(--transition-default);
+}
+
+/* Dark mode */
+html.dark body {
+  background-color: var(--color-dark-bg);
+  color: var(--color-dark-text);
+}
+
+/* Utility classes for theme-aware styling */
+.dark\:bg-gray-800 {
+  @media (prefers-color-scheme: dark) {
+    background-color: #1f2937;
+  }
+}
+
+html.dark .dark\:bg-gray-800 {
+  background-color: #1f2937;
+}
+
+.dark\:text-white {
+  @media (prefers-color-scheme: dark) {
+    color: #ffffff;
+  }
+}
+
+html.dark .dark\:text-white {
+  color: #ffffff;
+}
+
+/* Ensure smooth transitions for theme changes */
+* {
+  @apply transition-colors duration-200;
+}
+
+/* Prevent transition on page load */
+html:not(.js-loaded) * {
+  transition: none !important;
+}

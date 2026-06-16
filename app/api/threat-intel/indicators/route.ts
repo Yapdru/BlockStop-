@@ -7,7 +7,7 @@ import { feedManager } from '@/lib/threat-intel/feed-manager';
 import { iocMatcher } from '@/lib/threat-intel/ioc-matcher';
 import { threatPredictor } from '@/lib/threat-intel/ml/threat-predictor';
 import { anomalyDetector } from '@/lib/threat-intel/ml/anomaly-detector';
-import { threatClassifier } from '@/lib/threat-intel/ml/classifier';
+import { threatClassifier } from '@/lib/threat-intel/classifier';
 import { correlationEngine } from '@/lib/threat-intel/correlation-engine';
 
 export async function GET(request: NextRequest) {

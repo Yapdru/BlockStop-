@@ -1,0 +1,704 @@
+/**
+ * Responsive Design System Utilities
+ * Mobile-first approach with TailwindCSS integration
+ */
+
+/* ============================================================================
+   VIEWPORT & CONTAINER SETUP
+   ========================================================================== */
+
+html {
+  /* Smooth scrolling for all browsers */
+  scroll-behavior: smooth;
+
+  /* Reset font size for REM calculations */
+  font-size: 16px;
+
+  /* Responsive font size on larger screens */
+  @media (min-width: 1024px) {
+    font-size: 16px;
+  }
+
+  @media (min-width: 2560px) {
+    font-size: 18px;
+  }
+}
+
+body {
+  /* Ensure body takes full viewport */
+  min-height: 100vh;
+  width: 100%;
+
+  /* Use system fonts for best performance */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+    "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+    "Helvetica Neue", sans-serif;
+
+  /* Font rendering optimization */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Prevent text size adjustment on orientation change */
+  -webkit-text-size-adjust: 100%;
+}
+
+/* ============================================================================
+   FLUID TYPOGRAPHY - RESPONSIVE FONT SIZING
+   ========================================================================== */
+
+/* Heading 1 - Fluid sizing from 28px to 36px */
+h1 {
+  font-size: clamp(28px, 5vw, 36px);
+  line-height: clamp(1.2, 1.3, 1.4);
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+/* Heading 2 - Fluid sizing from 24px to 32px */
+h2 {
+  font-size: clamp(24px, 4vw, 32px);
+  line-height: clamp(1.25, 1.35, 1.45);
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+}
+
+/* Heading 3 - Fluid sizing from 20px to 28px */
+h3 {
+  font-size: clamp(20px, 3.5vw, 28px);
+  line-height: clamp(1.3, 1.4, 1.5);
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+/* Heading 4 - Fluid sizing from 18px to 24px */
+h4 {
+  font-size: clamp(18px, 2.5vw, 24px);
+  line-height: 1.4;
+  font-weight: 600;
+  margin-bottom: 0.875rem;
+}
+
+/* Heading 5 */
+h5 {
+  font-size: 16px;
+  line-height: 1.5;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+/* Heading 6 */
+h6 {
+  font-size: 14px;
+  line-height: 1.5;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+/* Body text - Fluid sizing from 16px to 18px */
+body, p, span {
+  font-size: clamp(16px, 1.5vw, 18px);
+  line-height: 1.6;
+}
+
+/* Small text */
+small, .text-sm {
+  font-size: clamp(14px, 1.2vw, 16px);
+  line-height: 1.5;
+}
+
+/* Tiny text */
+.text-xs {
+  font-size: clamp(12px, 1vw, 14px);
+  line-height: 1.4;
+}
+
+/* Large text */
+.text-lg {
+  font-size: clamp(18px, 2vw, 20px);
+  line-height: 1.6;
+}
+
+/* Extra large text */
+.text-xl {
+  font-size: clamp(20px, 2.5vw, 24px);
+  line-height: 1.5;
+}
+
+/* ============================================================================
+   FLUID SPACING - RESPONSIVE PADDING & MARGINS
+   ========================================================================== */
+
+/* Fluid padding utilities */
+.p-fluid-sm {
+  padding: clamp(8px, 2vw, 12px);
+}
+
+.p-fluid-md {
+  padding: clamp(12px, 3vw, 16px);
+}
+
+.p-fluid-lg {
+  padding: clamp(16px, 4vw, 24px);
+}
+
+.p-fluid-xl {
+  padding: clamp(24px, 5vw, 32px);
+}
+
+.p-fluid-xxl {
+  padding: clamp(32px, 6vw, 48px);
+}
+
+/* Responsive padding by axis */
+.px-fluid-sm {
+  padding-left: clamp(8px, 2vw, 12px);
+  padding-right: clamp(8px, 2vw, 12px);
+}
+
+.px-fluid-md {
+  padding-left: clamp(12px, 3vw, 16px);
+  padding-right: clamp(12px, 3vw, 16px);
+}
+
+.px-fluid-lg {
+  padding-left: clamp(16px, 4vw, 24px);
+  padding-right: clamp(16px, 4vw, 24px);
+}
+
+.px-fluid-xl {
+  padding-left: clamp(24px, 5vw, 32px);
+  padding-right: clamp(24px, 5vw, 32px);
+}
+
+.py-fluid-sm {
+  padding-top: clamp(8px, 2vw, 12px);
+  padding-bottom: clamp(8px, 2vw, 12px);
+}
+
+.py-fluid-md {
+  padding-top: clamp(12px, 3vw, 16px);
+  padding-bottom: clamp(12px, 3vw, 16px);
+}
+
+.py-fluid-lg {
+  padding-top: clamp(16px, 4vw, 24px);
+  padding-bottom: clamp(16px, 4vw, 24px);
+}
+
+.py-fluid-xl {
+  padding-top: clamp(24px, 5vw, 32px);
+  padding-bottom: clamp(24px, 5vw, 32px);
+}
+
+/* Fluid margin utilities */
+.m-fluid-sm {
+  margin: clamp(8px, 2vw, 12px);
+}
+
+.m-fluid-md {
+  margin: clamp(12px, 3vw, 16px);
+}
+
+.m-fluid-lg {
+  margin: clamp(16px, 4vw, 24px);
+}
+
+.m-fluid-xl {
+  margin: clamp(24px, 5vw, 32px);
+}
+
+/* Responsive margin by axis */
+.mx-fluid-sm {
+  margin-left: clamp(8px, 2vw, 12px);
+  margin-right: clamp(8px, 2vw, 12px);
+}
+
+.mx-fluid-lg {
+  margin-left: clamp(16px, 4vw, 24px);
+  margin-right: clamp(16px, 4vw, 24px);
+}
+
+.my-fluid-lg {
+  margin-top: clamp(16px, 4vw, 24px);
+  margin-bottom: clamp(16px, 4vw, 24px);
+}
+
+.gap-fluid-md {
+  gap: clamp(12px, 3vw, 16px);
+}
+
+.gap-fluid-lg {
+  gap: clamp(16px, 4vw, 24px);
+}
+
+.gap-fluid-xl {
+  gap: clamp(24px, 5vw, 32px);
+}
+
+/* ============================================================================
+   RESPONSIVE IMAGES
+   ========================================================================== */
+
+img {
+  /* Images scale with container */
+  max-width: 100%;
+  height: auto;
+
+  /* Prevent layout shift while loading */
+  display: block;
+}
+
+/* Responsive image container for aspect ratio preservation */
+.image-responsive {
+  position: relative;
+  width: 100%;
+  padding-bottom: 66.666%; /* 3:2 aspect ratio */
+}
+
+.image-responsive.aspect-square {
+  padding-bottom: 100%;
+}
+
+.image-responsive.aspect-video {
+  padding-bottom: 56.25%; /* 16:9 aspect ratio */
+}
+
+.image-responsive.aspect-cinematic {
+  padding-bottom: 50%; /* 2:1 aspect ratio */
+}
+
+.image-responsive img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Picture element support */
+picture {
+  display: block;
+  width: 100%;
+}
+
+picture img {
+  width: 100%;
+  height: auto;
+}
+
+/* ============================================================================
+   RESPONSIVE GRIDS & LAYOUTS
+   ========================================================================== */
+
+/* Auto-fit grid that responds to container width */
+.grid-auto-fit {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: clamp(12px, 3vw, 16px);
+}
+
+.grid-auto-fit-sm {
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.grid-auto-fit-lg {
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+/* Responsive grid with breakpoints */
+@media (max-width: 639px) {
+  .grid-responsive {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(8px, 2vw, 12px);
+  }
+}
+
+@media (min-width: 640px) and (max-width: 1023px) {
+  .grid-responsive {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: clamp(12px, 2.5vw, 16px);
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid-responsive {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(16px, 3vw, 24px);
+  }
+}
+
+/* Container queries for component-level responsiveness */
+@supports (container-type: inline-size) {
+  .container-responsive {
+    container-type: inline-size;
+  }
+
+  /* Responsive layout inside container */
+  @container (min-width: 300px) {
+    .container-responsive-layout {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+  }
+
+  @container (min-width: 600px) {
+    .container-responsive-layout {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+  }
+
+  @container (min-width: 900px) {
+    .container-responsive-layout {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+  }
+}
+
+/* ============================================================================
+   TOUCH-FRIENDLY TARGETS
+   ========================================================================== */
+
+/* Ensure minimum 44x44px touch target size */
+button, a, [role="button"], input[type="checkbox"], input[type="radio"] {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Larger touch targets for important actions */
+.touch-target-large {
+  min-height: 56px;
+  min-width: 56px;
+  padding: 12px 16px;
+}
+
+/* Touch-friendly spacing */
+.touch-spacing {
+  padding: clamp(8px, 2vw, 12px);
+}
+
+/* Increase click area for touch devices */
+@media (hover: none) and (pointer: coarse) {
+  button, a, [role="button"] {
+    min-height: 48px;
+    min-width: 48px;
+    padding: 12px 16px;
+  }
+
+  input, select, textarea {
+    min-height: 48px;
+    padding: 12px 16px;
+  }
+
+  /* Add extra spacing between interactive elements */
+  .touch-spacing {
+    gap: 16px;
+  }
+}
+
+/* ============================================================================
+   RESPONSIVE DISPLAY UTILITIES
+   ========================================================================== */
+
+/* Hide on mobile */
+@media (max-width: 639px) {
+  .hidden-mobile {
+    display: none !important;
+  }
+}
+
+/* Hide on tablet */
+@media (min-width: 640px) and (max-width: 1023px) {
+  .hidden-tablet {
+    display: none !important;
+  }
+}
+
+/* Hide on desktop and up */
+@media (min-width: 1024px) {
+  .hidden-desktop {
+    display: none !important;
+  }
+}
+
+/* Show only on mobile */
+.show-mobile {
+  display: none;
+}
+
+@media (max-width: 639px) {
+  .show-mobile {
+    display: block;
+  }
+}
+
+/* Show only on tablet */
+.show-tablet {
+  display: none;
+}
+
+@media (min-width: 640px) and (max-width: 1023px) {
+  .show-tablet {
+    display: block;
+  }
+}
+
+/* Show only on desktop */
+.show-desktop {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .show-desktop {
+    display: block;
+  }
+}
+
+/* ============================================================================
+   RESPONSIVE LAYOUT UTILITIES
+   ========================================================================== */
+
+/* Responsive flex direction */
+.flex-responsive {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 3vw, 16px);
+}
+
+@media (min-width: 768px) {
+  .flex-responsive {
+    flex-direction: row;
+  }
+}
+
+/* Responsive width constraints */
+.container-max-width {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: clamp(16px, 4vw, 32px);
+}
+
+.container-fluid-safe {
+  width: 100%;
+  padding-left: clamp(16px, 4vw, 32px);
+  padding-right: clamp(16px, 4vw, 32px);
+}
+
+/* ============================================================================
+   RESPONSIVE COLUMNS
+   ========================================================================== */
+
+@media (min-width: 640px) {
+  .columns-2-tablet {
+    columns: 2;
+    column-gap: clamp(12px, 3vw, 16px);
+  }
+}
+
+@media (min-width: 1024px) {
+  .columns-3-desktop {
+    columns: 3;
+    column-gap: clamp(16px, 3vw, 24px);
+  }
+}
+
+/* ============================================================================
+   PRINT MEDIA QUERIES
+   ========================================================================== */
+
+@media print {
+  /* Hide navigation, buttons, and interactive elements */
+  nav, .no-print, button, .button, [role="button"] {
+    display: none !important;
+  }
+
+  /* Optimize for print */
+  body {
+    font-size: 12pt;
+    line-height: 1.5;
+    color: black;
+    background: white;
+  }
+
+  /* Prevent page breaks inside elements */
+  h1, h2, h3, h4, h5, h6,
+  p, div, section, article {
+    page-break-inside: avoid;
+  }
+
+  /* Always show page breaks before headings */
+  h1, h2, h3 {
+    page-break-after: avoid;
+  }
+
+  /* Links should show URL */
+  a[href]:after {
+    content: " (" attr(href) ")";
+  }
+
+  /* Images should stay with content */
+  img {
+    max-width: 100%;
+    page-break-inside: avoid;
+  }
+
+  /* Table optimization */
+  table {
+    page-break-inside: avoid;
+    border-collapse: collapse;
+  }
+
+  /* Remove shadows and borders for print */
+  * {
+    box-shadow: none !important;
+    border: 1px solid #999 !important;
+  }
+}
+
+/* ============================================================================
+   ACCESSIBILITY & MOTION
+   ========================================================================== */
+
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: more) {
+  body {
+    font-weight: 600;
+  }
+
+  button, a {
+    border-width: 2px;
+  }
+}
+
+/* ============================================================================
+   ORIENTATION-SPECIFIC STYLES
+   ========================================================================== */
+
+/* Portrait orientation */
+@media (orientation: portrait) {
+  .portrait-only {
+    display: block;
+  }
+
+  .landscape-only {
+    display: none;
+  }
+}
+
+/* Landscape orientation */
+@media (orientation: landscape) {
+  .portrait-only {
+    display: none;
+  }
+
+  .landscape-only {
+    display: block;
+  }
+}
+
+/* ============================================================================
+   SAFE AREA & NOTCH SUPPORT
+   ========================================================================== */
+
+/* Support for devices with notches (iPhone X, etc) */
+body {
+  padding-left: max(0px, env(safe-area-inset-left));
+  padding-right: max(0px, env(safe-area-inset-right));
+  padding-bottom: max(0px, env(safe-area-inset-bottom));
+  padding-top: max(0px, env(safe-area-inset-top));
+}
+
+.safe-area-padding {
+  padding-left: max(16px, env(safe-area-inset-left));
+  padding-right: max(16px, env(safe-area-inset-right));
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
+}
+
+/* ============================================================================
+   SCROLLBAR STYLING (Optional)
+   ========================================================================== */
+
+/* Thin scrollbar for modern browsers */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+
+/* ============================================================================
+   VIEWPORT UNITS - CSS CUSTOM PROPERTIES
+   ========================================================================== */
+
+:root {
+  /* Viewport dimensions */
+  --vw: 1vw;
+  --vh: 1vh;
+  --vmin: 1vmin;
+  --vmax: 1vmax;
+
+  /* Fluid typography */
+  --font-scale-mobile: 1;
+  --font-scale-tablet: 1.1;
+  --font-scale-desktop: 1.2;
+
+  /* Spacing scale */
+  --spacing-xs: clamp(4px, 1vw, 8px);
+  --spacing-sm: clamp(8px, 1.5vw, 12px);
+  --spacing-md: clamp(12px, 2vw, 16px);
+  --spacing-lg: clamp(16px, 3vw, 24px);
+  --spacing-xl: clamp(24px, 4vw, 32px);
+  --spacing-xxl: clamp(32px, 5vw, 48px);
+}
+
+@media (min-width: 640px) {
+  :root {
+    --font-scale-mobile: 1.05;
+    --font-scale-tablet: 1.15;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --font-scale-mobile: 1.1;
+    --font-scale-tablet: 1.2;
+    --font-scale-desktop: 1.3;
+  }
+}
