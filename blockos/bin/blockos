@@ -1,0 +1,140 @@
+#!/bin/bash
+
+# BlockOS CLI Tool - Command-line interface for BlockStop PRO
+# Allows running commands outside of interactive shell
+
+set -e
+
+BLOCKOS_VERSION="1.0.0"
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+show_help() {
+    cat << "EOF"
+BlockOS CLI - BlockStop PRO Command Line Interface
+Version $BLOCKOS_VERSION
+
+Usage: blockos <command> [options]
+
+Commands:
+  email check <content>      Analyze email for threats
+  file scan <path>           Scan file for malware
+  file scan-dir <path>       Scan directory recursively
+  server start               Start BlockStop server
+  server stop                Stop BlockStop server
+  server status              Check server status
+  system status              Show system status
+  system logs [lines]        Show system logs
+  --version                  Show version
+  --help                     Show this help message
+
+Examples:
+  blockos email check "Suspicious email content"
+  blockos file scan /path/to/file.exe
+  blockos server start
+  blockos system status
+
+Environment Variables:
+  BLOCKOS_API_URL            API endpoint (default: http://localhost:3000)
+  BLOCKOS_HOME               BlockOS home directory
+
+EOF
+}
+
+check_api() {
+    API_URL="${BLOCKOS_API_URL:-http://localhost:3000}"
+    if ! curl -s "$API_URL" > /dev/null 2>&1; then
+        echo -e "${RED}Error: Cannot connect to BlockStop server${NC}"
+        echo "Start server with: blockos server start"
+        exit 1
+    fi
+}
+
+email_check() {
+    if [ -z "$1" ]; then
+        echo -e "${RED}Error: No email content provided${NC}"
+        echo "Usage: blockos email check <content>"
+        exit 1
+    fi
+
+    check_api
+
+    echo -e "${BLUE}Analyzing email...${NC}"
+    curl -s -X POST "${BLOCKOS_API_URL:-http://localhost:3000}/api/email/check" \
+        -H "Content-Type: application/json" \
+        -d "{\"email\": \"$1\"}" | jq '.' 2>/dev/null || {
+        echo -e "${RED}Error: Failed to analyze email${NC}"
+        exit 1
+    }
+}
+
+file_scan() {
+    if [ -z "$1" ]; then
+        echo -e "${RED}Error: No file path provided${NC}"
+        echo "Usage: blockos file scan <path>"
+        exit 1
+    fi
+
+    if [ ! -f "$1" ]; then
+        echo -e "${RED}Error: File not found: $1${NC}"
+        exit 1
+    fi
+
+    check_api
+
+    echo -e "${BLUE}Scanning file...${NC}"
+    # Note: This is simplified - actual implementation would send file to API
+    echo "File scan feature coming soon"
+}
+
+main() {
+    case "${1:-}" in
+        email)
+            case "${2:-}" in
+                check)
+                    shift 2
+                    email_check "$@"
+                    ;;
+                *)
+                    echo "Usage: blockos email check <content>"
+                    exit 1
+                    ;;
+            esac
+            ;;
+        file)
+            case "${2:-}" in
+                scan)
+                    shift 2
+                    file_scan "$1"
+                    ;;
+                *)
+                    echo "Usage: blockos file scan <path>"
+                    exit 1
+                    ;;
+            esac
+            ;;
+        server)
+            echo "Server management coming soon"
+            ;;
+        system)
+            echo "System commands coming soon"
+            ;;
+        --version)
+            echo "BlockOS v$BLOCKOS_VERSION"
+            ;;
+        --help|"")
+            show_help
+            ;;
+        *)
+            echo -e "${RED}Unknown command: $1${NC}"
+            echo "Use 'blockos --help' for usage information"
+            exit 1
+            ;;
+    esac
+}
+
+main "$@"

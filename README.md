@@ -1,22 +1,41 @@
 # BlockStop PRO
 
-Advanced email and file security analysis tool with DRAR AI and BetterBot PRO.
+Advanced email and file security analysis tool with real DRAR AI and BetterBot PRO engines, deployed via BlockOS containerized environment.
 
-## Features
+## 🎯 Features
 
-- 📧 **Email Checker** - Analyze emails for phishing, malicious links, and spam
-- 📁 **File Scanner** - Scan files for malware, viruses, and ransomware threats
-- 🔔 **Gmail Alerts** - Get real-time alerts directly in your Gmail inbox
-- 📊 **History & Export** - View scan history and export results as screenshots or text
+- 📧 **DRAR AI Email Analysis** - Heuristic-based phishing, link, and spam detection
+- 📁 **BetterBot PRO Malware Detection** - Signature-based malware and virus scanning
+- 🔔 **Gmail Alerts** - Real-time alerts directly in Gmail inbox
+- 📊 **Comprehensive History** - Track all scans with detailed reports
+- 🐳 **BlockOS Environment** - Containerized security platform with custom CLI
+- 🌐 **GitHub Pages Support** - Automatic static site deployment
 
-## Tech Stack
+## 🛡️ AI Engines
+
+### DRAR AI (Distributed Risk Analysis & Reputation)
+- Phishing detection with keyword analysis
+- Suspicious sender reputation evaluation
+- Malicious link detection
+- Urgency tactic identification
+- Pattern-based threat scoring
+
+### BetterBot PRO
+- File signature analysis (YARA-like rules)
+- Entropy-based packing detection
+- Dangerous extension classification
+- Ransomware behavior indicators
+- Trojan/backdoor pattern matching
+
+## 💻 Tech Stack
 
 - **Framework**: Next.js 14+ (React + TypeScript)
-- **Styling**: Tailwind CSS with light blue theme
-- **Animations**: Framer Motion
+- **Styling**: Tailwind CSS (light blue theme with animations)
 - **Backend**: Next.js API Routes
-- **Database**: PostgreSQL (to be integrated)
-- **Authentication**: NextAuth.js (to be integrated)
+- **Containerization**: Docker + Docker Compose
+- **Database**: PostgreSQL with custom schema
+- **Authentication**: NextAuth.js (ready for Gmail OAuth)
+- **CLI**: Custom BlockOS shell interface
 
 ## Project Structure
 

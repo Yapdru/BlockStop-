@@ -1,0 +1,235 @@
+#!/bin/bash
+
+# BlockOS Shell - Interactive Command Interface for BlockStop PRO
+# Version 1.0.0
+
+set -e
+
+BLOCKOS_VERSION="1.0.0"
+BLOCKOS_HOME="${BLOCKOS_HOME:-/var/lib/blockstop}"
+BLOCKOS_CONFIG="${BLOCKOS_CONFIG:-/etc/blockstop}"
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# Logo
+print_banner() {
+    cat << "EOF"
+╔═══════════════════════════════════════════════════════════════╗
+║                   🛡️  BLOCKSTOP PRO - BlockOS               ║
+║                                                               ║
+║  Advanced Email & File Security Analysis System             ║
+║  Version 1.0.0                                               ║
+╚═══════════════════════════════════════════════════════════════╝
+EOF
+}
+
+# Help function
+print_help() {
+    cat << "EOF"
+BlockOS Commands:
+
+  EMAIL ANALYSIS:
+    email check <content>      - Analyze email for threats
+    email analyze <file>       - Analyze email from file
+    email history              - View email scan history
+
+  FILE SCANNING:
+    file scan <path>           - Scan file for malware
+    file scan-dir <path>       - Scan directory for threats
+    file history               - View file scan history
+
+  SYSTEM:
+    status                     - Show BlockOS status
+    logs [lines]               - View system logs
+    config show                - Show configuration
+    config set <key> <value>   - Set configuration
+
+  SERVER:
+    start                      - Start BlockStop server
+    stop                       - Stop BlockStop server
+    restart                    - Restart BlockStop server
+
+  HELP:
+    help                       - Show this help message
+    version                    - Show version information
+    exit                       - Exit BlockOS shell
+
+Examples:
+  blockos> email check "Click here to verify your account"
+  blockos> file scan /tmp/suspicious.exe
+  blockos> status
+EOF
+}
+
+# Check server status
+check_server_status() {
+    if curl -s http://localhost:3000 > /dev/null 2>&1; then
+        echo -e "${GREEN}✓${NC} BlockStop server is running (port 3000)"
+        return 0
+    else
+        echo -e "${RED}✗${NC} BlockStop server is not running"
+        return 1
+    fi
+}
+
+# Start server
+start_server() {
+    echo -e "${BLUE}Starting BlockStop server...${NC}"
+    npm run dev > /var/log/blockstop/server.log 2>&1 &
+    SERVER_PID=$!
+    echo $SERVER_PID > /tmp/blockstop.pid
+    sleep 2
+
+    if check_server_status; then
+        echo -e "${GREEN}✓${NC} Server started with PID $SERVER_PID"
+    else
+        echo -e "${RED}✗${NC} Failed to start server"
+        return 1
+    fi
+}
+
+# Stop server
+stop_server() {
+    if [ -f /tmp/blockstop.pid ]; then
+        PID=$(cat /tmp/blockstop.pid)
+        echo -e "${BLUE}Stopping BlockStop server (PID: $PID)...${NC}"
+        kill $PID 2>/dev/null || true
+        rm -f /tmp/blockstop.pid
+        echo -e "${GREEN}✓${NC} Server stopped"
+    else
+        echo -e "${YELLOW}⚠${NC} No running server found"
+    fi
+}
+
+# Analyze email
+analyze_email() {
+    if [ -z "$1" ]; then
+        echo -e "${RED}Error: Please provide email content${NC}"
+        return 1
+    fi
+
+    echo -e "${BLUE}Analyzing email...${NC}"
+
+    # Call the API
+    RESPONSE=$(curl -s -X POST http://localhost:3000/api/email/check \
+        -H "Content-Type: application/json" \
+        -d "{\"email\": \"$1\"}" 2>/dev/null || echo "{\"error\": true}")
+
+    if echo "$RESPONSE" | jq . > /dev/null 2>&1; then
+        echo -e "${GREEN}Analysis Complete:${NC}"
+        echo "$RESPONSE" | jq '.'
+    else
+        echo -e "${RED}Error: Could not reach BlockStop server${NC}"
+        echo "Start the server with: blockos> start"
+        return 1
+    fi
+}
+
+# Show status
+show_status() {
+    echo -e "${BLUE}BlockOS System Status:${NC}"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+    echo -e "Version:        ${GREEN}$BLOCKOS_VERSION${NC}"
+    echo -e "Hostname:       $(hostname)"
+    echo -e "Uptime:         $(uptime -p 2>/dev/null || echo 'N/A')"
+    echo -e "Memory Usage:   $(free -h | awk 'NR==2{print $3"/"$2}')"
+    echo -e "Disk Usage:     $(df -h / | awk 'NR==2{print $3"/"$2}')"
+
+    echo ""
+    echo -e "${BLUE}Server Status:${NC}"
+    if check_server_status; then
+        echo -e "Web Interface:  ${GREEN}http://localhost:3000${NC}"
+    fi
+
+    echo ""
+    echo -e "${BLUE}File Locations:${NC}"
+    echo "Home:           $BLOCKOS_HOME"
+    echo "Config:         $BLOCKOS_CONFIG"
+    echo "Logs:           /var/log/blockstop"
+}
+
+# Interactive shell loop
+interactive_shell() {
+    print_banner
+    echo ""
+    echo -e "${GREEN}Type 'help' for available commands${NC}"
+    echo ""
+
+    while true; do
+        read -p "blockos> " cmd rest
+
+        case $cmd in
+            email)
+                case $rest in
+                    check*)
+                        content=$(echo "$rest" | sed 's/^check[[:space:]]*//g')
+                        analyze_email "$content"
+                        ;;
+                    *)
+                        echo "Usage: email check <content>"
+                        ;;
+                esac
+                ;;
+            file)
+                echo -e "${YELLOW}File scanning coming soon${NC}"
+                ;;
+            status)
+                show_status
+                ;;
+            start)
+                start_server
+                ;;
+            stop)
+                stop_server
+                ;;
+            restart)
+                stop_server
+                start_server
+                ;;
+            logs)
+                tail -f /var/log/blockstop/server.log 2>/dev/null || echo "No logs yet"
+                ;;
+            help)
+                print_help
+                ;;
+            version)
+                echo "BlockOS Version: $BLOCKOS_VERSION"
+                ;;
+            exit|quit)
+                echo -e "${GREEN}Goodbye!${NC}"
+                exit 0
+                ;;
+            "")
+                continue
+                ;;
+            *)
+                echo -e "${RED}Unknown command: $cmd${NC}"
+                echo "Type 'help' for available commands"
+                ;;
+        esac
+    done
+}
+
+# Main entry
+main() {
+    # Check if running in container
+    if [ -f /.dockerenv ]; then
+        # Create necessary directories
+        mkdir -p /var/log/blockstop /var/lib/blockstop /etc/blockstop
+
+        # Start the interactive shell
+        interactive_shell
+    else
+        echo "BlockOS should be run in a Docker container"
+        echo "Use: docker-compose up"
+        exit 1
+    fi
+}
+
+main "$@"
