@@ -1,0 +1,79 @@
+{
+  "name": "@blockstop/design-system",
+  "version": "1.0.0",
+  "description": "BlockStop Design System - Production-grade component library",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    },
+    "./tokens": "./tokens",
+    "./tailwind": "./tailwind.config.ts"
+  },
+  "files": [
+    "dist",
+    "components",
+    "tokens",
+    "utils",
+    "tailwind.config.ts",
+    "index.ts",
+    "README.md"
+  ],
+  "scripts": {
+    "dev": "next dev",
+    "build": "tsc && tsup src/index.ts --format esm,cjs --dts",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "lint": "eslint . --ext .ts,.tsx",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": [
+    "react",
+    "components",
+    "design-system",
+    "tailwind",
+    "typescript",
+    "blockstop",
+    "ui"
+  ],
+  "author": "BlockStop Inc.",
+  "license": "PROPRIETARY",
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "devDependencies": {
+    "@storybook/addon-a11y": "^8.0.0",
+    "@storybook/addon-essentials": "^8.0.0",
+    "@storybook/addon-interactions": "^8.0.0",
+    "@storybook/addon-links": "^8.0.0",
+    "@storybook/react": "^8.0.0",
+    "@storybook/react-webpack5": "^8.0.0",
+    "@testing-library/jest-dom": "^6.0.0",
+    "@testing-library/react": "^14.0.0",
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "autoprefixer": "^10.4.0",
+    "eslint": "^8.0.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-react": "^7.33.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "postcss": "^8.4.0",
+    "postcss-loader": "^7.0.0",
+    "prettier": "^3.0.0",
+    "tailwindcss": "^3.3.0",
+    "tsup": "^7.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^0.34.0"
+  },
+  "dependencies": {}
+}

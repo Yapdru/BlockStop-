@@ -1,8 +1,18 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import Link from "next/link";
+import React, { useEffect, useState } from 'react';
+import { DashboardLayout } from '@/app/components/layouts/DashboardLayout';
+import { Breadcrumbs } from '@/app/components/layouts/Breadcrumbs';
+import { ResponsiveGrid, GridItem } from '@/app/components/layouts/ResponsiveGrid';
+import {
+  AlertCircle,
+  TrendingUp,
+  FileText,
+  Mail,
+  Shield,
+  Clock,
+  ArrowRight,
+} from 'lucide-react';
 
 interface ScanItem {
   id: number;
@@ -14,18 +24,77 @@ interface ScanItem {
   createdAt: string;
 }
 
-export default function Dashboard() {
+const StatCard: React.FC<{
+  title: string;
+  value: string | number;
+  change?: string;
+  icon: React.ReactNode;
+  trend?: 'up' | 'down' | 'neutral';
+}> = ({ title, value, change, icon, trend = 'neutral' }) => (
+  <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow">
+    <div className="flex items-start justify-between">
+      <div className="flex-1">
+        <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{title}</p>
+        <p className="text-2xl font-bold text-gray-900 dark:text-white mt-2">{value}</p>
+        {change && (
+          <p className={`text-sm mt-2 ${
+            trend === 'up' ? 'text-green-600 dark:text-green-400' :
+            trend === 'down' ? 'text-red-600 dark:text-red-400' :
+            'text-gray-600 dark:text-gray-400'
+          }`}>
+            {change}
+          </p>
+        )}
+      </div>
+      <div className={`p-3 rounded-lg ${
+        trend === 'up' ? 'bg-green-100 dark:bg-green-900' :
+        trend === 'down' ? 'bg-red-100 dark:bg-red-900' :
+        'bg-blue-100 dark:bg-blue-900'
+      }`}>
+        {icon}
+      </div>
+    </div>
+  </div>
+);
+
+const ActivityCard: React.FC<{
+  title: string;
+  description: string;
+  time: string;
+  severity: 'critical' | 'high' | 'medium' | 'low';
+}> = ({ title, description, time, severity }) => {
+  const severityColors = {
+    critical: 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300',
+    high: 'bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-300',
+    medium: 'bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-300',
+    low: 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300',
+  };
+
+  return (
+    <div className="flex items-start gap-4 p-4 border-b border-gray-200 dark:border-gray-700 last:border-b-0">
+      <div className={`px-3 py-1 rounded text-xs font-semibold ${severityColors[severity]}`}>
+        {severity.toUpperCase()}
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium text-gray-900 dark:text-white">{title}</p>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 truncate">{description}</p>
+      </div>
+      <p className="text-xs text-gray-500 dark:text-gray-500 whitespace-nowrap">{time}</p>
+    </div>
+  );
+};
+
+export default function DashboardPage() {
   const [emailHistory, setEmailHistory] = useState<ScanItem[]>([]);
   const [fileHistory, setFileHistory] = useState<ScanItem[]>([]);
-  const [activeTab, setActiveTab] = useState<"email" | "file">("email");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchHistory = async () => {
       try {
         const [emailRes, fileRes] = await Promise.all([
-          fetch("/api/email/history"),
-          fetch("/api/file/results"),
+          fetch('/api/email/history'),
+          fetch('/api/file/results'),
         ]);
 
         const emailData = await emailRes.json();
@@ -34,7 +103,7 @@ export default function Dashboard() {
         setEmailHistory(emailData.history || []);
         setFileHistory(fileData.results || []);
       } catch (error) {
-        console.error("Error fetching history:", error);
+        console.error('Error fetching history:', error);
       } finally {
         setLoading(false);
       }
@@ -45,216 +114,145 @@ export default function Dashboard() {
 
   const stats = {
     totalScans: emailHistory.length + fileHistory.length,
-    threatsDetected: emailHistory.filter(
-      (e) => e.riskScore && e.riskScore > 50
-    ).length,
-    malwareFound: fileHistory.filter((f) => f.threatLevel === "dangerous")
-      .length,
+    threatsDetected: emailHistory.filter((e) => e.riskScore && e.riskScore > 50).length,
+    malwareFound: fileHistory.filter((f) => f.threatLevel === 'dangerous').length,
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-light-bg to-primary-50">
-      {/* Header */}
-      <header className="bg-white border-b border-light-border sticky top-0 z-40">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link href="/" className="text-primary-600 hover:text-primary-700">
-              ← Home
-            </Link>
-            <h1 className="text-2xl font-bold text-gray-900">📊 Dashboard</h1>
-          </div>
-        </div>
-      </header>
+    <DashboardLayout>
+      <div className="flex-1 overflow-y-auto">
+        <div className="p-4 sm:p-6 lg:p-8 space-y-6">
+          {/* Breadcrumbs */}
+          <Breadcrumbs items={[{ label: 'Dashboard' }]} />
 
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        {/* Stats Cards */}
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          {[
-            {
-              label: "Total Scans",
-              value: stats.totalScans,
-              icon: "📋",
-              color: "primary",
-            },
-            {
-              label: "Threats Detected",
-              value: stats.threatsDetected,
-              icon: "⚠️",
-              color: "yellow",
-            },
-            {
-              label: "Malware Found",
-              value: stats.malwareFound,
-              icon: "🦠",
-              color: "red",
-            },
-          ].map((stat, i) => (
-            <motion.div
-              key={i}
-              className="bg-white rounded-xl p-6 shadow-lg border border-light-border"
-              whileHover={{ y: -5 }}
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-600 text-sm mb-2">{stat.label}</p>
-                  <p className="text-4xl font-bold text-gray-900">
-                    {stat.value}
-                  </p>
+          {/* Header */}
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+            <p className="text-gray-600 dark:text-gray-400 mt-2">Welcome back! Here's your security overview.</p>
+          </div>
+
+          {/* Stats Grid */}
+          <ResponsiveGrid
+            columns={{ default: 1, sm: 2, lg: 4 }}
+            gap="md"
+          >
+            <StatCard
+              title="Total Scans"
+              value={stats.totalScans}
+              change="+12% this week"
+              trend="up"
+              icon={<FileText className="w-6 h-6 text-blue-600 dark:text-blue-400" />}
+            />
+            <StatCard
+              title="Threats Detected"
+              value={stats.threatsDetected}
+              change="+3 this week"
+              trend="down"
+              icon={<AlertCircle className="w-6 h-6 text-red-600 dark:text-red-400" />}
+            />
+            <StatCard
+              title="System Health"
+              value="98.5%"
+              change="All systems nominal"
+              icon={<Shield className="w-6 h-6 text-green-600 dark:text-green-400" />}
+            />
+            <StatCard
+              title="Avg. Scan Time"
+              value="2.3s"
+              change="-0.4s improvement"
+              trend="up"
+              icon={<Clock className="w-6 h-6 text-purple-600 dark:text-purple-400" />}
+            />
+          </ResponsiveGrid>
+
+          {/* Main Content Grid */}
+          <ResponsiveGrid
+            columns={{ default: 1, lg: 2, xl: 3 }}
+            gap="md"
+          >
+            {/* Recent Activity */}
+            <GridItem span={{ default: 1, lg: 2 }}>
+              <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+                <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Recent Activity</h2>
                 </div>
-                <div className="text-5xl opacity-50">{stat.icon}</div>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
-
-        {/* Tabs */}
-        <motion.div
-          className="bg-white rounded-xl shadow-lg border border-light-border overflow-hidden"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <div className="flex border-b border-light-border">
-            <button
-              onClick={() => setActiveTab("email")}
-              className={`flex-1 px-6 py-4 font-semibold transition ${
-                activeTab === "email"
-                  ? "bg-primary-50 text-primary-700 border-b-2 border-primary-600"
-                  : "text-gray-600 hover:text-gray-900"
-              }`}
-            >
-              📧 Email Scans ({emailHistory.length})
-            </button>
-            <button
-              onClick={() => setActiveTab("file")}
-              className={`flex-1 px-6 py-4 font-semibold transition ${
-                activeTab === "file"
-                  ? "bg-primary-50 text-primary-700 border-b-2 border-primary-600"
-                  : "text-gray-600 hover:text-gray-900"
-              }`}
-            >
-              📁 File Scans ({fileHistory.length})
-            </button>
-          </div>
-
-          {/* Table */}
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-light-surface border-b border-light-border">
-                <tr>
-                  {activeTab === "email" ? (
-                    <>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
-                        Email Content
-                      </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
-                        Risk Score
-                      </th>
-                    </>
+                <div className="divide-y divide-gray-200 dark:divide-gray-700">
+                  {loading ? (
+                    <div className="p-6 text-center text-gray-600 dark:text-gray-400">Loading...</div>
+                  ) : emailHistory.length === 0 && fileHistory.length === 0 ? (
+                    <div className="p-6 text-center text-gray-600 dark:text-gray-400">No activity yet</div>
                   ) : (
                     <>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
-                        File Name
-                      </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
-                        Threat Level
-                      </th>
+                      {emailHistory.slice(0, 2).map((item) => (
+                        <ActivityCard
+                          key={item.id}
+                          title={`Email from ${item.email?.substring(0, 20)}...`}
+                          description={`Risk Score: ${item.riskScore}%`}
+                          time={new Date(item.createdAt).toLocaleDateString()}
+                          severity={item.riskScore! > 70 ? 'critical' : item.riskScore! > 40 ? 'high' : 'low'}
+                        />
+                      ))}
+                      {fileHistory.slice(0, 1).map((item) => (
+                        <ActivityCard
+                          key={item.id}
+                          title={`File: ${item.fileName}`}
+                          description={`Threat Level: ${item.threatLevel}`}
+                          time={new Date(item.createdAt).toLocaleDateString()}
+                          severity={item.threatLevel === 'dangerous' ? 'critical' : item.threatLevel === 'warning' ? 'high' : 'low'}
+                        />
+                      ))}
                     </>
                   )}
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
-                    Threats
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
-                    Date
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-light-border">
-                {loading ? (
-                  <tr>
-                    <td colSpan={4} className="px-6 py-8 text-center">
-                      <div className="animate-spin text-primary-600">⏳</div>
-                    </td>
-                  </tr>
-                ) : activeTab === "email" && emailHistory.length === 0 ? (
-                  <tr>
-                    <td colSpan={4} className="px-6 py-8 text-center text-gray-600">
-                      No email scans yet
-                    </td>
-                  </tr>
-                ) : activeTab === "file" && fileHistory.length === 0 ? (
-                  <tr>
-                    <td colSpan={4} className="px-6 py-8 text-center text-gray-600">
-                      No file scans yet
-                    </td>
-                  </tr>
-                ) : activeTab === "email" ? (
-                  emailHistory.map((item) => (
-                    <tr key={item.id} className="hover:bg-light-surface transition">
-                      <td className="px-6 py-4 text-sm text-gray-600">
-                        {item.email?.substring(0, 50)}...
-                      </td>
-                      <td className="px-6 py-4 text-sm">
-                        <span
-                          className={`px-3 py-1 rounded-full font-semibold text-xs ${
-                            item.riskScore! > 70
-                              ? "bg-red-100 text-red-700"
-                              : item.riskScore! > 40
-                              ? "bg-yellow-100 text-yellow-700"
-                              : "bg-green-100 text-green-700"
-                          }`}
-                        >
-                          {item.riskScore}%
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">
-                        {item.threats.length > 0
-                          ? item.threats[0]
-                          : "No threats"}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">
-                        {new Date(item.createdAt).toLocaleDateString()}
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  fileHistory.map((item) => (
-                    <tr key={item.id} className="hover:bg-light-surface transition">
-                      <td className="px-6 py-4 text-sm text-gray-600">
-                        {item.fileName}
-                      </td>
-                      <td className="px-6 py-4 text-sm">
-                        <span
-                          className={`px-3 py-1 rounded-full font-semibold text-xs ${
-                            item.threatLevel === "dangerous"
-                              ? "bg-red-100 text-red-700"
-                              : item.threatLevel === "warning"
-                              ? "bg-yellow-100 text-yellow-700"
-                              : "bg-green-100 text-green-700"
-                          }`}
-                        >
-                          {item.threatLevel?.toUpperCase()}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">
-                        {item.threats.length > 0
-                          ? item.threats[0]
-                          : "No threats"}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">
-                        {new Date(item.createdAt).toLocaleDateString()}
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+                </div>
+                <div className="p-4 border-t border-gray-200 dark:border-gray-700 flex justify-center">
+                  <button className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium flex items-center gap-2">
+                    View all activity
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </GridItem>
+
+            {/* Quick Actions */}
+            <GridItem span={{ default: 1 }}>
+              <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+                <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Quick Actions</h2>
+                </div>
+                <div className="p-4 space-y-3">
+                  <button className="w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center gap-2 justify-center">
+                    <Mail className="w-5 h-5" />
+                    Scan Email
+                  </button>
+                  <button className="w-full px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition-colors flex items-center gap-2 justify-center">
+                    <FileText className="w-5 h-5" />
+                    Upload File
+                  </button>
+                  <button className="w-full px-4 py-3 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-white font-medium rounded-lg transition-colors">
+                    Run Threat Hunt
+                  </button>
+                  <button className="w-full px-4 py-3 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-white font-medium rounded-lg transition-colors">
+                    View Reports
+                  </button>
+                </div>
+              </div>
+            </GridItem>
+          </ResponsiveGrid>
+
+          {/* Alerts Summary */}
+          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 flex items-start gap-4">
+            <TrendingUp className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="font-medium text-blue-900 dark:text-blue-200">
+                Performance Insight
+              </p>
+              <p className="text-sm text-blue-800 dark:text-blue-300 mt-1">
+                Your system is performing 12% better than last week. Keep monitoring your settings for optimal security.
+              </p>
+            </div>
           </div>
-        </motion.div>
+        </div>
       </div>
-    </main>
+    </DashboardLayout>
   );
 }

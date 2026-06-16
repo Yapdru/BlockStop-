@@ -1,0 +1,243 @@
+/**
+ * BlockStop Content Script Styles
+ * Injected styles for Gmail integration
+ */
+
+/* Threat Badge Styles */
+.blockstop-threat-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-left: 8px;
+  transition: all 0.2s ease;
+}
+
+.blockstop-threat-badge.critical {
+  background-color: #fecaca;
+  color: #7f1d1d;
+  border: 1px solid #dc2626;
+}
+
+.blockstop-threat-badge.high {
+  background-color: #fed7aa;
+  color: #7c2d12;
+  border: 1px solid #ea580c;
+}
+
+.blockstop-threat-badge.medium {
+  background-color: #fef08a;
+  color: #713f12;
+  border: 1px solid #eab308;
+}
+
+.blockstop-threat-badge.low {
+  background-color: #bfdbfe;
+  color: #1e3a8a;
+  border: 1px solid #2563eb;
+}
+
+/* Highlighted Elements */
+.blockstop-threat-highlight {
+  background-color: #fee2e2 !important;
+  border: 2px solid #dc2626 !important;
+  padding: 2px 4px !important;
+  border-radius: 2px !important;
+}
+
+.blockstop-warning-highlight {
+  background-color: #fef3c7 !important;
+  border: 2px solid #eab308 !important;
+  padding: 2px 4px !important;
+  border-radius: 2px !important;
+}
+
+/* Scan Button */
+.blockstop-scan-btn {
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.blockstop-scan-btn:hover {
+  background-color: #1d4ed8;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+}
+
+.blockstop-scan-btn:active {
+  transform: scale(0.98);
+}
+
+/* Notification Styles */
+.blockstop-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 10000;
+  animation: slideIn 0.3s ease-out;
+}
+
+.blockstop-notification.critical {
+  background-color: #dc2626;
+  color: white;
+}
+
+.blockstop-notification.high {
+  background-color: #ea580c;
+  color: white;
+}
+
+.blockstop-notification.warning {
+  background-color: #eab308;
+  color: #713f12;
+}
+
+.blockstop-notification.info {
+  background-color: #2563eb;
+  color: white;
+}
+
+.blockstop-notification.success {
+  background-color: #16a34a;
+  color: white;
+}
+
+/* Animations */
+@keyframes slideIn {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Loading State */
+.blockstop-loading {
+  animation: spin 1s linear infinite;
+}
+
+.blockstop-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Gmail Integration Styles */
+.blockstop-email-container {
+  border-left: 4px solid transparent;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.blockstop-email-container.threat-critical {
+  border-left-color: #dc2626;
+  background-color: rgba(220, 38, 38, 0.02);
+}
+
+.blockstop-email-container.threat-high {
+  border-left-color: #ea580c;
+  background-color: rgba(234, 88, 12, 0.02);
+}
+
+.blockstop-email-container.threat-medium {
+  border-left-color: #eab308;
+  background-color: rgba(234, 179, 8, 0.02);
+}
+
+.blockstop-email-container.threat-low {
+  border-left-color: #2563eb;
+  background-color: rgba(37, 99, 235, 0.02);
+}
+
+.blockstop-email-container.safe {
+  border-left-color: #16a34a;
+  background-color: rgba(22, 163, 74, 0.02);
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+  .blockstop-notification {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+    width: calc(100% - 20px);
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .blockstop-threat-badge.critical {
+    background-color: #7f1d1d;
+    color: #fecaca;
+  }
+
+  .blockstop-threat-badge.high {
+    background-color: #7c2d12;
+    color: #fed7aa;
+  }
+
+  .blockstop-threat-badge.medium {
+    background-color: #713f12;
+    color: #fef08a;
+  }
+
+  .blockstop-threat-badge.low {
+    background-color: #1e3a8a;
+    color: #bfdbfe;
+  }
+
+  .blockstop-scan-btn {
+    background-color: #1d4ed8;
+  }
+
+  .blockstop-scan-btn:hover {
+    background-color: #1e40af;
+  }
+}
