@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth/next';
 import { subscriptionManager } from '@/lib/billing/subscription-manager';
 import { query } from '@/lib/db';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     const session = await getServerSession();
