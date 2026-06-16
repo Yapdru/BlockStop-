@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { ResultCard } from "@/components/ResultCard";
 
 export default function EmailChecker() {
   const [email, setEmail] = useState("");
@@ -76,41 +77,13 @@ export default function EmailChecker() {
 
         {/* Results */}
         {result && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-xl shadow-lg p-8"
-          >
-            <h3 className="text-2xl font-bold text-gray-900 mb-6">Analysis Result</h3>
-
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-light-surface rounded-lg border border-light-border">
-                <span className="font-semibold text-gray-700">Risk Score</span>
-                <span className={`text-3xl font-bold ${
-                  result.riskScore > 70 ? "text-red-600" :
-                  result.riskScore > 40 ? "text-yellow-600" :
-                  "text-green-600"
-                }`}>
-                  {result.riskScore}%
-                </span>
-              </div>
-
-              <div className="p-4 bg-light-surface rounded-lg border border-light-border">
-                <h4 className="font-semibold text-gray-900 mb-3">Threats Detected</h4>
-                <ul className="space-y-2">
-                  {result.threats?.map((threat: string, i: number) => (
-                    <li key={i} className="text-gray-700">
-                      • {threat}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <button className="w-full px-4 py-2 bg-primary-100 text-primary-700 rounded-lg hover:bg-primary-200 transition font-medium">
-                📥 Export Result
-              </button>
-            </div>
-          </motion.div>
+          <ResultCard
+            title="Email Analysis Result"
+            riskScore={result.riskScore}
+            threats={result.threats || []}
+            timestamp={result.timestamp}
+            details={result.analysis}
+          />
         )}
       </div>
     </main>
