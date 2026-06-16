@@ -32,9 +32,17 @@ export default function Home() {
           <h1 className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-primary-500 bg-clip-text text-transparent">
             🛡️ BlockStop PRO
           </h1>
-          <button className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition">
-            Sign In
-          </button>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/dashboard"
+              className="px-4 py-2 text-primary-600 hover:text-primary-700 font-semibold"
+            >
+              Dashboard
+            </Link>
+            <button className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition">
+              Sign In
+            </button>
+          </div>
         </nav>
       </header>
 
