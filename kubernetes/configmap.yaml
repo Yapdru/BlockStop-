@@ -1,0 +1,134 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: blockstop-config
+  namespace: blockstop
+  labels:
+    app: blockstop
+    component: config
+data:
+  LOG_LEVEL: "info"
+  ENVIRONMENT: "production"
+  NODE_ENV: "production"
+  WORKER_CONCURRENCY: "4"
+  QUEUE_POLL_INTERVAL: "5000"
+  API_PORT: "4000"
+  WEB_PORT: "3000"
+  MAX_UPLOAD_SIZE: "104857600"  # 100MB
+  RATE_LIMIT_WINDOW: "900000"    # 15 minutes
+  RATE_LIMIT_MAX_REQUESTS: "100"
+  SESSION_TIMEOUT: "3600000"     # 1 hour
+  JWT_EXPIRATION: "86400"         # 24 hours
+  REDIS_DB: "0"
+  DATABASE_POOL_MIN: "5"
+  DATABASE_POOL_MAX: "20"
+  DATABASE_IDLE_TIMEOUT: "30000"
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: blockstop-nginx-config
+  namespace: blockstop
+  labels:
+    app: blockstop
+    component: nginx
+data:
+  nginx.conf: |
+    user nginx;
+    worker_processes auto;
+    error_log /var/log/nginx/error.log warn;
+    pid /var/run/nginx.pid;
+
+    events {
+        worker_connections 4096;
+        use epoll;
+        multi_accept on;
+    }
+
+    http {
+        include /etc/nginx/mime.types;
+        default_type application/octet-stream;
+
+        log_format main '$remote_addr - $remote_user [$time_local] "$request" '
+                        '$status $body_bytes_sent "$http_referer" '
+                        '"$http_user_agent" "$http_x_forwarded_for"';
+
+        access_log /var/log/nginx/access.log main;
+
+        sendfile on;
+        tcp_nopush on;
+        tcp_nodelay on;
+        keepalive_timeout 65;
+        types_hash_max_size 2048;
+        client_max_body_size 100M;
+
+        gzip on;
+        gzip_vary on;
+        gzip_proxied any;
+        gzip_comp_level 6;
+        gzip_types text/plain text/css text/xml text/javascript
+                   application/json application/javascript application/xml+rss;
+
+        add_header X-Frame-Options "SAMEORIGIN" always;
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header X-XSS-Protection "1; mode=block" always;
+
+        upstream api_backend {
+            least_conn;
+            server api:4000 max_fails=3 fail_timeout=30s;
+            keepalive 32;
+        }
+
+        upstream web_backend {
+            least_conn;
+            server web:3000 max_fails=3 fail_timeout=30s;
+            keepalive 32;
+        }
+
+        server {
+            listen 80;
+            server_name _;
+
+            location /api/ {
+                proxy_pass http://api_backend;
+                proxy_http_version 1.1;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+            }
+
+            location / {
+                proxy_pass http://web_backend;
+                proxy_http_version 1.1;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            }
+
+            location = /health {
+                access_log off;
+                return 200 "OK";
+                add_header Content-Type text/plain;
+            }
+        }
+    }
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: blockstop-app-config
+  namespace: blockstop
+  labels:
+    app: blockstop
+    component: app
+data:
+  API_TIMEOUT: "30000"
+  ENABLE_METRICS: "true"
+  ENABLE_TRACING: "true"
+  TRACE_SAMPLE_RATE: "0.1"
+  CORS_ENABLED: "true"
+  CSRF_PROTECTION: "true"
+  SECURITY_HEADERS: "true"

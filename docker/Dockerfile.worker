@@ -1,0 +1,81 @@
+# BlockStop Worker Service - Multi-stage Dockerfile
+# Background job processing container
+
+# Stage 1: Builder
+FROM node:18-alpine AS builder
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+COPY tsconfig.json ./
+
+# Install dependencies
+RUN npm ci
+
+# Copy source code
+COPY lib ./lib
+COPY types ./types
+
+# Build TypeScript if needed
+RUN if [ -f tsconfig.json ]; then npm run build 2>/dev/null || true; fi
+
+# Stage 2: Runtime
+FROM node:18-alpine AS runtime
+
+WORKDIR /app
+
+# Install runtime dependencies for worker processing
+RUN apk add --no-cache \
+    dumb-init \
+    curl \
+    bash \
+    postgresql-client \
+    ffmpeg \
+    imagemagick \
+    libgomp
+
+# Copy package files
+COPY package*.json ./
+
+# Install production dependencies
+RUN npm ci --only=production && \
+    npm cache clean --force
+
+# Copy built code
+COPY --from=builder /app/lib ./lib
+COPY --from=builder /app/types ./types
+
+# Create non-root user for security
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S worker -u 1001
+
+# Set ownership
+RUN chown -R worker:nodejs /app
+
+# Create worker logs directory
+RUN mkdir -p /var/log/blockstop/worker && \
+    chown -R worker:nodejs /var/log/blockstop
+
+USER worker
+
+# Environment variables
+ENV NODE_ENV=production
+ENV WORKER_CONCURRENCY=4
+ENV QUEUE_POLL_INTERVAL=5000
+ENV LOG_LEVEL=info
+
+# Health check - workers may not expose HTTP, so check process
+HEALTHCHECK --interval=60s --timeout=10s --start-period=30s --retries=3 \
+    CMD ps aux | grep "worker" | grep -v grep || exit 1
+
+# Use dumb-init to handle signals properly
+ENTRYPOINT ["/usr/sbin/dumb-init", "--"]
+
+# Start worker service
+CMD ["node", "lib/worker.js"]
+
+# Metadata
+LABEL org.blockstop.image="blockstop-worker" \
+      org.blockstop.version="1.0.0" \
+      org.blockstop.description="BlockStop Worker Service" \
+      maintainer="BlockStop Team <dev@blockstop.io>"

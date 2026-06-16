@@ -1,0 +1,192 @@
+version: '3.9'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: blockstop-postgres
+    environment:
+      POSTGRES_DB: ${DB_NAME:-blockstop}
+      POSTGRES_USER: ${DB_USER:-blockstop}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-secure_password}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/migrations:/docker-entrypoint-initdb.d
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    networks:
+      - blockstop-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-blockstop}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      POSTGRES_INITDB_ARGS: "-c shared_buffers=256MB -c max_connections=200"
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: blockstop-redis
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-redis_secure}
+    volumes:
+      - redis_data:/data
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    networks:
+      - blockstop-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+
+  # Express API Server
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    container_name: blockstop-api
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${DB_USER:-blockstop}:${DB_PASSWORD:-secure_password}@postgres:5432/${DB_NAME:-blockstop}
+      REDIS_URL: redis://:${REDIS_PASSWORD:-redis_secure}@redis:6379
+      API_PORT: 4000
+      LOG_LEVEL: info
+      ENVIRONMENT: production
+    ports:
+      - "${API_PORT:-4000}:4000"
+    networks:
+      - blockstop-network
+    volumes:
+      - api_logs:/var/log/blockstop
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+
+  # Next.js Web Application
+  web:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.web
+    container_name: blockstop-web
+    depends_on:
+      - api
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_API_URL: http://api:4000
+      PORT: 3000
+    ports:
+      - "${WEB_PORT:-3000}:3000"
+    networks:
+      - blockstop-network
+    volumes:
+      - web_logs:/var/log/blockstop
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+
+  # Worker Service
+  worker:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker
+    container_name: blockstop-worker
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${DB_USER:-blockstop}:${DB_PASSWORD:-secure_password}@postgres:5432/${DB_NAME:-blockstop}
+      REDIS_URL: redis://:${REDIS_PASSWORD:-redis_secure}@redis:6379
+      WORKER_CONCURRENCY: 4
+      LOG_LEVEL: info
+    networks:
+      - blockstop-network
+    volumes:
+      - worker_logs:/var/log/blockstop
+      - worker_tmp:/tmp/blockstop
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: blockstop-nginx
+    depends_on:
+      - web
+      - api
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/ssl:/etc/nginx/ssl:ro
+      - nginx_logs:/var/log/nginx
+    networks:
+      - blockstop-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    security_opt:
+      - no-new-privileges:true
+
+networks:
+  blockstop-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  api_logs:
+    driver: local
+  web_logs:
+    driver: local
+  worker_logs:
+    driver: local
+  worker_tmp:
+    driver: local
+  nginx_logs:
+    driver: local

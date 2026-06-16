@@ -1,0 +1,147 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: blockstop-sa
+  namespace: blockstop
+  labels:
+    app: blockstop
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: blockstop-role
+  namespace: blockstop
+  labels:
+    app: blockstop
+rules:
+# ConfigMap access
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["get", "list", "watch"]
+  resourceNames: ["blockstop-config", "blockstop-nginx-config", "blockstop-app-config"]
+
+# Secret access
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get", "list"]
+  resourceNames:
+    - blockstop-db-secret
+    - blockstop-redis-secret
+    - blockstop-app-secret
+    - blockstop-smtp-secret
+    - blockstop-oauth-secret
+
+# Pod access for inter-pod communication
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list", "watch"]
+
+# Service discovery
+- apiGroups: [""]
+  resources: ["services", "endpoints"]
+  verbs: ["get", "list", "watch"]
+
+# Logs access
+- apiGroups: [""]
+  resources: ["pods/log"]
+  verbs: ["get", "list"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: blockstop-rolebinding
+  namespace: blockstop
+  labels:
+    app: blockstop
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: blockstop-role
+subjects:
+- kind: ServiceAccount
+  name: blockstop-sa
+  namespace: blockstop
+
+---
+# ClusterRole for cross-namespace access if needed
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: blockstop-cluster-role
+  labels:
+    app: blockstop
+rules:
+# Namespace viewing
+- apiGroups: [""]
+  resources: ["namespaces"]
+  verbs: ["get", "list", "watch"]
+
+# Event reading
+- apiGroups: [""]
+  resources: ["events"]
+  verbs: ["get", "list", "watch"]
+
+# Pod Disruption Budget reading
+- apiGroups: ["policy"]
+  resources: ["poddisruptionbudgets"]
+  verbs: ["get", "list", "watch"]
+
+# HPA reading
+- apiGroups: ["autoscaling"]
+  resources: ["horizontalpodautoscalers"]
+  verbs: ["get", "list", "watch"]
+
+# Deployment status
+- apiGroups: ["apps"]
+  resources: ["deployments", "deployments/status", "replicasets"]
+  verbs: ["get", "list", "watch"]
+
+# Metrics
+- apiGroups: ["metrics.k8s.io"]
+  resources: ["pods", "nodes"]
+  verbs: ["get", "list"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: blockstop-cluster-rolebinding
+  labels:
+    app: blockstop
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: blockstop-cluster-role
+subjects:
+- kind: ServiceAccount
+  name: blockstop-sa
+  namespace: blockstop
+
+---
+# Network Policy Admin for setting up network policies
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: blockstop-network-admin
+  namespace: blockstop
+rules:
+- apiGroups: ["networking.k8s.io"]
+  resources: ["networkpolicies"]
+  verbs: ["get", "list", "watch"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: blockstop-network-admin-binding
+  namespace: blockstop
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: blockstop-network-admin
+subjects:
+- kind: ServiceAccount
+  name: blockstop-sa
+  namespace: blockstop
