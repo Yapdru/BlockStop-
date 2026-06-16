@@ -1,0 +1,82 @@
+{
+  "expo": {
+    "name": "BlockStop",
+    "slug": "blockstop-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0a0a0a"
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow BlockStop to access your camera for scanning."
+        }
+      ],
+      [
+        "expo-file-system"
+      ],
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Allow BlockStop to use Face ID for authentication."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#3b82f6",
+          "sounds": [
+            "./assets/sounds/notification.wav"
+          ],
+          "modes": "default"
+        }
+      ],
+      [
+        "expo-haptics"
+      ]
+    ],
+    "permissions": [
+      "android.permission.CAMERA",
+      "android.permission.WRITE_EXTERNAL_STORAGE",
+      "android.permission.READ_EXTERNAL_STORAGE",
+      "android.permission.INTERNET",
+      "android.permission.ACCESS_NETWORK_STATE",
+      "android.permission.USE_BIOMETRIC",
+      "android.permission.POST_NOTIFICATIONS"
+    ],
+    "ios": {
+      "supportsTabletMode": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "Allow BlockStop to access your camera for scanning.",
+        "NSFaceIDUsageDescription": "Allow BlockStop to use Face ID for authentication.",
+        "NSPhotoLibraryUsageDescription": "Allow BlockStop to access your photos.",
+        "NSPhotoLibraryAddUsageDescription": "Allow BlockStop to save scan results."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.digitalconversation.blockstop",
+      "versionCode": 1
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "scheme": "blockstop",
+    "extra": {
+      "apiUrl": "https://api.blockstop.app",
+      "eas": {
+        "projectId": "blockstop-mobile-app"
+      }
+    }
+  }
+}

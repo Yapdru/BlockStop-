@@ -1,0 +1,32 @@
+{
+  "id": "threat-enrichment-example",
+  "name": "Threat Enrichment Example",
+  "version": "1.0.0",
+  "author": "BlockStop Team",
+  "description": "Example plugin that enriches threats with additional intelligence from external sources",
+  "type": "threat_enrichment",
+  "main": "index.ts",
+  "license": "MIT",
+  "repository": "https://github.com/blockstop/plugins",
+  "keywords": ["threat", "enrichment", "intelligence"],
+  "permissions": [
+    {
+      "resource": "threats",
+      "action": "read",
+      "description": "Read threat information"
+    },
+    {
+      "resource": "threats",
+      "action": "write",
+      "description": "Enrich threats with additional data"
+    },
+    {
+      "resource": "http",
+      "action": "execute",
+      "description": "Make HTTP requests to external APIs"
+    }
+  ],
+  "dependencies": {
+    "@blockstop/plugin-sdk": "^1.0.0"
+  }
+}

@@ -1,0 +1,145 @@
+name: Security Scan
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+  schedule:
+    - cron: '0 2 * * *'  # Daily at 2 AM UTC
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results.sarif'
+          category: 'trivy'
+
+      - name: Run Snyk security scan
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high
+        continue-on-error: true
+
+      - name: Run OWASP Dependency-Check
+        uses: dependency-check/Dependency-Check_Action@main
+        with:
+          project: 'BlockStop'
+          path: '.'
+          format: 'SARIF'
+          args: >
+            --enableExperimental
+        continue-on-error: true
+
+      - name: Upload Dependency-Check results
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'dependency-check-report.sarif'
+          category: 'dependency-check'
+        continue-on-error: true
+
+      - name: Run CodeQL analysis
+        uses: github/codeql-action/init@v2
+        with:
+          languages: 'javascript,typescript'
+
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@v2
+
+      - name: Run npm audit
+        run: |
+          npm audit --audit-level=moderate || true
+
+      - name: Check for secrets
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+          extra_args: --debug
+
+      - name: Container image scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'ghcr.io/${{ github.repository }}-web:latest'
+          format: 'sarif'
+          output: 'trivy-image-results.sarif'
+        continue-on-error: true
+
+      - name: Upload container scan results
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-image-results.sarif'
+          category: 'trivy-image'
+        continue-on-error: true
+
+      - name: Run SAST scan with semgrep
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: >-
+            p/security-audit
+            p/owasp-top-ten
+            p/typescript
+        continue-on-error: true
+
+      - name: Generate security report
+        run: |
+          cat > security-report.md << 'EOF'
+          # Security Scan Report
+
+          ## Summary
+          - Scan Date: $(date)
+          - Commit: ${{ github.sha }}
+          - Branch: ${{ github.ref_name }}
+
+          ## Scanning Tools
+          - Trivy (Container & Filesystem)
+          - Snyk
+          - OWASP Dependency-Check
+          - GitHub CodeQL
+          - npm audit
+          - TruffleHog (Secrets)
+          - Semgrep (SAST)
+
+          ## Results
+          Check GitHub Security tab for detailed findings.
+          EOF
+
+      - name: Comment PR with security results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '## Security Scan Results\n\nPlease review the security findings in the [Security](https://github.com/${{ github.repository }}/security) tab.'
+            })

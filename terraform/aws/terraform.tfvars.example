@@ -1,0 +1,64 @@
+# AWS Region
+aws_region = "us-east-1"
+
+# Environment
+environment = "production"  # dev, staging, production
+
+# Project Configuration
+project_name = "blockstop"
+
+# VPC Configuration
+vpc_cidr = "10.0.0.0/16"
+
+public_subnet_cidrs = [
+  "10.0.1.0/24",
+  "10.0.2.0/24",
+  "10.0.3.0/24"
+]
+
+private_subnet_cidrs = [
+  "10.0.11.0/24",
+  "10.0.12.0/24",
+  "10.0.13.0/24"
+]
+
+# EKS Configuration
+cluster_name       = "blockstop-cluster"
+kubernetes_version = "1.28"
+
+# On-demand node configuration
+node_group_desired_size = 3
+node_group_min_size     = 2
+node_group_max_size     = 10
+node_instance_types     = ["t3.large", "t3a.large"]
+
+# Spot instance configuration (for cost optimization)
+spot_node_desired_size = 2
+spot_node_min_size     = 1
+spot_node_max_size     = 20
+spot_instance_types    = ["t3.large", "t3a.large", "t2.large"]
+
+# RDS Configuration
+db_identifier         = "blockstop-postgres"
+db_name               = "blockstop"
+db_username           = "blockstop"
+db_instance_class     = "db.t3.medium"  # db.t3.large for production
+db_allocated_storage  = 100
+db_max_allocated_storage = 500
+db_engine_version     = "15.3"
+db_family             = "postgres15"
+db_major_version      = "15"
+backup_retention_days = 30
+
+# ElastiCache Configuration
+cache_identifier   = "blockstop-redis"
+redis_version      = "7.0"
+cache_node_type    = "cache.t3.medium"  # cache.r6g.large for production
+redis_parameter_group = "default.redis7"
+
+# Common Tags
+common_tags = {
+  Project = "BlockStop"
+  Owner   = "DevOps Team"
+  CostCenter = "Engineering"
+}

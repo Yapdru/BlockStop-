@@ -1,0 +1,165 @@
+name: Performance Testing
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+  schedule:
+    - cron: '0 3 * * *'  # Daily at 3 AM UTC
+
+jobs:
+  performance-test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: blockstop_test
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+
+      - name: Run load tests
+        run: npm run test:load
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/blockstop_test
+          REDIS_URL: redis://localhost:6379
+          TEST_TIMEOUT: 60000
+        continue-on-error: true
+
+      - name: Run performance benchmarks
+        run: npm run test:benchmark
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/blockstop_test
+          REDIS_URL: redis://localhost:6379
+        continue-on-error: true
+
+      - name: Analyze bundle size
+        run: |
+          npm run build:analyze 2>/dev/null || true
+
+      - name: Upload build analysis
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-analysis
+          path: |
+            .next/analyze/
+            coverage/
+        continue-on-error: true
+
+      - name: Run Lighthouse CI
+        uses: treosh/lighthouse-ci-action@v9
+        with:
+          configPath: './lighthouserc.json'
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+        continue-on-error: true
+
+      - name: Generate performance report
+        run: |
+          cat > performance-report.md << 'EOF'
+          # Performance Test Report
+
+          ## Test Results
+          - Test Date: $(date)
+          - Commit: ${{ github.sha }}
+          - Branch: ${{ github.ref_name }}
+
+          ## Tests Run
+          - Load Testing
+          - Performance Benchmarks
+          - Bundle Size Analysis
+          - Lighthouse Audit
+
+          ## Artifacts
+          - Build Analysis: Check artifacts
+          - Performance Data: Available in artifacts
+
+          EOF
+
+      - name: Comment PR with performance results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '## Performance Test Results\n\nPerformance tests completed. Download artifacts to review detailed results.\n\n- Load Tests\n- Benchmarks\n- Bundle Analysis\n- Lighthouse Audit'
+            })
+
+  lighthouse-audit:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Audit URL with Lighthouse
+        uses: treosh/lighthouse-ci-action@v9
+        with:
+          configPath: './lighthouserc.json'
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+        continue-on-error: true
+
+  k6-load-test:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run k6 load test
+        uses: grafana/k6-action@v0.3.0
+        with:
+          filename: ./tests/k6/load-test.js
+          cloud: true
+        env:
+          K6_CLOUD_TOKEN: ${{ secrets.K6_CLOUD_TOKEN }}
+        continue-on-error: true
+
+      - name: Upload results to Grafana Cloud
+        run: |
+          echo "Load test results uploaded to Grafana Cloud"
+        continue-on-error: true

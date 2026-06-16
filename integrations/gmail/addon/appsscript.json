@@ -1,0 +1,45 @@
+{
+  "timeZone": "America/New_York",
+  "dependencies": {
+    "libraries": [
+      {
+        "userSymbol": "Utilities",
+        "libraryId": "1B7FSrk5Zi6L1rSxxTDgDEUsPzlW4dVhkVDPFQvqQvU0VZF8-yD_W8w3Y"
+      }
+    ]
+  },
+  "exceptionLogging": "STACKDRIVER",
+  "runtimeVersion": "V8",
+  "oauthScopes": [
+    "https://www.googleapis.com/auth/gmail.modify",
+    "https://www.googleapis.com/auth/script.external_request",
+    "https://www.googleapis.com/auth/spreadsheets"
+  ],
+  "addOns": {
+    "common": {
+      "name": "BlockStop Security Scanner",
+      "description": "Scan email attachments for malware and threats",
+      "logoUrl": "https://blockstop.io/logo.png",
+      "homepageName": "BlockStop Dashboard",
+      "homepageUrl": "https://blockstop.io"
+    },
+    "gmail": {
+      "contextualTriggers": [
+        {
+          "unconditional": {},
+          "onTriggerFunction": "onGmailMessage"
+        }
+      ],
+      "composeTriggers": [
+        {
+          "selectActions": [
+            {
+              "text": "Scan for threats",
+              "runFunction": "scanAttachments"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

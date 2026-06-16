@@ -1,0 +1,23 @@
+{
+  "breakpoints": {
+    "xs": "320px",
+    "sm": "640px",
+    "md": "1024px",
+    "lg": "1280px",
+    "xl": "1536px"
+  },
+  "breakpointValues": {
+    "xs": 320,
+    "sm": 640,
+    "md": 1024,
+    "lg": 1280,
+    "xl": 1536
+  },
+  "mediaQueries": {
+    "xs": "@media (min-width: 320px)",
+    "sm": "@media (min-width: 640px)",
+    "md": "@media (min-width: 1024px)",
+    "lg": "@media (min-width: 1280px)",
+    "xl": "@media (min-width: 1536px)"
+  }
+}

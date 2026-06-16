@@ -1,0 +1,65 @@
+filebeat.inputs:
+- type: http_server
+  enabled: true
+  host: "0.0.0.0"
+  port: 5066
+  response_code: 202
+  response_body: "accepted"
+  read_timeout: 30s
+  write_timeout: 30s
+  shutdown_timeout: 30s
+
+  # URL path for receiving events
+  url: "/blockstop/events"
+
+  # TLS configuration
+  ssl.enabled: true
+  ssl.certificate: "/etc/filebeat/certs/server.crt"
+  ssl.key: "/etc/filebeat/certs/server.key"
+  ssl.verification_mode: "full"
+
+  # Request validation
+  auth.enabled: true
+  auth.type: "apiKey"
+  auth.api_key.header_name: "X-API-Key"
+
+  # Processors for event enhancement
+  processors:
+    - add_host_metadata:
+        netinfo.enabled: true
+    - add_docker_metadata: ~
+    - rename:
+        fields:
+          - from: "message"
+            to: "event.original"
+    - drop_fields:
+        fields:
+          - "agent.ephemeral_id"
+          - "agent.id"
+
+# Output to Elasticsearch
+output.elasticsearch:
+  enabled: true
+  hosts:
+    - "${ELASTICSEARCH_HOST:localhost:9200}"
+  username: "${ELASTICSEARCH_USERNAME:elastic}"
+  password: "${ELASTICSEARCH_PASSWORD:changeme}"
+  index: "blockstop-scan-%{+yyyy.MM.dd}"
+
+  # Pipeline for processing
+  pipeline: blockstop-scan-pipeline
+
+  # TLS configuration
+  ssl:
+    enabled: true
+    certificate_authorities: ["/etc/filebeat/certs/ca.crt"]
+    verification_mode: "full"
+
+# Logging
+logging.level: info
+logging.to_files: true
+logging.files:
+  path: /var/log/filebeat
+  name: filebeat
+  keepfiles: 7
+  permissions: 0640

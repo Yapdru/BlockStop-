@@ -1,0 +1,22 @@
+{
+  "id": "slack-notifier",
+  "name": "Slack Notifier",
+  "version": "1.0.0",
+  "author": "BlockStop Team",
+  "description": "Send threat notifications to Slack channels",
+  "type": "integration",
+  "main": "index.ts",
+  "license": "MIT",
+  "repository": "https://github.com/blockstop/plugins",
+  "keywords": ["slack", "notifications", "integration"],
+  "permissions": [
+    {
+      "resource": "threats",
+      "action": "read"
+    },
+    {
+      "resource": "http",
+      "action": "execute"
+    }
+  ]
+}

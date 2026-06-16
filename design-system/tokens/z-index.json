@@ -1,0 +1,21 @@
+{
+  "zIndex": {
+    "hide": "-1",
+    "base": "0",
+    "dropdown": "1000",
+    "sticky": "1020",
+    "fixed": "1030",
+    "tooltip": "1080",
+    "modal": "1040",
+    "popover": "1050",
+    "notification": "1090"
+  },
+  "layering": {
+    "background": "0",
+    "content": "10",
+    "overlay": "100",
+    "dropdown": "200",
+    "modal": "300",
+    "notification": "400"
+  }
+}

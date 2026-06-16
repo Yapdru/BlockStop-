@@ -1,0 +1,74 @@
+{
+  "manifest_version": 3,
+  "name": "BlockStop - Email & Content Security",
+  "version": "2.0.0",
+  "description": "Comprehensive threat detection and content scanning for Gmail and web",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting",
+    "tabs",
+    "webRequest"
+  ],
+  "host_permissions": [
+    "https://mail.google.com/*",
+    "https://gmail.google.com/*",
+    "*://*/*"
+  ],
+  "icons": {
+    "16": "public/icons/icon-16.png",
+    "48": "public/icons/icon-48.png",
+    "128": "public/icons/icon-128.png"
+  },
+  "background": {
+    "service_worker": "src/background.ts",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://mail.google.com/*",
+        "https://gmail.google.com/*"
+      ],
+      "js": ["src/content.ts"],
+      "css": ["src/styles/content.css"]
+    }
+  ],
+  "action": {
+    "default_popup": "src/pages/popup.html",
+    "default_title": "BlockStop Security Scanner"
+  },
+  "side_panel": {
+    "default_path": "src/pages/sidebar.html"
+  },
+  "options_page": "src/pages/options.html",
+  "commands": {
+    "quick-scan": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+B",
+        "mac": "Cmd+Shift+B"
+      },
+      "description": "Perform a quick security scan"
+    },
+    "scan-email": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+E",
+        "mac": "Cmd+Shift+E"
+      },
+      "description": "Scan current email"
+    },
+    "toggle-sidebar": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+S",
+        "mac": "Cmd+Shift+S"
+      },
+      "description": "Toggle sidebar panel"
+    }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["public/icons/*", "src/styles/*"],
+      "matches": ["https://mail.google.com/*", "https://gmail.google.com/*"]
+    }
+  ]
+}
