@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { ResultCard } from "@/components/ResultCard";
 
 export default function FileScanner() {
   const [file, setFile] = useState<File | null>(null);
@@ -132,60 +133,18 @@ export default function FileScanner() {
 
         {/* Results */}
         {result && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-xl shadow-lg p-8"
-          >
-            <h3 className="text-2xl font-bold text-gray-900 mb-6">Scan Result</h3>
-
-            <div className="space-y-4">
-              <div className={`flex items-center justify-between p-4 rounded-lg border-2 ${
-                result.threatLevel === "safe"
-                  ? "bg-green-50 border-green-200"
-                  : result.threatLevel === "warning"
-                  ? "bg-yellow-50 border-yellow-200"
-                  : "bg-red-50 border-red-200"
-              }`}>
-                <span className="font-semibold text-gray-700">Threat Level</span>
-                <span className={`text-2xl font-bold uppercase ${
-                  result.threatLevel === "safe"
-                    ? "text-green-600"
-                    : result.threatLevel === "warning"
-                    ? "text-yellow-600"
-                    : "text-red-600"
-                }`}>
-                  {result.threatLevel}
-                </span>
-              </div>
-
-              <div className="p-4 bg-light-surface rounded-lg border border-light-border">
-                <h4 className="font-semibold text-gray-900 mb-3">File Details</h4>
-                <div className="space-y-2 text-sm">
-                  <p><strong>Name:</strong> {result.fileName}</p>
-                  <p><strong>Type:</strong> {result.fileType}</p>
-                  <p><strong>Size:</strong> {result.fileSize}</p>
-                </div>
-              </div>
-
-              {result.threats && result.threats.length > 0 && (
-                <div className="p-4 bg-red-50 rounded-lg border border-red-200">
-                  <h4 className="font-semibold text-red-900 mb-3">⚠️ Threats Detected</h4>
-                  <ul className="space-y-2">
-                    {result.threats.map((threat: string, i: number) => (
-                      <li key={i} className="text-red-700 text-sm">
-                        • {threat}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              <button className="w-full px-4 py-2 bg-primary-100 text-primary-700 rounded-lg hover:bg-primary-200 transition font-medium">
-                📥 Export Result
-              </button>
-            </div>
-          </motion.div>
+          <ResultCard
+            title={`File Scan: ${result.fileName}`}
+            threatLevel={result.threatLevel}
+            threats={result.threats || []}
+            timestamp={result.scanTimestamp}
+            details={{
+              "File Type": result.fileType,
+              "File Size": result.fileSize,
+              "Malware Signatures": result.analysis?.malwareSignatures,
+              "Ransomware Risk": result.analysis?.ransomwareRisk,
+            }}
+          />
         )}
       </div>
     </main>
