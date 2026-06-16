@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { betterbotPro } from "@/lib/ai/betterbot-pro";
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,34 +13,33 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Mock BetterBot PRO analysis
-    const fileName = file.name;
-    const fileType = file.type || "unknown";
-    const fileSize = `${(file.size / 1024 / 1024).toFixed(2)} MB`;
+    // Convert file to buffer
+    const arrayBuffer = await file.arrayBuffer();
+    const fileBuffer = Buffer.from(arrayBuffer);
 
-    const threatLevels = ["safe", "warning", "dangerous"];
-    const threatLevel = threatLevels[Math.floor(Math.random() * threatLevels.length)];
-
-    const threats = [];
-    if (threatLevel !== "safe") {
-      if (file.name.toLowerCase().includes(".exe")) {
-        threats.push("Executable file detected - potential risk");
-      }
-      if (fileSize && parseInt(fileSize) > 50) {
-        threats.push("Suspiciously large file");
-      }
-      threats.push("Behavioral analysis inconclusive - manual review recommended");
+    // Check file size limit (50MB)
+    if (fileBuffer.length > 50 * 1024 * 1024) {
+      return NextResponse.json(
+        { error: "File too large (max 50MB)" },
+        { status: 413 }
+      );
     }
 
+    // Use real BetterBot PRO analysis
+    const result = await betterbotPro.scanFile(fileBuffer, file.name);
+
     return NextResponse.json({
-      fileName,
-      fileType,
-      fileSize,
-      threatLevel,
-      threats: threats.length > 0 ? threats : [],
+      fileName: file.name,
+      fileType: file.type || "unknown",
+      fileSize: `${(fileBuffer.length / 1024 / 1024).toFixed(2)} MB`,
+      threatLevel: result.threatLevel,
+      threats: result.threats,
+      analysis: result.analysis,
+      scanDetails: result.scanDetails,
       scanTimestamp: new Date().toISOString(),
     });
   } catch (error) {
+    console.error("File scan error:", error);
     return NextResponse.json(
       { error: "Failed to scan file" },
       { status: 500 }
