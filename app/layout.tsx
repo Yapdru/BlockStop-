@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Providers } from "./providers";
 
 export const metadata: Metadata = {
-  title: "BlockStop PRO - Email & File Security",
-  description: "Advanced email and file security analysis tool with DRAR AI and BetterBot PRO",
+  title: "BlockStop NEO - Email & File Security",
+  description: "Tiered security platform with email analysis, file scanning, team collaboration, and VPN integration",
 };
 
 export default function RootLayout({
@@ -14,7 +15,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="bg-light-bg text-gray-900">
-        {children}
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   );
