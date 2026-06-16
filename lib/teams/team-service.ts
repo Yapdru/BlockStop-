@@ -201,6 +201,147 @@ export class TeamService {
     const result = await query(query_text, [teamId]);
     return result.rows;
   }
+
+  /**
+   * Update team member role
+   */
+  async updateMemberRole(
+    teamId: number,
+    userId: number,
+    requesterUserId: number,
+    newRole: 'admin' | 'member'
+  ): Promise<boolean> {
+    // Check if requester is admin
+    const adminCheck = await query(
+      `SELECT role FROM team_members
+       WHERE team_id = $1 AND user_id = $2`,
+      [teamId, requesterUserId]
+    );
+
+    if (adminCheck.rows.length === 0 || adminCheck.rows[0].role !== 'admin') {
+      throw new Error('Only team admins can change member roles');
+    }
+
+    // Don't allow removing last admin
+    if (newRole !== 'admin') {
+      const adminCount = await query(
+        `SELECT COUNT(*) as count FROM team_members
+         WHERE team_id = $1 AND role = 'admin'`,
+        [teamId]
+      );
+
+      if (adminCount.rows[0].count === 1) {
+        throw new Error('Team must have at least one admin');
+      }
+    }
+
+    await query(
+      `UPDATE team_members SET role = $1
+       WHERE team_id = $2 AND user_id = $3`,
+      [newRole, teamId, userId]
+    );
+
+    return true;
+  }
+
+  /**
+   * Get team activity log
+   */
+  async getTeamActivityLog(
+    teamId: number,
+    limit: number = 50,
+    offset: number = 0
+  ): Promise<Array<{ id: number; userId: number; action: string; timestamp: Date }>> {
+    const result = await query(
+      `SELECT id, user_id as "userId", action, created_at as "timestamp"
+       FROM team_activity_logs
+       WHERE team_id = $1
+       ORDER BY created_at DESC
+       LIMIT $2 OFFSET $3`,
+      [teamId, limit, offset]
+    );
+
+    return result.rows;
+  }
+
+  /**
+   * Log team activity
+   */
+  async logTeamActivity(
+    teamId: number,
+    userId: number,
+    action: string
+  ): Promise<void> {
+    await query(
+      `INSERT INTO team_activity_logs (team_id, user_id, action)
+       VALUES ($1, $2, $3)`,
+      [teamId, userId, action]
+    );
+  }
+
+  /**
+   * Get team by ID
+   */
+  async getTeamById(teamId: number): Promise<Team | null> {
+    const result = await query(
+      `SELECT id, name, created_by as "createdBy", plan_id as "planId",
+              max_users as "maxUsers", created_at as "createdAt"
+       FROM teams WHERE id = $1`,
+      [teamId]
+    );
+
+    if (result.rows.length === 0) {
+      return null;
+    }
+
+    return result.rows[0];
+  }
+
+  /**
+   * Update team subscription
+   */
+  async updateTeamSubscription(teamId: number, planId: number): Promise<boolean> {
+    const result = await query(
+      `UPDATE teams SET plan_id = $1, updated_at = NOW() WHERE id = $2`,
+      [planId, teamId]
+    );
+
+    return result.rowCount > 0;
+  }
+
+  /**
+   * Get pending team invitations
+   */
+  async getPendingInvitations(teamId: number): Promise<Array<{
+    id: number;
+    email: string;
+    role: string;
+    createdAt: Date;
+    expiresAt: Date;
+  }>> {
+    const result = await query(
+      `SELECT id, email, role, created_at as "createdAt", expires_at as "expiresAt"
+       FROM team_invitations
+       WHERE team_id = $1 AND accepted = false AND expires_at > NOW()
+       ORDER BY created_at DESC`,
+      [teamId]
+    );
+
+    return result.rows;
+  }
+
+  /**
+   * Check if user is team admin
+   */
+  async isTeamAdmin(teamId: number, userId: number): Promise<boolean> {
+    const result = await query(
+      `SELECT role FROM team_members
+       WHERE team_id = $1 AND user_id = $2 AND role = 'admin'`,
+      [teamId, userId]
+    );
+
+    return result.rows.length > 0;
+  }
 }
 
 export const teamService = new TeamService();
