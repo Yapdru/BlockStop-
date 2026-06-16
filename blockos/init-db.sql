@@ -1,13 +1,29 @@
 -- BlockOS Database Initialization
--- PostgreSQL schema for BlockStop PRO
+-- PostgreSQL schema for BlockStop NEO
 
--- Create users table
+-- Create plans table (tier definitions)
+CREATE TABLE IF NOT EXISTS plans (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(50) UNIQUE NOT NULL,
+    max_users INTEGER DEFAULT 1,
+    price_monthly DECIMAL(10, 2) DEFAULT 0,
+    features_json JSONB,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create users table with auth support
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     email VARCHAR(255) UNIQUE NOT NULL,
     name VARCHAR(255),
+    plan_id INTEGER DEFAULT 1 REFERENCES plans(id),
+    auth_method VARCHAR(20) DEFAULT 'password',
+    password_hash VARCHAR(255),
+    google_id VARCHAR(255),
+    passkey_credential_id VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_login TIMESTAMP
 );
 
 -- Create email scan history table
@@ -74,9 +90,11 @@ CREATE TABLE IF NOT EXISTS statistics (
     average_risk_score DECIMAL(5, 2)
 );
 
--- Insert initial admin user (for development)
-INSERT INTO users (email, name) VALUES ('admin@blockstop.local', 'Administrator')
-ON CONFLICT (email) DO NOTHING;
+-- Insert plan tiers
+INSERT INTO plans (name, max_users, price_monthly, features_json) VALUES
+('free', 1, 0, '{"emailAnalysis": true, "fileScanning": true, "teamCollaboration": false, "twoFactor": false, "captchaRequired": false, "vpnIntegration": false, "wifiChecker": false, "advancedAnalytics": false}'),
+('pro', 6, 9.99, '{"emailAnalysis": true, "fileScanning": true, "teamCollaboration": true, "twoFactor": true, "captchaRequired": true, "vpnIntegration": true, "wifiChecker": true, "advancedAnalytics": true}')
+ON CONFLICT (name) DO NOTHING;
 
 -- Grant permissions to blockstop user
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO blockstop;
