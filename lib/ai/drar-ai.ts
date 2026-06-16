@@ -63,7 +63,6 @@ export class DrarAI {
   private calculateSpamScore(emailContent: string): number {
     let score = 0;
     const lowerContent = emailContent.toLowerCase();
-    const wordCount = emailContent.split(/\s+/).length;
 
     // ALL CAPS ratio
     const capsCount = (emailContent.match(/[A-Z]/g) || []).length;
@@ -105,8 +104,6 @@ export class DrarAI {
 
   private analyzeSenderReputation(senderEmail: string): string {
     if (!senderEmail) return "unknown";
-
-    const lowerSender = senderEmail.toLowerCase();
 
     // Red flags in sender
     if (senderEmail.includes(".tk") || senderEmail.includes(".ml")) {
