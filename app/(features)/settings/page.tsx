@@ -1,173 +1,129 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { motion } from "framer-motion";
-import Link from "next/link";
+import React from 'react';
+import Link from 'next/link';
+import { DashboardLayout } from '@/app/components/layouts/DashboardLayout';
+import { Breadcrumbs } from '@/app/components/layouts/Breadcrumbs';
+import { ResponsiveGrid, GridItem } from '@/app/components/layouts/ResponsiveGrid';
+import {
+  User,
+  Shield,
+  Bell,
+  Lock,
+  ChevronRight,
+  Users,
+  CreditCard,
+  Database,
+} from 'lucide-react';
 
-interface SettingsState {
-  emailNotifications: boolean;
-  autoScan: boolean;
-  threatLevel: string;
-  dataRetention: number;
-  theme: string;
-}
-
-export default function Settings() {
-  const [settings, setSettings] = useState<SettingsState>({
-    emailNotifications: true,
-    autoScan: false,
-    threatLevel: "medium",
-    dataRetention: 90,
-    theme: "light",
-  });
-
-  const [saved, setSaved] = useState(false);
-
-  const handleToggle = (key: keyof SettingsState) => {
-    setSettings(prev => ({ ...prev, [key]: !prev[key] }));
-    setSaved(false);
-  };
-
-  const handleChange = (key: keyof SettingsState, value: unknown) => {
-    setSettings(prev => ({ ...prev, [key]: value }));
-    setSaved(false);
-  };
-
-  const handleSave = () => {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
-  };
-
-  return (
-    <main className="min-h-screen bg-gradient-to-br from-light-bg to-primary-50">
-      <header className="bg-white border-b border-light-border sticky top-0 z-40">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center gap-4">
-          <Link href="/" className="text-primary-600 hover:text-primary-700">
-            ← Back
-          </Link>
-          <h1 className="text-2xl font-bold text-gray-900">⚙️ Settings</h1>
+const SettingCard: React.FC<{
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  href: string;
+}> = ({ icon, title, description, href }) => (
+  <Link href={href}>
+    <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow cursor-pointer group">
+      <div className="flex items-start justify-between mb-4">
+        <div className="p-3 bg-blue-100 dark:bg-blue-900/20 rounded-lg group-hover:bg-blue-200 dark:group-hover:bg-blue-900/30 transition-colors">
+          {icon}
         </div>
-      </header>
-
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="space-y-6"
-        >
-          {/* Notifications Section */}
-          <div className="bg-white rounded-xl shadow-lg p-6 border border-light-border">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">Notifications</h2>
-
-            <div className="space-y-4">
-              <label className="flex items-center justify-between p-4 bg-light-surface rounded-lg cursor-pointer hover:bg-primary-50 transition">
-                <div>
-                  <p className="font-semibold text-gray-900">Email Notifications</p>
-                  <p className="text-sm text-gray-600">Receive email alerts for threats</p>
-                </div>
-                <input
-                  type="checkbox"
-                  checked={settings.emailNotifications}
-                  onChange={() => handleToggle("emailNotifications")}
-                  className="w-6 h-6 text-primary-600"
-                />
-              </label>
-
-              <label className="flex items-center justify-between p-4 bg-light-surface rounded-lg cursor-pointer hover:bg-primary-50 transition">
-                <div>
-                  <p className="font-semibold text-gray-900">Auto-Scan Emails</p>
-                  <p className="text-sm text-gray-600">Automatically scan incoming emails</p>
-                </div>
-                <input
-                  type="checkbox"
-                  checked={settings.autoScan}
-                  onChange={() => handleToggle("autoScan")}
-                  className="w-6 h-6 text-primary-600"
-                />
-              </label>
-            </div>
-          </div>
-
-          {/* Security Section */}
-          <div className="bg-white rounded-xl shadow-lg p-6 border border-light-border">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">Security</h2>
-
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Threat Alert Level
-                </label>
-                <select
-                  value={settings.threatLevel}
-                  onChange={(e) => handleChange("threatLevel", e.target.value)}
-                  className="w-full px-4 py-2 border border-light-border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                >
-                  <option value="low">Low - Only critical threats</option>
-                  <option value="medium">Medium - Standard threats</option>
-                  <option value="high">High - All potential threats</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Data Retention (days)
-                </label>
-                <input
-                  type="number"
-                  value={settings.dataRetention}
-                  onChange={(e) => handleChange("dataRetention", parseInt(e.target.value))}
-                  min="1"
-                  max="365"
-                  className="w-full px-4 py-2 border border-light-border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                />
-                <p className="text-xs text-gray-600 mt-1">
-                  Scan history will be deleted after this period
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Appearance Section */}
-          <div className="bg-white rounded-xl shadow-lg p-6 border border-light-border">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">Appearance</h2>
-
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Theme
-              </label>
-              <select
-                value={settings.theme}
-                onChange={(e) => handleChange("theme", e.target.value)}
-                className="w-full px-4 py-2 border border-light-border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              >
-                <option value="light">Light Mode</option>
-                <option value="dark">Dark Mode</option>
-                <option value="auto">Auto (System)</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Save Button */}
-          <div className="flex justify-end gap-4">
-            {saved && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="px-4 py-2 bg-green-100 text-green-700 rounded-lg font-semibold"
-              >
-                ✓ Settings saved
-              </motion.div>
-            )}
-            <button
-              onClick={handleSave}
-              className="px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-semibold rounded-lg hover:shadow-lg transition"
-            >
-              Save Settings
-            </button>
-          </div>
-        </motion.div>
+        <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors" />
       </div>
-    </main>
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{title}</h3>
+      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{description}</p>
+    </div>
+  </Link>
+);
+
+export default function SettingsPage() {
+  return (
+    <DashboardLayout>
+      <div className="flex-1 overflow-y-auto">
+        <div className="p-4 sm:p-6 lg:p-8 space-y-6">
+          {/* Breadcrumbs */}
+          <Breadcrumbs items={[{ label: 'Settings' }]} />
+
+          {/* Header */}
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Settings</h1>
+            <p className="text-gray-600 dark:text-gray-400 mt-2">Manage your account and preferences</p>
+          </div>
+
+          {/* Account Settings */}
+          <div className="space-y-4">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Account</h2>
+            <ResponsiveGrid columns={{ default: 1, sm: 2 }} gap="md">
+              <SettingCard
+                icon={<User className="w-6 h-6 text-blue-600 dark:text-blue-400" />}
+                title="Profile"
+                description="Update your personal information"
+                href="/settings/account"
+              />
+              <SettingCard
+                icon={<Lock className="w-6 h-6 text-blue-600 dark:text-blue-400" />}
+                title="Security"
+                description="Password, 2FA, and login security"
+                href="/settings/security"
+              />
+            </ResponsiveGrid>
+          </div>
+
+          {/* Preferences */}
+          <div className="space-y-4">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Preferences</h2>
+            <ResponsiveGrid columns={{ default: 1, sm: 2 }} gap="md">
+              <SettingCard
+                icon={<Bell className="w-6 h-6 text-blue-600 dark:text-blue-400" />}
+                title="Notifications"
+                description="Email, push, and SMS alerts"
+                href="/settings/notifications"
+              />
+              <SettingCard
+                icon={<Database className="w-6 h-6 text-blue-600 dark:text-blue-400" />}
+                title="Privacy"
+                description="Data usage and privacy settings"
+                href="/settings/privacy"
+              />
+            </ResponsiveGrid>
+          </div>
+
+          {/* Team & Billing */}
+          <div className="space-y-4">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Organization</h2>
+            <ResponsiveGrid columns={{ default: 1, sm: 2 }} gap="md">
+              <SettingCard
+                icon={<Users className="w-6 h-6 text-blue-600 dark:text-blue-400" />}
+                title="Team"
+                description="Manage team members and roles"
+                href="/team"
+              />
+              <SettingCard
+                icon={<CreditCard className="w-6 h-6 text-blue-600 dark:text-blue-400" />}
+                title="Billing"
+                description="Payment method and invoices"
+                href="/billing"
+              />
+            </ResponsiveGrid>
+          </div>
+
+          {/* Danger Zone */}
+          <div className="p-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg space-y-4">
+            <h3 className="text-lg font-bold text-red-900 dark:text-red-200">Danger Zone</h3>
+            <p className="text-sm text-red-800 dark:text-red-300">
+              These actions cannot be undone. Please be careful.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <button className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors">
+                Export Data
+              </button>
+              <button className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors">
+                Delete Account
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </DashboardLayout>
   );
 }
