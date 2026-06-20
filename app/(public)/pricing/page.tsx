@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Button, Card, Badge } from '@/components';
+import { a11y } from '@/lib/a11y';
 
 const products = [
   {
@@ -83,6 +84,19 @@ export default function PricingPage() {
 
   return (
     <main className="min-h-screen bg-neutral-50">
+      <a
+        href="#pricing-cards"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary-500 focus:text-white focus:rounded"
+        onClick={(e) => {
+          e.preventDefault();
+          const cards = document.querySelector('#pricing-cards');
+          if (cards instanceof HTMLElement) {
+            cards.focus();
+          }
+        }}
+      >
+        Skip to pricing plans
+      </a>
       {/* Header */}
       <div className="bg-gradient-to-b from-primary-50 to-neutral-0 border-b border-neutral-200 py-16">
         <div className="container-max text-center">
@@ -96,10 +110,14 @@ export default function PricingPage() {
       <div className="container-max py-12">
         {/* Billing Toggle */}
         <div className="flex justify-center mb-12">
-          <div className="inline-flex rounded-lg border border-neutral-300 p-1 bg-neutral-0">
+          <fieldset className="inline-flex rounded-lg border border-neutral-300 p-1 bg-neutral-0">
+            <legend className="sr-only">Billing period</legend>
             <button
               onClick={() => setBillingPeriod('monthly')}
-              className={`px-6 py-2 rounded font-medium transition ${
+              role="radio"
+              aria-checked={billingPeriod === 'monthly'}
+              aria-label="Monthly billing"
+              className={`px-6 py-2 rounded font-medium transition focus:outline-none focus:ring-2 focus:ring-primary-500 ${
                 billingPeriod === 'monthly'
                   ? 'bg-primary-100 text-primary-700'
                   : 'text-neutral-600 hover:text-neutral-900'
@@ -109,28 +127,44 @@ export default function PricingPage() {
             </button>
             <button
               onClick={() => setBillingPeriod('annual')}
-              className={`px-6 py-2 rounded font-medium transition flex items-center gap-2 ${
+              role="radio"
+              aria-checked={billingPeriod === 'annual'}
+              aria-label="Annual billing - save 20 percent"
+              className={`px-6 py-2 rounded font-medium transition flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-accent-500 ${
                 billingPeriod === 'annual'
                   ? 'bg-accent-100 text-accent-700'
                   : 'text-neutral-600 hover:text-neutral-900'
               }`}
             >
               Annual
-              <Badge variant="success" className="text-xs">Save 20%</Badge>
+              <Badge variant="success" className="text-xs" aria-hidden="true">Save 20%</Badge>
             </button>
-          </div>
+          </fieldset>
         </div>
 
         {/* Pricing Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-5">
+        <div
+          id="pricing-cards"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-5"
+          role="region"
+          aria-label="Pricing plans"
+          tabIndex={-1}
+        >
           {products.map((product) => (
             <div
               key={product.id}
-              className={`relative animate-slideUp ${product.highlight ? 'lg:col-span-2 md:col-span-2' : ''}`}
+              className={`relative ${product.highlight ? 'lg:col-span-2 md:col-span-2' : ''}`}
             >
               {product.highlight && (
                 <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
-                  <Badge variant="primary" className="font-bold">⭐ MOST POPULAR</Badge>
+                  <Badge
+                    variant="primary"
+                    className="font-bold"
+                    role="status"
+                    aria-label="Most popular plan"
+                  >
+                    ⭐ MOST POPULAR
+                  </Badge>
                 </div>
               )}
 
@@ -138,13 +172,15 @@ export default function PricingPage() {
                 padding="lg"
                 className={`h-full flex flex-col transition ${
                   product.highlight
-                    ? 'border-2 border-accent-400 shadow-lg scale-105'
-                    : 'border-neutral-200 hover:border-primary-300'
+                    ? 'border-2 border-accent-400 shadow-lg scale-105 focus-within:ring-2 focus-within:ring-accent-500'
+                    : 'border-neutral-200 hover:border-primary-300 focus-within:ring-2 focus-within:ring-primary-500'
                 }`}
+                role="article"
+                aria-label={`${product.name} plan`}
               >
                 {/* Header */}
                 <div className="mb-6">
-                  <div className="text-4xl mb-2">{product.icon}</div>
+                  <div className="text-4xl mb-2" aria-hidden="true">{product.icon}</div>
                   <h3 className="text-xl font-bold text-neutral-900">{product.name}</h3>
                   <p className="text-sm text-neutral-600 mt-1">{product.description}</p>
                 </div>
@@ -163,16 +199,17 @@ export default function PricingPage() {
                     variant={product.highlight ? 'primary' : 'secondary'}
                     className="w-full"
                     size="md"
+                    aria-label={`${product.cta} for ${product.name} plan at ₹${product.price}`}
                   >
                     {product.cta}
                   </Button>
                 </Link>
 
                 {/* Features */}
-                <ul className="space-y-3 flex-1">
+                <ul className="space-y-3 flex-1" role="list">
                   {product.features.map((feature) => (
                     <li key={feature} className="flex items-start gap-2 text-sm">
-                      <span className="text-success font-bold mt-0.5">✓</span>
+                      <span className="text-success font-bold mt-0.5" aria-hidden="true">✓</span>
                       <span className="text-neutral-700">{feature}</span>
                     </li>
                   ))}
@@ -183,23 +220,44 @@ export default function PricingPage() {
         </div>
 
         {/* FAQ Section */}
-        <div className="mt-16 max-w-3xl mx-auto">
-          <h2 className="text-h3 font-bold text-neutral-900 mb-8 text-center">Frequently Asked Questions</h2>
-          <div className="space-y-4">
-            <Card padding="md" className="border-primary-200 bg-primary-50">
-              <p className="font-semibold text-neutral-900 mb-2">Can I upgrade or downgrade anytime?</p>
-              <p className="text-sm text-neutral-700">Yes! Change your plan at any time. Upgrades take effect immediately, downgrades at the end of your billing period.</p>
+        <section className="mt-16 max-w-3xl mx-auto" aria-labelledby="faq-heading">
+          <h2 id="faq-heading" className="text-h3 font-bold text-neutral-900 mb-8 text-center">
+            Frequently Asked Questions
+          </h2>
+          <div className="space-y-4" role="list">
+            <Card
+              padding="md"
+              className="border-primary-200 bg-primary-50 focus-within:ring-2 focus-within:ring-primary-500"
+              role="listitem"
+            >
+              <h3 className="font-semibold text-neutral-900 mb-2">Can I upgrade or downgrade anytime?</h3>
+              <p className="text-sm text-neutral-700">
+                Yes! Change your plan at any time. Upgrades take effect immediately, downgrades at the end of your
+                billing period.
+              </p>
             </Card>
-            <Card padding="md" className="border-accent-200 bg-accent-50">
-              <p className="font-semibold text-neutral-900 mb-2">What payment methods do you accept?</p>
-              <p className="text-sm text-neutral-700">We accept UPI, BHIM, Credit Cards, Debit Cards, and PayTM for secure payments in India.</p>
+            <Card
+              padding="md"
+              className="border-accent-200 bg-accent-50 focus-within:ring-2 focus-within:ring-accent-500"
+              role="listitem"
+            >
+              <h3 className="font-semibold text-neutral-900 mb-2">What payment methods do you accept?</h3>
+              <p className="text-sm text-neutral-700">
+                We accept UPI, BHIM, Credit Cards, Debit Cards, and PayTM for secure payments in India.
+              </p>
             </Card>
-            <Card padding="md" className="border-primary-200 bg-primary-50">
-              <p className="font-semibold text-neutral-900 mb-2">Do you offer discounts for annual billing?</p>
-              <p className="text-sm text-neutral-700">Yes! Annual plans save you 20% compared to monthly billing. Buy annual now and lock in the rate.</p>
+            <Card
+              padding="md"
+              className="border-primary-200 bg-primary-50 focus-within:ring-2 focus-within:ring-primary-500"
+              role="listitem"
+            >
+              <h3 className="font-semibold text-neutral-900 mb-2">Do you offer discounts for annual billing?</h3>
+              <p className="text-sm text-neutral-700">
+                Yes! Annual plans save you 20% compared to monthly billing. Buy annual now and lock in the rate.
+              </p>
             </Card>
           </div>
-        </div>
+        </section>
       </div>
     </main>
   );

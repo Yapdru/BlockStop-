@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Button, Card } from '@/components';
 import { ResultCard } from '@/components/ResultCard';
+import { a11y } from '@/lib/a11y';
 
 export default function FileScanner() {
   const [file, setFile] = useState<File | null>(null);
@@ -28,6 +29,7 @@ export default function FileScanner() {
     const files = e.dataTransfer.files;
     if (files && files[0]) {
       setFile(files[0]);
+      a11y.announce(`File selected: ${files[0].name}`, 'polite');
     }
   };
 
@@ -54,20 +56,39 @@ export default function FileScanner() {
   };
 
   return (
-    <main className="min-h-screen bg-neutral-50 pb-24 md:pb-0">
+    <main className="min-h-screen bg-neutral-50 pb-24 md:pb-0" id="main-content">
+      <a
+        href="#file-input"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary-500 focus:text-white focus:rounded"
+        onClick={(e) => {
+          e.preventDefault();
+          const input = document.querySelector('#file-input');
+          if (input instanceof HTMLElement) {
+            input.focus();
+          }
+        }}
+      >
+        Skip to file upload
+      </a>
       {/* Header */}
       <header className="bg-neutral-0 border-b border-neutral-200 sticky top-0 z-40">
         <div className="container-max py-4 flex items-center gap-4">
-          <Link href="/dashboard" className="text-primary-600 hover:text-primary-700 font-medium">
+          <Link
+            href="/dashboard"
+            className="text-primary-600 hover:text-primary-700 font-medium focus:outline-none focus:ring-2 focus:ring-primary-500 rounded"
+            aria-label="Back to dashboard"
+          >
             ← Back
           </Link>
-          <h1 className="text-h3 font-bold text-neutral-900">📁 File Scanner</h1>
+          <h1 className="text-h3 font-bold text-neutral-900">
+            <span aria-hidden="true">📁</span> File Scanner
+          </h1>
         </div>
       </header>
 
       <div className="container-max py-8">
         {/* Upload Section */}
-        <Card padding="lg" className="mb-8 animate-slideUp">
+        <Card padding="lg" className="mb-8">
           <h2 className="text-h4 font-bold text-neutral-900 mb-4">Scan Files for Threats</h2>
           <p className="text-neutral-600 text-sm mb-6">
             Check your files for malware, ransomware, and suspicious patterns using BetterBot PRO
@@ -79,7 +100,17 @@ export default function FileScanner() {
               onDragLeave={handleDrag}
               onDragOver={handleDrag}
               onDrop={handleDrop}
-              className={`relative border-2 border-dashed rounded-lg p-12 text-center transition ${
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  const input = document.querySelector('#file-input') as HTMLInputElement;
+                  input?.click();
+                }
+              }}
+              role="button"
+              aria-label="Drag and drop file upload area, or press Enter to browse files"
+              aria-disabled={loading}
+              className={`relative border-2 border-dashed rounded-lg p-12 text-center transition focus:outline-none focus:ring-2 focus:ring-primary-500 ${
                 dragActive
                   ? 'border-primary-500 bg-primary-50'
                   : 'border-neutral-300 hover:border-primary-400 hover:bg-neutral-100/50'
@@ -87,12 +118,15 @@ export default function FileScanner() {
             >
               <input
                 type="file"
-                onChange={e => e.target.files && setFile(e.target.files[0])}
+                onChange={e => {
+                  e.target.files && setFile(e.target.files[0]);
+                  a11y.announce(`File selected: ${e.target.files?.[0]?.name}`, 'polite');
+                }}
                 className="hidden"
                 id="file-input"
               />
               <label htmlFor="file-input" className="cursor-pointer block">
-                <div className="text-5xl mb-3">📤</div>
+                <div className="text-5xl mb-3" aria-hidden="true">📤</div>
                 <p className="text-lg font-semibold text-neutral-900 mb-1">
                   Drag your file here
                 </p>
@@ -100,9 +134,9 @@ export default function FileScanner() {
               </label>
 
               {file && (
-                <div className="mt-6 p-4 bg-success/10 border border-success/20 rounded-lg animate-slideUp">
+                <div className="mt-6 p-4 bg-success/10 border border-success/20 rounded-lg" role="status">
                   <p className="text-sm font-medium text-neutral-900">
-                    ✓ Selected: {file.name}
+                    <span aria-hidden="true">✓</span> Selected: {file.name}
                   </p>
                   <p className="text-xs text-neutral-600 mt-1">
                     {(file.size / 1024 / 1024).toFixed(2)} MB
@@ -118,6 +152,8 @@ export default function FileScanner() {
               isLoading={loading}
               disabled={!file}
               className="w-full"
+              aria-label={loading ? 'Scanning file, please wait' : 'Scan file for threats'}
+              aria-busy={loading}
             >
               {loading ? 'Scanning file...' : '🔍 Scan File'}
             </Button>
@@ -126,8 +162,10 @@ export default function FileScanner() {
 
         {/* Results */}
         {result && (
-          <div className="animate-slideUp">
-            <h2 className="text-h4 font-bold text-neutral-900 mb-4">Scan Results</h2>
+          <section role="region" aria-labelledby="results-heading" aria-live="polite">
+            <h2 id="results-heading" className="text-h4 font-bold text-neutral-900 mb-4">
+              Scan Results
+            </h2>
             <ResultCard
               title={`File Scan: ${result.fileName}`}
               threatLevel={result.threatLevel}
@@ -143,11 +181,16 @@ export default function FileScanner() {
 
             {/* Action Buttons */}
             <div className="mt-6 flex gap-3">
-              <Button variant="secondary" onClick={() => setResult(null)}>
+              <Button
+                variant="secondary"
+                onClick={() => setResult(null)}
+                aria-label="Scan another file"
+              >
                 ← Scan Another File
               </Button>
               <Link href="/email-checker">
-                <Button variant="secondary">Check Email →</Button>
+                <Button variant="secondary" aria-label="Go to email checker">
+                  Check Email →</Button>
               </Link>
             </div>
           </div>

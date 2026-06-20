@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button, Card, Input, Badge } from '@/components';
+import { a11y } from '@/lib/a11y';
 
 interface TwoFactorStatus {
   enabled: boolean;
@@ -137,28 +138,53 @@ export default function SecuritySettings() {
   }
 
   return (
-    <main className="min-h-screen bg-neutral-50 pb-24 md:pb-0">
+    <main className="min-h-screen bg-neutral-50 pb-24 md:pb-0" id="main-content">
+      {/* Skip to main content link */}
+      <a
+        href="#main-content"
+        className="absolute top-0 left-0 p-2 bg-primary-600 text-white rounded-b-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 -translate-y-full focus:translate-y-0 transition-transform"
+        aria-label="Skip to main content"
+      >
+        Skip to main content
+      </a>
+
       {/* Header */}
       <header className="bg-neutral-0 border-b border-neutral-200 sticky top-0 z-40">
         <div className="container-max py-4 flex items-center gap-4">
-          <Link href="/settings" className="text-primary-600 hover:text-primary-700 font-medium">
+          <Link
+            href="/settings"
+            className="text-primary-600 hover:text-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 rounded font-medium"
+            aria-label="Back to settings"
+          >
             ← Back
           </Link>
-          <h1 className="text-h3 font-bold text-neutral-900">🔒 Security Settings</h1>
+          <h1 className="text-h3 font-bold text-neutral-900">
+            <span aria-hidden="true">🔒</span> Security Settings
+          </h1>
         </div>
       </header>
 
       <div className="container-max py-8 space-y-6">
         {/* Messages */}
         {error && (
-          <div className="bg-danger/10 border border-danger/20 text-danger p-4 rounded-lg animate-slideDown">
-            ❌ {error}
+          <div
+            className="bg-danger/10 border border-danger/20 text-danger p-4 rounded-lg"
+            role="alert"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            <span aria-hidden="true">❌</span> {error}
           </div>
         )}
 
         {success && (
-          <div className="bg-success/10 border border-success/20 text-success p-4 rounded-lg animate-slideDown">
-            ✅ {success}
+          <div
+            className="bg-success/10 border border-success/20 text-success p-4 rounded-lg"
+            role="alert"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            <span aria-hidden="true">✅</span> {success}
           </div>
         )}
 
@@ -184,16 +210,22 @@ export default function SecuritySettings() {
             )}
 
             {!twoFactorStatus.enabled ? (
-              <Button variant="primary" onClick={handleSetup2FA} className="w-full">
-                🔐 Enable 2FA
+              <Button
+                variant="primary"
+                onClick={handleSetup2FA}
+                className="w-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600"
+                aria-label="Enable two-factor authentication"
+              >
+                <span aria-hidden="true">🔐</span> Enable 2FA
               </Button>
             ) : (
               <Button
                 variant="danger"
                 onClick={() => setIsDisablingConfirm(true)}
-                className="w-full"
+                className="w-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-danger-600"
+                aria-label="Disable two-factor authentication"
               >
-                ⚠️ Disable 2FA
+                <span aria-hidden="true">⚠️</span> Disable 2FA
               </Button>
             )}
           </Card>
@@ -217,26 +249,31 @@ export default function SecuritySettings() {
             </div>
 
             <div className="mb-6">
-              <label className="block text-sm font-medium text-neutral-900 mb-2">
+              <label htmlFor="verification-code" className="block text-sm font-medium text-neutral-900 mb-2">
                 Verification Code <span className="text-xs text-neutral-600">(6 digits)</span>
               </label>
               <Input
+                id="verification-code"
                 type="text"
                 value={verificationToken}
                 onChange={(e) => setVerificationToken(e.target.value.replace(/\D/g, '').slice(0, 6))}
                 placeholder="000000"
                 maxLength={6}
                 className="text-center text-lg font-mono"
+                aria-describedby="code-hint"
               />
+              <p id="code-hint" className="text-xs text-neutral-600 mt-1">Enter the 6-digit code from your authenticator app</p>
             </div>
 
             <Button
               variant="primary"
               onClick={handleVerify2FA}
               disabled={isVerifying || verificationToken.length !== 6}
-              className="w-full"
+              className="w-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600"
+              aria-busy={isVerifying}
+              aria-label="Verify authentication code and enable two-factor authentication"
             >
-              {isVerifying ? 'Verifying...' : '✓ Verify & Enable 2FA'}
+              {isVerifying ? 'Verifying...' : <><span aria-hidden="true">✓</span> Verify & Enable 2FA</>}
             </Button>
           </Card>
         )}
@@ -267,10 +304,12 @@ export default function SecuritySettings() {
               onClick={() => {
                 navigator.clipboard.writeText(backupCodes.join('\n'));
                 setSuccess('Backup codes copied!');
+                a11y.announce('Backup codes copied to clipboard');
               }}
-              className="w-full"
+              className="w-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-600"
+              aria-label="Copy all backup codes to clipboard"
             >
-              📋 Copy All Codes
+              <span aria-hidden="true">📋</span> Copy All Codes
             </Button>
           </Card>
         )}
@@ -278,17 +317,24 @@ export default function SecuritySettings() {
         {/* Disable 2FA Confirmation */}
         {isDisablingConfirm && twoFactorStatus?.enabled && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <Card padding="lg" className="max-w-md w-full">
-              <h3 className="text-h5 font-bold text-danger mb-3">Disable 2FA?</h3>
+            <Card
+              padding="lg"
+              className="max-w-md w-full"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="disable-2fa-title"
+            >
+              <h3 id="disable-2fa-title" className="text-h5 font-bold text-danger mb-3">Disable 2FA?</h3>
               <p className="text-sm text-neutral-600 mb-6">
                 This will remove the extra security from your account. Confirm with your password.
               </p>
 
               <div className="mb-6">
-                <label className="block text-sm font-medium text-neutral-900 mb-2">
+                <label htmlFor="confirm-password-2fa" className="block text-sm font-medium text-neutral-900 mb-2">
                   Confirm Password
                 </label>
                 <Input
+                  id="confirm-password-2fa"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -299,18 +345,20 @@ export default function SecuritySettings() {
               <div className="flex gap-3">
                 <Button
                   variant="secondary"
-                  className="flex-1"
+                  className="flex-1 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-600"
                   onClick={() => {
                     setIsDisablingConfirm(false);
                     setPassword('');
                   }}
+                  aria-label="Cancel disable two-factor authentication"
                 >
                   Cancel
                 </Button>
                 <Button
                   variant="danger"
-                  className="flex-1"
+                  className="flex-1 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-danger-600"
                   onClick={handleDisable2FA}
+                  aria-label="Confirm disable two-factor authentication"
                 >
                   Disable
                 </Button>

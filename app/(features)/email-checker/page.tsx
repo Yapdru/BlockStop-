@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Button, Card, Input } from '@/components';
 import { ResultCard } from '@/components/ResultCard';
+import { a11y } from '@/lib/a11y';
 
 export default function EmailChecker() {
   const [email, setEmail] = useState('');
@@ -30,20 +31,39 @@ export default function EmailChecker() {
   };
 
   return (
-    <main className="min-h-screen bg-neutral-50 pb-24 md:pb-0">
+    <main className="min-h-screen bg-neutral-50 pb-24 md:pb-0" id="main-content">
+      <a
+        href="#email-input"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary-500 focus:text-white focus:rounded"
+        onClick={(e) => {
+          e.preventDefault();
+          const input = document.querySelector('#email-input');
+          if (input instanceof HTMLElement) {
+            input.focus();
+          }
+        }}
+      >
+        Skip to email input
+      </a>
       {/* Header */}
       <header className="bg-neutral-0 border-b border-neutral-200 sticky top-0 z-40">
         <div className="container-max py-4 flex items-center gap-4">
-          <Link href="/dashboard" className="text-primary-600 hover:text-primary-700 font-medium">
+          <Link
+            href="/dashboard"
+            className="text-primary-600 hover:text-primary-700 font-medium focus:outline-none focus:ring-2 focus:ring-primary-500 rounded"
+            aria-label="Back to dashboard"
+          >
             ← Back
           </Link>
-          <h1 className="text-h3 font-bold text-neutral-900">📧 Email Checker</h1>
+          <h1 className="text-h3 font-bold text-neutral-900">
+            <span aria-hidden="true">📧</span> Email Checker
+          </h1>
         </div>
       </header>
 
       <div className="container-max py-8">
         {/* Input Section */}
-        <Card padding="lg" className="mb-8 animate-slideUp">
+        <Card padding="lg" className="mb-8">
           <h2 className="text-h4 font-bold text-neutral-900 mb-4">Analyze Email Security</h2>
           <p className="text-neutral-600 text-sm mb-6">
             Check emails for phishing, malicious links, and suspicious patterns using DRAR AI
@@ -51,17 +71,20 @@ export default function EmailChecker() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-sm font-semibold text-neutral-900 mb-2">
+              <label htmlFor="email-input" className="block text-sm font-semibold text-neutral-900 mb-2">
                 Email Address or Content
               </label>
               <textarea
+                id="email-input"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 placeholder="Enter email address or paste entire email content..."
                 className="input w-full min-h-40 rounded-lg"
                 required
+                aria-required="true"
+                aria-describedby="email-hint"
               />
-              <p className="text-xs text-neutral-600 mt-2">
+              <p id="email-hint" className="text-xs text-neutral-600 mt-2">
                 💡 Tip: Paste full email headers for better analysis
               </p>
             </div>
@@ -72,6 +95,8 @@ export default function EmailChecker() {
               size="lg"
               isLoading={loading}
               className="w-full"
+              aria-label={loading ? 'Analyzing email' : 'Check email for threats'}
+              aria-busy={loading}
             >
               {loading ? 'Analyzing...' : '🔍 Check Email'}
             </Button>
@@ -80,8 +105,10 @@ export default function EmailChecker() {
 
         {/* Results Section */}
         {result && (
-          <div className="animate-slideUp">
-            <h2 className="text-h4 font-bold text-neutral-900 mb-4">Analysis Result</h2>
+          <section role="region" aria-labelledby="results-heading" aria-live="polite">
+            <h2 id="results-heading" className="text-h4 font-bold text-neutral-900 mb-4">
+              Analysis Result
+            </h2>
             <ResultCard
               title="Email Security Analysis"
               riskScore={result.riskScore}
@@ -92,14 +119,20 @@ export default function EmailChecker() {
 
             {/* Action Buttons */}
             <div className="mt-6 flex gap-3">
-              <Button variant="secondary" onClick={() => setResult(null)}>
+              <Button
+                variant="secondary"
+                onClick={() => setResult(null)}
+                aria-label="Analyze another email"
+              >
                 ← Analyze Another Email
               </Button>
               <Link href="/file-scanner">
-                <Button variant="secondary">Check File →</Button>
+                <Button variant="secondary" aria-label="Go to file scanner">
+                  Check File →
+                </Button>
               </Link>
             </div>
-          </div>
+          </section>
         )}
 
         {/* Empty State */}

@@ -27,6 +27,43 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: more) {
+  body {
+    --tw-text-opacity: 1;
+  }
+
+  .btn-primary {
+    @apply border-2 border-current;
+  }
+
+  .btn-secondary {
+    @apply border-2 border-current;
+  }
+
+  .focus-ring {
+    @apply focus:outline-4 focus:outline-offset-2;
+  }
+
+  button, a, [role="button"], [role="link"] {
+    @apply focus:outline-2 focus:outline-offset-1;
+  }
+}
+
+/* Enhanced Focus Indicators for Keyboard Navigation */
+@layer components {
+  .focus-visible-ring {
+    @apply focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary-500 focus-visible:ring-offset-2;
+  }
+
+  button, a, input, select, textarea, [role="button"], [role="link"], [role="tab"], [role="menuitem"] {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2;
+  }
 }
 
 /* Base Component Styles */
