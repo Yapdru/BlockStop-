@@ -87,7 +87,7 @@ export const PRODUCTS: Record<ProductTier, ProductConfig> = {
   office: {
     tier: 'office',
     name: 'BlockStop Office',
-    description: 'Enterprise office security',
+    description: 'Enterprise office security with BetterBot',
     monthlyPrice: 499,
     annualPrice: 4999,
     features: [
@@ -100,6 +100,8 @@ export const PRODUCTS: Record<ProductTier, ProductConfig> = {
       'Automated threat response',
       'Compliance automation',
       'Executive dashboards',
+      'BetterBot AI - Basic queries over threat data',
+      'Automated security insights',
       '24/7 managed services'
     ],
     maxTeamSize: 5000,
@@ -136,22 +138,24 @@ export const PRODUCTS: Record<ProductTier, ProductConfig> = {
     annualPrice: 2999,
     features: [
       'All Office features',
-      'BetterBot AI - Natural language data queries',
+      'BetterBot AI - Advanced natural language queries',
       'Custom threat intelligence generation',
       'Automated security recommendations',
-      'Smart feature auto-addition system',
+      'Smart feature auto-addition (₹5 per addition)',
       'Unlimited custom integrations',
       'Advanced ML threat hunting',
       'Real-time threat correlation',
       'Global threat intelligence feeds',
-      'Executive AI insights',
+      'Executive AI insights & custom reports',
       'Custom alert policies via AI',
       'Predictive threat analysis',
-      'Priority AI-powered support',
+      'BetterBot conversational threat analysis',
+      'AI-powered policy recommendations',
+      'Priority AI support team',
       'Available worldwide (except China)'
     ],
     maxTeamSize: 5000,
-    integrations: ['slack', 'teams', 'discord', 'gmail', 'outlook', 'google-drive', 'onedrive', 'dropbox', 'box', 'jira', 'servicenow', 'splunk', 'active-directory', 'okta', 'azure-ad', 'salesforce', 'epic-emr', 'cerner', 'siem', 'splunk', 'crowdstrike', 'okta', 'datadog']
+    integrations: ['slack', 'teams', 'discord', 'gmail', 'outlook', 'google-drive', 'onedrive', 'dropbox', 'box', 'jira', 'servicenow', 'splunk', 'active-directory', 'okta', 'azure-ad', 'salesforce', 'epic-emr', 'cerner', 'siem', 'crowdstrike', 'datadog']
   }
 };
 

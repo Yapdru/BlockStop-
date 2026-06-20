@@ -36,7 +36,7 @@ const products = [
     price: 499,
     period: '/month or ₹4,999/year',
     description: 'Enterprise on-premises',
-    features: ['All PRO features', 'On-premises deployment', 'Active Directory integration', 'File server scanning', 'Automated threat response', '24/7 managed services'],
+    features: ['All PRO features', 'On-premises deployment', 'Active Directory integration', 'BetterBot AI (basic)', 'Automated threat response', '24/7 managed services'],
     cta: 'Contact Sales',
     highlight: false
   },
@@ -54,7 +54,7 @@ const products = [
     price: 299,
     period: '/month or ₹2,999/year',
     description: 'Ultimate AI-powered security',
-    features: ['All OFFICE features', 'BetterBot AI natural language queries', 'Custom threat intelligence', 'Automated recommendations', 'Smart feature auto-addition', 'Available worldwide (except China)'],
+    features: ['All OFFICE features', 'BetterBot AI advanced (natural language + custom rules)', 'Smart feature auto-addition (₹5 each)', 'Custom threat intelligence engine', 'AI-powered policy generation', 'Available worldwide (except China)'],
     cta: 'Start MAX Trial',
     highlight: true
   }

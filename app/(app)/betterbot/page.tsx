@@ -94,8 +94,18 @@ export default function BetterBotAIPage() {
   return (
     <div className="max-w-4xl mx-auto p-6 h-screen flex flex-col">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">BetterBot AI</h1>
-        <p className="text-gray-400">Your intelligent security intelligence assistant</p>
+        <h1 className="text-3xl font-bold mb-2">🤖 BetterBot AI</h1>
+        <p className="text-gray-400">Your intelligent security intelligence assistant (Available on Office & MAX tiers)</p>
+        <div className="mt-4 flex gap-4">
+          <div className="flex-1 bg-slate-800 border border-slate-700 rounded p-3">
+            <p className="text-sm font-bold text-blue-400">BlockStop Office</p>
+            <p className="text-xs text-gray-400 mt-1">Basic AI queries • Threat analysis • Insights</p>
+          </div>
+          <div className="flex-1 bg-gradient-to-r from-purple-900/30 to-blue-900/30 border border-purple-600 rounded p-3">
+            <p className="text-sm font-bold text-purple-400">BlockStop MAX</p>
+            <p className="text-xs text-gray-300 mt-1">Advanced AI • Custom rules • Smart features • ₹5 auto-add</p>
+          </div>
+        </div>
       </div>
 
       {/* Chat Container */}
@@ -181,8 +191,13 @@ export default function BetterBotAIPage() {
       </div>
 
       {/* Info Banner */}
-      <div className="mt-4 bg-blue-900/20 border border-blue-700 rounded px-4 py-3 text-sm text-blue-400">
-        <p>💡 <strong>Pro tip:</strong> Ask BetterBot about your threat patterns, custom security recommendations, or request automatic feature additions tailored to your organization.</p>
+      <div className="mt-4 space-y-2">
+        <div className="bg-blue-900/20 border border-blue-700 rounded px-4 py-3 text-sm text-blue-400">
+          <p>💡 <strong>Pro tip:</strong> Ask BetterBot about your threat patterns, custom security recommendations, or request automatic feature additions.</p>
+        </div>
+        <div className="bg-purple-900/20 border border-purple-700 rounded px-4 py-3 text-sm text-purple-300">
+          <p><strong>MAX Exclusive:</strong> Use smart feature auto-addition (₹5 per feature) to automatically add security capabilities based on AI recommendations. Office users get essential insights only.</p>
+        </div>
       </div>
     </div>
   );
