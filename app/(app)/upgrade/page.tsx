@@ -28,6 +28,7 @@ export default function UpgradePage() {
   const [frequency, setFrequency] = useState<'monthly' | 'annual'>('monthly');
   const [selectedPayment, setSelectedPayment] = useState('upi');
   const [processing, setProcessing] = useState(false);
+  const [showQR, setShowQR] = useState(false);
   const router = useRouter();
 
   const product = products.find(p => p.id === selectedProduct);
@@ -35,6 +36,12 @@ export default function UpgradePage() {
   const saving = frequency === 'annual' ? Math.round((product?.price || 0) * 12 * 0.2) : 0;
 
   const handlePayment = async () => {
+    // Show QR code for PayTM
+    if (selectedPayment === 'paytm') {
+      setShowQR(true);
+      return;
+    }
+
     setProcessing(true);
     try {
       const userId = localStorage.getItem('userId');
@@ -57,8 +64,6 @@ export default function UpgradePage() {
           router.push(`/payment/upi/${data.transactionId}`);
         } else if (selectedPayment === 'bhim') {
           router.push(`/payment/bhim/${data.transactionId}`);
-        } else if (selectedPayment === 'paytm') {
-          router.push(`/payment/paytm/${data.transactionId}`);
         }
       }
     } catch (error) {
@@ -217,6 +222,52 @@ export default function UpgradePage() {
               </div>
             </Card>
           </section>
+
+
+          {/* PayTM QR Code Modal */}
+          {showQR && selectedPayment === 'paytm' && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" role="dialog" aria-modal="true" aria-labelledby="qr-title">
+              <Card padding="lg" className="max-w-sm w-full mx-4 relative">
+                <button
+                  onClick={() => setShowQR(false)}
+                  className="absolute top-4 right-4 text-neutral-600 hover:text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary-600"
+                  aria-label="Close PayTM QR code"
+                >
+                  ✕
+                </button>
+
+                <h2 id="qr-title" className="text-h4 font-bold text-neutral-900 mb-4 text-center">
+                  <span aria-hidden="true">📱</span> Scan to Pay
+                </h2>
+
+                <div className="bg-neutral-100 rounded-lg p-4 flex items-center justify-center mb-6 min-h-64">
+                  <img
+                    src="/images/paytm-qr/paytm-qr.jpg"
+                    alt="PayTM QR Code - Scan to pay"
+                    className="w-full h-full object-contain max-w-48"
+                  />
+                </div>
+
+                <div className="bg-primary-50 border border-primary-200 rounded-lg p-4 mb-6">
+                  <p className="text-sm text-neutral-700 text-center font-medium">
+                    <span aria-hidden="true">💰</span> Amount: <strong>₹{amount}</strong>
+                  </p>
+                  <p className="text-xs text-neutral-600 text-center mt-3">
+                    Open your PayTM app and scan this QR code to complete the payment.
+                  </p>
+                </div>
+
+                <Button
+                  variant="secondary"
+                  className="w-full"
+                  onClick={() => setShowQR(false)}
+                  aria-label="Close and go back to payment options"
+                >
+                  ← Back to Options
+                </Button>
+              </Card>
+            </div>
+          )}
 
           {/* Order Summary */}
           <aside className="lg:col-span-1">
