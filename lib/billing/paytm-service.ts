@@ -1,11 +1,16 @@
 import { getDb } from '@/lib/db';
 import crypto from 'crypto';
 
+export type PaymentMethodType = 'upi' | 'bhim' | 'paytm' | 'credit_card' | 'debit_card';
+
 export interface PayTMOrder {
   orderId: string;
   userId: string;
   amount: number;
   currency: string;
+  paymentMethod: PaymentMethodType;
+  product: string;
+  frequency: 'monthly' | 'annual';
   status: 'initiated' | 'pending' | 'success' | 'failed';
   paytmTransactionId?: string;
   createdAt: Date;
@@ -21,20 +26,33 @@ export class PayTMBillingService {
   async initializeOrder(
     userId: string,
     amount: number,
-    planType: 'pro_monthly' | 'pro_annual' = 'pro_monthly'
-  ): Promise<{ orderId: string; paytmUrl: string; checksum: string }> {
+    paymentMethod: PaymentMethodType,
+    product: string,
+    frequency: 'monthly' | 'annual' = 'monthly'
+  ): Promise<{ orderId: string; paytmUrl: string; checksum: string; paymentMethod: PaymentMethodType }> {
     const db = getDb();
     const orderId = `ORDER_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
     // Store order in database
     await db.query(
-      `INSERT INTO paytm_orders (id, user_id, plan_type, amount, status, created_at)
-       VALUES ($1, $2, $3, $4, $5, NOW())`,
-      [orderId, userId, planType, amount, 'initiated']
+      `INSERT INTO paytm_orders (id, user_id, payment_method, product, frequency, amount, status, created_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())`,
+      [orderId, userId, paymentMethod, product, frequency, amount, 'initiated']
     );
 
     // Generate checksum
     const checksum = this.generateChecksum(orderId, amount);
+
+    // Map payment method to PayTM channel
+    const channelMapping: Record<PaymentMethodType, string> = {
+      upi: 'UPI',
+      bhim: 'UPI', // BHIM is UPI-based
+      paytm: 'PAYTM',
+      credit_card: 'CREDITCARD',
+      debit_card: 'DEBITCARD'
+    };
+
+    const channel = channelMapping[paymentMethod];
 
     // Build PayTM URL with parameters
     const params = new URLSearchParams({
@@ -43,6 +61,7 @@ export class PayTMBillingService {
       CUST_ID: userId,
       TXN_AMOUNT: amount.toString(),
       CURRENCY: 'INR',
+      CHANNEL: channel,
       CALLBACK_URL: this.callbackUrl,
       CHECKSUM: checksum
     });
@@ -52,7 +71,8 @@ export class PayTMBillingService {
     return {
       orderId,
       paytmUrl,
-      checksum
+      checksum,
+      paymentMethod
     };
   }
 

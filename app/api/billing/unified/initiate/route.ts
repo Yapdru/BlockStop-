@@ -10,16 +10,16 @@ export async function POST(req: NextRequest) {
 
     const { method, product, frequency } = await req.json();
 
-    if (!method || !['upi', 'bhim', 'paytm', 'apple_pay'].includes(method)) {
+    if (!method || !['upi', 'bhim', 'paytm', 'apple_pay', 'credit_card', 'debit_card'].includes(method)) {
       return NextResponse.json(
-        { error: 'Valid payment method required (upi, bhim, paytm, apple_pay)' },
+        { error: 'Valid payment method required (upi, bhim, paytm, apple_pay, credit_card, debit_card)' },
         { status: 400 }
       );
     }
 
-    if (!product || !['free', 'neo', 'pro', 'office', 'health'].includes(product)) {
+    if (!product || !['free', 'neo', 'pro', 'office', 'health', 'max'].includes(product)) {
       return NextResponse.json(
-        { error: 'Valid product required (free, neo, pro, office, health)' },
+        { error: 'Valid product required (free, neo, pro, office, health, max)' },
         { status: 400 }
       );
     }
@@ -45,7 +45,9 @@ export async function POST(req: NextRequest) {
       upi: 'Scan QR or use UPI ID',
       bhim: 'Open BHIM app or use deep link',
       paytm: 'Redirect to PayTM gateway',
-      apple_pay: 'Use Apple Pay on iOS/Mac'
+      apple_pay: 'Use Apple Pay on iOS/Mac',
+      credit_card: 'Enter credit card details on PayTM',
+      debit_card: 'Enter debit card details on PayTM'
     };
 
     return NextResponse.json({

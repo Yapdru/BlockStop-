@@ -179,23 +179,8 @@ export class UnifiedPaymentService {
       [transactionId, userId, method, amount, 'INR', product, 'pending', frequency]
     );
 
-    // Route to appropriate payment processor
-    let paymentData: any;
-
-    switch (method) {
-      case 'upi':
-        paymentData = await this.initiateUPI(transactionId, amount, product);
-        break;
-      case 'bhim':
-        paymentData = await this.initiateBHIM(transactionId, amount, product);
-        break;
-      case 'paytm':
-        paymentData = await this.initiatePayTMTransfer(transactionId, amount, product);
-        break;
-      case 'apple_pay':
-        paymentData = await this.initiateApplePay(transactionId, amount, product);
-        break;
-    }
+    // Route all payments through PayTM gateway
+    const paymentData = await this.initiatePayTMPayment(userId, amount, method, product, frequency);
 
     return {
       id: transactionId,
@@ -306,6 +291,29 @@ export class UnifiedPaymentService {
          updated_at = NOW()`,
       [subscriptionId, userId, planId, 'active', currentPeriodEnd]
     );
+  }
+
+  private async initiatePayTMPayment(
+    userId: string,
+    amount: number,
+    method: PaymentMethod,
+    product: ProductTier,
+    frequency: 'monthly' | 'annual'
+  ): Promise<any> {
+    // Import PayTM service
+    const { PayTMBillingService } = await import('./paytm-service');
+    const paytmService = new PayTMBillingService();
+
+    // Initialize PayTM order for all payment methods
+    const order = await paytmService.initializeOrder(userId, amount, method, product, frequency);
+
+    return {
+      orderId: order.orderId,
+      paytmUrl: order.paytmUrl,
+      checksum: order.checksum,
+      paymentMethod: method,
+      message: `Redirecting to PayTM for ${method.toUpperCase()} payment`
+    };
   }
 
   getProductConfig(product: ProductTier): ProductConfig {
