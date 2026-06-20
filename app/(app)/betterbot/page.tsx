@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Button, Card, Badge } from '@/components';
+import { a11y } from '@/lib/a11y';
 
 interface Message {
   id: string;
@@ -74,34 +75,57 @@ export default function BetterBotAIPage() {
 
   return (
     <div className="min-h-screen bg-neutral-50 pb-24 md:pb-0 flex flex-col">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary-500 focus:text-white focus:rounded"
+        onClick={(e) => {
+          e.preventDefault();
+          const main = document.querySelector('#main-content');
+          if (main instanceof HTMLElement) {
+            main.focus();
+          }
+        }}
+      >
+        Skip to main content
+      </a>
+
       {/* Header */}
       <header className="bg-neutral-0 border-b border-neutral-200 sticky top-0 z-40">
         <div className="container-max py-4">
           <div className="flex items-center gap-2 mb-2">
-            <h1 className="text-h3 font-bold text-neutral-900">🤖 BetterBot AI</h1>
+            <h1 className="text-h3 font-bold text-neutral-900">
+              <span aria-hidden="true">🤖</span>
+              {' '}BetterBot AI
+            </h1>
           </div>
           <p className="text-sm text-neutral-600">Your intelligent security assistant</p>
         </div>
       </header>
 
       {/* Tier Info */}
-      <div className="container-max py-4">
+      <section className="container-max py-4" aria-label="Subscription tiers">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Card padding="md" className="border-primary-200 bg-primary-50">
-            <p className="font-semibold text-primary-900 text-sm mb-1">📚 BlockStop Office</p>
+            <p className="font-semibold text-primary-900 text-sm mb-1">
+              <span aria-hidden="true">📚</span>
+              {' '}BlockStop Office
+            </p>
             <p className="text-xs text-primary-700">Basic AI queries, threat analysis, security insights</p>
           </Card>
           <Card padding="md" className="border-accent-300 bg-accent-50">
-            <p className="font-semibold text-accent-900 text-sm mb-1">⭐ BlockStop MAX</p>
+            <p className="font-semibold text-accent-900 text-sm mb-1">
+              <span aria-hidden="true">⭐</span>
+              {' '}BlockStop MAX
+            </p>
             <p className="text-xs text-accent-700">Advanced AI, custom rules, smart feature auto-add (₹5)</p>
           </Card>
         </div>
-      </div>
+      </section>
 
       {/* Chat Area */}
-      <div className="container-max flex-1 flex flex-col py-4">
+      <main id="main-content" className="container-max flex-1 flex flex-col py-4" tabIndex={-1}>
         {/* Messages */}
-        <div className="flex-1 bg-neutral-0 border border-neutral-200 rounded-lg p-6 mb-4 overflow-y-auto space-y-4">
+        <div role="region" aria-label="Chat messages" aria-live="polite" className="flex-1 bg-neutral-0 border border-neutral-200 rounded-lg p-6 mb-4 overflow-y-auto space-y-4">
           {messages.map(message => (
             <div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
               <div
@@ -139,31 +163,37 @@ export default function BetterBotAIPage() {
           <div className="space-y-3">
             <div className="flex gap-2">
               <input
+                id="message-input"
                 type="text"
                 value={inputValue}
                 onChange={e => setInputValue(e.target.value)}
                 onKeyPress={e => e.key === 'Enter' && handleSendMessage()}
                 placeholder="Ask about threats, security recommendations..."
-                className="input flex-1"
+                className="input flex-1 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
                 disabled={isLoading}
+                aria-label="Message input"
+                aria-busy={isLoading}
               />
               <Button
                 onClick={handleSendMessage}
                 disabled={isLoading || !inputValue.trim()}
                 variant="primary"
                 size="md"
+                aria-label="Send message"
+                className="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
               >
                 Send
               </Button>
             </div>
 
             {/* Quick Actions */}
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2" role="region" aria-label="Quick prompts">
               {quickPrompts.map(prompt => (
                 <button
                   key={prompt.prompt}
                   onClick={() => setInputValue(prompt.prompt)}
-                  className="text-xs font-medium px-3 py-1 bg-neutral-100 text-neutral-700 hover:bg-primary-100 hover:text-primary-700 rounded-full transition"
+                  className="text-xs font-medium px-3 py-1 bg-neutral-100 text-neutral-700 hover:bg-primary-100 hover:text-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 rounded-full transition"
+                  aria-label={`Quick prompt: ${prompt.label}`}
                 >
                   {prompt.label}
                 </button>
@@ -171,21 +201,22 @@ export default function BetterBotAIPage() {
             </div>
           </div>
         </Card>
-      </div>
+      </main>
 
       {/* Info Banners */}
-      <div className="container-max py-4 space-y-3">
-        <div className="bg-primary-50 border border-primary-200 rounded-lg px-4 py-3">
+      <section className="container-max py-4 space-y-3" aria-label="Information banners">
+        <div className="bg-primary-50 border border-primary-200 rounded-lg px-4 py-3" role="region" aria-label="Pro tip">
           <p className="text-sm text-primary-900">
-            💡 <strong>Pro tip:</strong> Ask me about your threat patterns, security recommendations, or custom rules.
+            <span aria-hidden="true">💡</span>
+            {' '}<strong>Pro tip:</strong> Ask me about your threat patterns, security recommendations, or custom rules.
           </p>
         </div>
-        <div className="bg-accent-50 border border-accent-200 rounded-lg px-4 py-3">
+        <div className="bg-accent-50 border border-accent-200 rounded-lg px-4 py-3" role="region" aria-label="Premium feature information">
           <p className="text-sm text-accent-900">
             <strong>MAX Feature:</strong> Smart feature auto-addition automatically adds security capabilities based on AI recommendations (₹5 per feature).
           </p>
         </div>
-      </div>
+      </section>
     </div>
   );
 }

@@ -64,6 +64,20 @@ body {
   button, a, input, select, textarea, [role="button"], [role="link"], [role="tab"], [role="menuitem"] {
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2;
   }
+
+  /* Screen reader only content */
+  .sr-only {
+    @apply absolute -inset-1 h-1 w-1 overflow-hidden whitespace-nowrap border-0 p-0 clip;
+  }
+
+  .sr-only:focus {
+    @apply relative inset-auto h-auto w-auto overflow-visible whitespace-normal border-0 p-auto clip-auto bg-primary-500 text-white px-4 py-2 rounded z-50;
+  }
+
+  /* Focus visible for skip links */
+  a:focus:not(.sr-only) {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2;
+  }
 }
 
 /* Base Component Styles */

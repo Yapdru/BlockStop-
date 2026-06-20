@@ -151,13 +151,23 @@ export default function WiFiCheckerPage() {
         </div>
 
         {/* Networks List */}
-        <div className="space-y-4">
+        <div className="space-y-4" role="region" aria-label="WiFi networks">
           {networks.map((network) => (
             <Card
               key={network.id}
               padding="lg"
-              className="cursor-pointer transition hover:border-primary-300"
+              className="cursor-pointer transition hover:border-primary-300 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary-600"
               onClick={() => setSelectedNetwork(selectedNetwork?.id === network.id ? null : network)}
+              role="button"
+              aria-expanded={selectedNetwork?.id === network.id}
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  setSelectedNetwork(selectedNetwork?.id === network.id ? null : network);
+                }
+              }}
+              aria-label={`${network.isHidden ? 'Hidden' : network.ssid} network, ${getRiskLevel(network.riskScore)} risk`}
             >
               {/* Network Header */}
               <div className="flex items-start justify-between mb-4">
@@ -260,7 +270,7 @@ export default function WiFiCheckerPage() {
 
               {/* Expand Toggle */}
               <div className="text-center pt-2">
-                <p className="text-xs text-primary-600 font-medium cursor-pointer">
+                <p className="text-xs text-primary-600 font-medium cursor-pointer" aria-label={selectedNetwork?.id === network.id ? 'Collapse network details' : 'Expand network details'}>
                   {selectedNetwork?.id === network.id ? '▲ Collapse' : '▼ Details'}
                 </p>
               </div>
@@ -269,25 +279,29 @@ export default function WiFiCheckerPage() {
         </div>
 
         {/* Info Banner */}
-        <div className="mt-12 space-y-4">
-          <Card padding="lg" className="border-warning/20 bg-warning/5">
-            <h3 className="font-semibold text-neutral-900 mb-2">🛡️ WiFi Security Tips</h3>
+        <section className="mt-12 space-y-4">
+          <Card padding="lg" className="border-warning/20 bg-warning/5" role="region" aria-label="WiFi security tips">
+            <h3 className="font-semibold text-neutral-900 mb-2">
+              <span aria-hidden="true">🛡️</span> WiFi Security Tips
+            </h3>
             <ul className="text-sm text-neutral-700 space-y-2">
-              <li>✓ Only connect to networks you trust</li>
-              <li>✓ Use WPA3 encryption when available</li>
-              <li>✓ Disable auto-connect for public networks</li>
-              <li>✓ Use VPN on untrusted networks</li>
-              <li>✓ Keep your router firmware updated</li>
+              <li><span aria-hidden="true">✓</span> Only connect to networks you trust</li>
+              <li><span aria-hidden="true">✓</span> Use WPA3 encryption when available</li>
+              <li><span aria-hidden="true">✓</span> Disable auto-connect for public networks</li>
+              <li><span aria-hidden="true">✓</span> Use VPN on untrusted networks</li>
+              <li><span aria-hidden="true">✓</span> Keep your router firmware updated</li>
             </ul>
           </Card>
 
-          <Card padding="lg" className="border-primary-200 bg-primary-50">
-            <h3 className="font-semibold text-neutral-900 mb-2">📱 Mobile & Desktop Protection</h3>
+          <Card padding="lg" className="border-primary-200 bg-primary-50" role="region" aria-label="Mobile and desktop WiFi protection">
+            <h3 className="font-semibold text-neutral-900 mb-2">
+              <span aria-hidden="true">📱</span> Mobile & Desktop Protection
+            </h3>
             <p className="text-sm text-neutral-700">
               BlockStop monitors WiFi networks in real-time and alerts you to security risks before you connect.
             </p>
           </Card>
-        </div>
+        </section>
       </div>
     </main>
   );

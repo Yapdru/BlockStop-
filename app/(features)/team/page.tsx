@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button, Card, Badge, Input } from '@/components';
+import { a11y } from '@/lib/a11y';
 
 interface Team {
   id: number;
@@ -190,15 +191,30 @@ export default function TeamManagement() {
   }
 
   return (
-    <main className="min-h-screen bg-neutral-50 pb-24 md:pb-0">
+    <main className="min-h-screen bg-neutral-50 pb-24 md:pb-0" id="main-content">
+      {/* Skip to main content link */}
+      <a
+        href="#main-content"
+        className="absolute top-0 left-0 p-2 bg-primary-600 text-white rounded-b-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 -translate-y-full focus:translate-y-0 transition-transform"
+        aria-label="Skip to main content"
+      >
+        Skip to main content
+      </a>
+
       {/* Header */}
       <header className="bg-neutral-0 border-b border-neutral-200 sticky top-0 z-40">
         <div className="container-max py-4">
           <div className="flex items-center gap-4 mb-2">
-            <Link href="/dashboard" className="text-primary-600 hover:text-primary-700 font-medium">
+            <Link
+              href="/dashboard"
+              className="text-primary-600 hover:text-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 rounded font-medium"
+              aria-label="Back to dashboard"
+            >
               ← Back
             </Link>
-            <h1 className="text-h3 font-bold text-neutral-900">👥 Team Management</h1>
+            <h1 className="text-h3 font-bold text-neutral-900">
+              <span aria-hidden="true">👥</span> Team Management
+            </h1>
           </div>
           <p className="text-sm text-neutral-600">Manage your team members and collaborators</p>
         </div>
@@ -207,21 +223,33 @@ export default function TeamManagement() {
       <div className="container-max py-8 space-y-6">
         {/* Messages */}
         {error && (
-          <div className="bg-danger/10 border border-danger/20 text-danger p-4 rounded-lg animate-slideDown">
-            ❌ {error}
+          <div
+            className="bg-danger/10 border border-danger/20 text-danger p-4 rounded-lg"
+            role="alert"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            <span aria-hidden="true">❌</span> {error}
           </div>
         )}
 
         {success && (
-          <div className="bg-success/10 border border-success/20 text-success p-4 rounded-lg animate-slideDown">
-            ✅ {success}
+          <div
+            className="bg-success/10 border border-success/20 text-success p-4 rounded-lg"
+            role="alert"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            <span aria-hidden="true">✅</span> {success}
           </div>
         )}
 
         {/* Create Team */}
         <Card padding="lg">
           <div className="mb-6">
-            <h2 className="text-h4 font-bold text-neutral-900">🚀 Create a New Team</h2>
+            <h2 className="text-h4 font-bold text-neutral-900">
+              <span aria-hidden="true">🚀</span> Create a New Team
+            </h2>
             <p className="text-sm text-neutral-600 mt-1">Collaborate with your team members</p>
           </div>
 
@@ -232,10 +260,17 @@ export default function TeamManagement() {
               value={teamName}
               onChange={(e) => setTeamName(e.target.value)}
               placeholder="My Security Team"
+              aria-label="Team name input"
             />
 
-            <Button variant="primary" className="w-full" disabled={isCreating}>
-              {isCreating ? '⏳ Creating...' : '🚀 Create Team'}
+            <Button
+              variant="primary"
+              className="w-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600"
+              disabled={isCreating}
+              aria-busy={isCreating}
+              aria-label={isCreating ? 'Creating team' : 'Create new team'}
+            >
+              {isCreating ? <><span aria-hidden="true">⏳</span> Creating...</> : <><span aria-hidden="true">🚀</span> Create Team</>}
             </Button>
           </form>
         </Card>

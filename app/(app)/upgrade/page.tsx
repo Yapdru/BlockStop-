@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button, Card, Badge } from '@/components';
+import { a11y } from '@/lib/a11y';
 
 const products = [
   { id: 'neo', name: 'BlockStop NEO', price: 99, annualPrice: 999, icon: '🚀' },
@@ -69,15 +70,30 @@ export default function UpgradePage() {
   };
 
   return (
-    <main className="min-h-screen bg-neutral-50 pb-24 md:pb-0">
+    <main className="min-h-screen bg-neutral-50 pb-24 md:pb-0" id="main-content">
+      {/* Skip to main content link */}
+      <a
+        href="#main-content"
+        className="absolute top-0 left-0 p-2 bg-primary-600 text-white rounded-b-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 -translate-y-full focus:translate-y-0 transition-transform"
+        aria-label="Skip to main content"
+      >
+        Skip to main content
+      </a>
+
       {/* Header */}
       <header className="bg-neutral-0 border-b border-neutral-200 sticky top-0 z-40">
         <div className="container-max py-4">
           <div className="flex items-center gap-4 mb-2">
-            <Link href="/dashboard" className="text-primary-600 hover:text-primary-700 font-medium">
+            <Link
+              href="/dashboard"
+              className="text-primary-600 hover:text-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 rounded font-medium"
+              aria-label="Back to dashboard"
+            >
               ← Back
             </Link>
-            <h1 className="text-h3 font-bold text-neutral-900">⭐ Upgrade Plan</h1>
+            <h1 className="text-h3 font-bold text-neutral-900">
+              <span aria-hidden="true">⭐</span> Upgrade Plan
+            </h1>
           </div>
           <p className="text-sm text-neutral-600">Choose your perfect security tier</p>
         </div>
@@ -86,28 +102,32 @@ export default function UpgradePage() {
       <div className="container-max py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Selection Section */}
-          <div className="lg:col-span-2 space-y-8">
+          <section className="lg:col-span-2 space-y-8" aria-label="Upgrade plan selection">
             {/* Product Selection */}
             <Card padding="lg">
-              <h2 className="text-h5 font-bold text-neutral-900 mb-6">1️⃣ Select Your Plan</h2>
+              <h2 className="text-h5 font-bold text-neutral-900 mb-6">
+                <span aria-hidden="true">1️⃣</span> Select Your Plan
+              </h2>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-4" role="group" aria-label="Plan selection">
                 {products.map(p => (
                   <button
                     key={p.id}
                     onClick={() => setSelectedProduct(p.id)}
-                    className={`relative p-4 rounded-lg border-2 text-left transition ${
+                    className={`relative p-4 rounded-lg border-2 text-left transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 ${
                       selectedProduct === p.id
                         ? 'border-primary-500 bg-primary-50'
                         : 'border-neutral-200 hover:border-primary-300'
                     }`}
+                    aria-pressed={selectedProduct === p.id}
+                    aria-label={`${p.name} plan at ₹${p.price} per month`}
                   >
                     {p.highlight && (
                       <Badge variant="accent" className="absolute top-2 right-2">
-                        Popular
+                        Most Popular
                       </Badge>
                     )}
-                    <p className="text-2xl mb-2">{p.icon}</p>
+                    <p className="text-2xl mb-2" aria-hidden="true">{p.icon}</p>
                     <p className="font-bold text-neutral-900">{p.name}</p>
                     <p className="text-sm text-neutral-600 mt-2">₹{p.price}/mo</p>
                   </button>
@@ -117,32 +137,38 @@ export default function UpgradePage() {
 
             {/* Billing Frequency */}
             <Card padding="lg">
-              <h2 className="text-h5 font-bold text-neutral-900 mb-6">2️⃣ Billing Frequency</h2>
+              <h2 className="text-h5 font-bold text-neutral-900 mb-6">
+                <span aria-hidden="true">2️⃣</span> Billing Frequency
+              </h2>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-4" role="group" aria-label="Billing frequency selection">
                 <button
                   onClick={() => setFrequency('monthly')}
-                  className={`p-4 rounded-lg border-2 font-medium transition ${
+                  className={`p-4 rounded-lg border-2 font-medium transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 ${
                     frequency === 'monthly'
                       ? 'border-primary-500 bg-primary-50 text-primary-900'
                       : 'border-neutral-200 text-neutral-900 hover:border-primary-300'
                   }`}
+                  aria-pressed={frequency === 'monthly'}
+                  aria-label="Monthly billing"
                 >
-                  📅 Monthly
+                  <span aria-hidden="true">📅</span> Monthly
                 </button>
 
                 <button
                   onClick={() => setFrequency('annual')}
-                  className={`relative p-4 rounded-lg border-2 font-medium transition ${
+                  className={`relative p-4 rounded-lg border-2 font-medium transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-600 ${
                     frequency === 'annual'
                       ? 'border-accent-400 bg-accent-50 text-accent-900'
                       : 'border-neutral-200 text-neutral-900 hover:border-accent-300'
                   }`}
+                  aria-pressed={frequency === 'annual'}
+                  aria-label="Annual billing, save 20%"
                 >
                   <Badge variant="accent" className="absolute top-2 right-2 text-xs">
                     Save 20%
                   </Badge>
-                  📆 Annual
+                  <span aria-hidden="true">📆</span> Annual
                 </button>
               </div>
 
@@ -157,20 +183,24 @@ export default function UpgradePage() {
 
             {/* Payment Method */}
             <Card padding="lg">
-              <h2 className="text-h5 font-bold text-neutral-900 mb-6">3️⃣ Payment Method</h2>
+              <h2 className="text-h5 font-bold text-neutral-900 mb-6">
+                <span aria-hidden="true">3️⃣</span> Payment Method
+              </h2>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-4" role="group" aria-label="Payment method selection">
                 {paymentMethods.map(method => (
                   <button
                     key={method.id}
                     onClick={() => setSelectedPayment(method.id)}
-                    className={`p-4 rounded-lg border-2 flex items-center gap-3 transition ${
+                    className={`p-4 rounded-lg border-2 flex items-center gap-3 transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 ${
                       selectedPayment === method.id
                         ? 'border-primary-500 bg-primary-50'
                         : 'border-neutral-200 hover:border-primary-300'
                     }`}
+                    aria-pressed={selectedPayment === method.id}
+                    aria-label={`${method.name} payment method`}
                   >
-                    <span className="text-2xl">{method.icon}</span>
+                    <span className="text-2xl" aria-hidden="true">{method.icon}</span>
                     <span className={`font-medium text-sm ${
                       selectedPayment === method.id ? 'text-primary-900' : 'text-neutral-900'
                     }`}>
@@ -186,12 +216,14 @@ export default function UpgradePage() {
                 </p>
               </div>
             </Card>
-          </div>
+          </section>
 
           {/* Order Summary */}
-          <div className="lg:col-span-1">
+          <aside className="lg:col-span-1">
             <Card padding="lg" className="sticky top-24">
-              <h2 className="text-h5 font-bold text-neutral-900 mb-6">📋 Order Summary</h2>
+              <h2 className="text-h5 font-bold text-neutral-900 mb-6">
+                <span aria-hidden="true">📋</span> Order Summary
+              </h2>
 
               <div className="space-y-4 mb-6 pb-6 border-b border-neutral-200">
                 <div className="flex justify-between items-center">
@@ -235,17 +267,20 @@ export default function UpgradePage() {
 
               <Button
                 variant="primary"
-                className="w-full mb-3"
+                className="w-full mb-3 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600"
                 onClick={handlePayment}
                 disabled={processing}
+                aria-busy={processing}
+                aria-label={processing ? 'Processing payment' : 'Proceed to payment'}
               >
-                {processing ? '⏳ Processing...' : '💳 Proceed to Payment'}
+                {processing ? <><span aria-hidden="true">⏳</span> Processing...</> : <><span aria-hidden="true">💳</span> Proceed to Payment</>}
               </Button>
 
               <Button
                 variant="secondary"
-                className="w-full"
+                className="w-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-600"
                 onClick={() => window.history.back()}
+                aria-label="Go back and cancel upgrade"
               >
                 ← Cancel
               </Button>
@@ -254,31 +289,33 @@ export default function UpgradePage() {
                 ✅ Cancel anytime. No hidden fees.
               </p>
             </Card>
-          </div>
+          </aside>
         </div>
 
         {/* Features Comparison */}
-        <div className="mt-12 bg-primary-50 border border-primary-200 rounded-lg p-6">
-          <h3 className="font-semibold text-neutral-900 mb-3">✨ What&apos;s Included</h3>
+        <section className="mt-12 bg-primary-50 border border-primary-200 rounded-lg p-6" aria-label="Included features">
+          <h3 className="font-semibold text-neutral-900 mb-3">
+            <span aria-hidden="true">✨</span> What&apos;s Included
+          </h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
             <div>
-              <p className="font-medium text-neutral-900">🤖 BetterBot AI</p>
+              <p className="font-medium text-neutral-900"><span aria-hidden="true">🤖</span> BetterBot AI</p>
               <p className="text-xs text-neutral-600">Advanced threat analysis</p>
             </div>
             <div>
-              <p className="font-medium text-neutral-900">🌐 VPN (100+)</p>
+              <p className="font-medium text-neutral-900"><span aria-hidden="true">🌐</span> VPN (100+)</p>
               <p className="text-xs text-neutral-600">Global servers</p>
             </div>
             <div>
-              <p className="font-medium text-neutral-900">📡 WiFi Checker</p>
+              <p className="font-medium text-neutral-900"><span aria-hidden="true">📡</span> WiFi Checker</p>
               <p className="text-xs text-neutral-600">Network security</p>
             </div>
             <div>
-              <p className="font-medium text-neutral-900">👥 Team Access</p>
+              <p className="font-medium text-neutral-900"><span aria-hidden="true">👥</span> Team Access</p>
               <p className="text-xs text-neutral-600">Up to 6 users</p>
             </div>
           </div>
-        </div>
+        </section>
       </div>
     </main>
   );

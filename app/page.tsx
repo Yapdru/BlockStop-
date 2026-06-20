@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { Button, Card, Badge } from '@/components';
+import { a11y } from '@/lib/a11y';
 
 export default function Home() {
   const features = [
@@ -58,23 +59,42 @@ export default function Home() {
   ];
 
   return (
-    <main className="min-h-screen bg-neutral-50">
+    <main className="min-h-screen bg-neutral-50" id="main-content">
+      {/* Skip to main content link */}
+      <a
+        href="#main-content"
+        className="absolute top-0 left-0 p-2 bg-primary-600 text-white rounded-b-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 -translate-y-full focus:translate-y-0 transition-transform"
+        aria-label="Skip to main content"
+      >
+        Skip to main content
+      </a>
+
       {/* Header */}
       <header className="bg-neutral-0 border-b border-neutral-200 sticky top-0 z-40">
         <div className="container-max py-4 flex justify-between items-center">
-          <Link href="/" className="flex items-center gap-2">
-            <span className="text-2xl">🛡️</span>
+          <Link href="/" className="flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 rounded">
+            <span className="text-2xl" aria-hidden="true">🛡️</span>
             <h1 className="text-h4 font-bold text-neutral-900">BlockStop</h1>
           </Link>
 
-          <nav className="flex items-center gap-4">
-            <Link href="/pricing" className="text-neutral-600 hover:text-neutral-900 font-medium">
+          <nav className="flex items-center gap-4" aria-label="Main navigation">
+            <Link
+              href="/pricing"
+              className="text-neutral-600 hover:text-neutral-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 rounded font-medium"
+            >
               Pricing
             </Link>
-            <Link href="/dashboard" className="text-neutral-600 hover:text-neutral-900 font-medium">
+            <Link
+              href="/dashboard"
+              className="text-neutral-600 hover:text-neutral-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 rounded font-medium"
+            >
               Dashboard
             </Link>
-            <Button variant="primary" size="sm">
+            <Button
+              variant="primary"
+              size="sm"
+              className="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600"
+            >
               <Link href="/auth/login">Sign In</Link>
             </Button>
           </nav>
@@ -82,7 +102,7 @@ export default function Home() {
       </header>
 
       {/* Hero Section */}
-      <section className="container-max py-20 text-center">
+      <section className="container-max py-20 text-center" aria-label="Hero section">
         <div className="max-w-3xl mx-auto mb-12">
           <Badge variant="primary" className="mb-4">
             🎯 Advanced Email & File Security
@@ -95,11 +115,19 @@ export default function Home() {
           </p>
 
           <div className="flex justify-center gap-4">
-            <Button variant="primary" size="lg">
-              <Link href="/email-checker">📧 Check Email Now</Link>
+            <Button
+              variant="primary"
+              size="lg"
+              className="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600"
+            >
+              <Link href="/email-checker"><span aria-hidden="true">📧</span> Check Email Now</Link>
             </Button>
-            <Button variant="secondary" size="lg">
-              <Link href="/file-scanner">📁 Scan File Now</Link>
+            <Button
+              variant="secondary"
+              size="lg"
+              className="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-600"
+            >
+              <Link href="/file-scanner"><span aria-hidden="true">📁</span> Scan File Now</Link>
             </Button>
           </div>
         </div>
@@ -134,7 +162,7 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section className="container-max py-20">
+      <section className="container-max py-20" aria-label="Core features">
         <h2 className="text-h2 font-bold text-neutral-900 text-center mb-12">Core Features</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -142,13 +170,17 @@ export default function Home() {
             <Card
               key={feature.title}
               padding="lg"
-              className="flex flex-col transition hover:border-primary-300"
+              className="flex flex-col transition hover:border-primary-300 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary-600"
             >
-              <div className="text-5xl mb-4">{feature.icon}</div>
+              <div className="text-5xl mb-4" aria-hidden="true">{feature.icon}</div>
               <h3 className="text-h5 font-bold text-neutral-900 mb-3">{feature.title}</h3>
               <p className="text-neutral-600 mb-6 flex-1">{feature.description}</p>
               <Link href={feature.href}>
-                <Button variant="secondary" className="w-full">
+                <Button
+                  variant="secondary"
+                  className="w-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-600"
+                  aria-label={`Try ${feature.title} now`}
+                >
                   Try It Now →
                 </Button>
               </Link>
@@ -158,7 +190,7 @@ export default function Home() {
       </section>
 
       {/* Pricing Section */}
-      <section className="container-max py-20">
+      <section className="container-max py-20" aria-label="Pricing plans">
         <div className="text-center mb-12">
           <h2 className="text-h2 font-bold text-neutral-900 mb-4">Simple, Transparent Pricing</h2>
           <p className="text-lg text-neutral-600">Choose the perfect plan for your security needs</p>
@@ -169,7 +201,7 @@ export default function Home() {
             <Card
               key={tier.name}
               padding="lg"
-              className={`flex flex-col transition ${
+              className={`flex flex-col transition focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary-600 ${
                 tier.highlight
                   ? 'border-2 border-accent-400 shadow-lg scale-105 md:scale-100 lg:scale-105'
                   : 'border-neutral-200'
@@ -182,7 +214,7 @@ export default function Home() {
               )}
 
               <div className="mb-6">
-                <div className="text-4xl mb-3">{tier.icon}</div>
+                <div className="text-4xl mb-3" aria-hidden="true">{tier.icon}</div>
                 <h3 className="text-h4 font-bold text-neutral-900">{tier.name}</h3>
                 <p className="text-sm text-neutral-600 mt-2">{tier.price} {tier.period}</p>
               </div>
@@ -198,7 +230,8 @@ export default function Home() {
 
               <Button
                 variant={tier.highlight ? 'primary' : 'secondary'}
-                className="w-full"
+                className="w-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600"
+                aria-label={`${tier.cta} for ${tier.name} plan at ${tier.price} ${tier.period}`}
               >
                 <Link href={tier.href}>{tier.cta}</Link>
               </Button>
@@ -208,7 +241,12 @@ export default function Home() {
 
         <div className="text-center mt-12">
           <Link href="/pricing">
-            <Button variant="secondary" size="lg">
+            <Button
+              variant="secondary"
+              size="lg"
+              className="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-600"
+              aria-label="View all pricing plans"
+            >
               View All Pricing Plans →
             </Button>
           </Link>
@@ -216,7 +254,10 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="container-max py-20 bg-primary-50 border border-primary-200 rounded-xl">
+      <section
+        className="container-max py-20 bg-primary-50 border border-primary-200 rounded-xl"
+        aria-label="Call to action to get started"
+      >
         <div className="text-center">
           <h2 className="text-h2 font-bold text-neutral-900 mb-4">Ready to Stay Secure?</h2>
           <p className="text-lg text-neutral-600 mb-8 max-w-2xl mx-auto">
@@ -224,10 +265,18 @@ export default function Home() {
           </p>
 
           <div className="flex flex-wrap justify-center gap-4">
-            <Button variant="primary" size="lg">
+            <Button
+              variant="primary"
+              size="lg"
+              className="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600"
+            >
               <Link href="/register">Get Started Free</Link>
             </Button>
-            <Button variant="secondary" size="lg">
+            <Button
+              variant="secondary"
+              size="lg"
+              className="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-600"
+            >
               <Link href="/pricing">View Pricing</Link>
             </Button>
           </div>
@@ -235,14 +284,20 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-neutral-900 text-neutral-400 py-12 mt-20">
+      <footer className="bg-neutral-900 text-neutral-400 py-12 mt-20" role="contentinfo">
         <div className="container-max text-center">
           <p>&copy; 2026 BlockStop. Advanced email and file security for everyone.</p>
-          <div className="flex justify-center gap-6 mt-6 text-sm">
-            <Link href="#" className="hover:text-neutral-200">Privacy</Link>
-            <Link href="#" className="hover:text-neutral-200">Terms</Link>
-            <Link href="#" className="hover:text-neutral-200">Security</Link>
-          </div>
+          <nav className="flex justify-center gap-6 mt-6 text-sm" aria-label="Footer navigation">
+            <Link href="#" className="hover:text-neutral-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 rounded">
+              Privacy
+            </Link>
+            <Link href="#" className="hover:text-neutral-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 rounded">
+              Terms
+            </Link>
+            <Link href="#" className="hover:text-neutral-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 rounded">
+              Security
+            </Link>
+          </nav>
         </div>
       </footer>
     </main>

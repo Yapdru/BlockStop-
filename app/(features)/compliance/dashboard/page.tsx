@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button, Card, Badge, Input } from '@/components';
+import { a11y } from '@/lib/a11y';
 
 interface Framework {
   id: string;
@@ -112,15 +113,30 @@ export default function ComplianceDashboard() {
   const criticalFindings = findings.filter(f => f.severity === 'critical').length;
 
   return (
-    <main className="min-h-screen bg-neutral-50 pb-24 md:pb-0">
+    <main className="min-h-screen bg-neutral-50 pb-24 md:pb-0" id="main-content">
+      {/* Skip to main content link */}
+      <a
+        href="#main-content"
+        className="absolute top-0 left-0 p-2 bg-primary-600 text-white rounded-b-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 -translate-y-full focus:translate-y-0 transition-transform"
+        aria-label="Skip to main content"
+      >
+        Skip to main content
+      </a>
+
       {/* Header */}
       <header className="bg-neutral-0 border-b border-neutral-200 sticky top-0 z-40">
         <div className="container-max py-4">
           <div className="flex items-center gap-4 mb-4">
-            <Link href="/dashboard" className="text-primary-600 hover:text-primary-700 font-medium">
+            <Link
+              href="/dashboard"
+              className="text-primary-600 hover:text-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 rounded font-medium"
+              aria-label="Back to dashboard"
+            >
               ← Back
             </Link>
-            <h1 className="text-h3 font-bold text-neutral-900">📋 Compliance Dashboard</h1>
+            <h1 className="text-h3 font-bold text-neutral-900">
+              <span aria-hidden="true">📋</span> Compliance Dashboard
+            </h1>
           </div>
           <p className="text-sm text-neutral-600">Monitor organizational compliance posture across frameworks</p>
         </div>
@@ -128,12 +144,12 @@ export default function ComplianceDashboard() {
 
       <div className="container-max py-8">
         {/* Overall Score Card */}
-        <Card padding="lg" className="mb-8 border-primary-200 bg-primary-50">
+        <Card padding="lg" className="mb-8 border-primary-200 bg-primary-50" role="region" aria-label="Overall compliance score">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div>
               <p className="text-xs text-neutral-600 mb-2">Overall Score</p>
               <div className="flex items-baseline gap-2">
-                <span className="text-h2 font-bold text-primary-600">{score.toFixed(1)}</span>
+                <span className="text-h2 font-bold text-primary-600" aria-live="polite">{score.toFixed(1)}</span>
                 <span className="text-sm text-neutral-600">/100</span>
               </div>
               <div className="mt-3 w-full h-2 bg-neutral-200 rounded-full overflow-hidden">
@@ -174,15 +190,27 @@ export default function ComplianceDashboard() {
         </Card>
 
         {/* Frameworks Grid */}
-        <div className="mb-8">
-          <h2 className="text-h4 font-bold text-neutral-900 mb-4">📊 Compliance Frameworks</h2>
+        <section className="mb-8" aria-label="Compliance frameworks">
+          <h2 className="text-h4 font-bold text-neutral-900 mb-4">
+            <span aria-hidden="true">📊</span> Compliance Frameworks
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {frameworks.map((framework) => (
               <Card
                 key={framework.id}
                 padding="lg"
-                className="cursor-pointer transition hover:border-primary-300"
+                className="cursor-pointer transition hover:border-primary-300 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary-600"
                 onClick={() => setSelectedFramework(selectedFramework === framework.id ? null : framework.id)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setSelectedFramework(selectedFramework === framework.id ? null : framework.id);
+                  }
+                }}
+                aria-expanded={selectedFramework === framework.id}
+                aria-label={`${framework.name} compliance framework, ${framework.score}% score`}
               >
                 <div className="flex items-start justify-between mb-4">
                   <div>
@@ -217,7 +245,12 @@ export default function ComplianceDashboard() {
                 {selectedFramework === framework.id && (
                   <div className="mt-4 pt-4 border-t border-neutral-200">
                     <p className="text-xs text-neutral-600 mb-2">Failing Controls: {framework.controls - framework.passing}</p>
-                    <Button variant="secondary" size="sm" className="w-full">
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="w-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-600"
+                      aria-label={`View details for ${framework.name}`}
+                    >
                       View Details
                     </Button>
                   </div>
@@ -225,11 +258,13 @@ export default function ComplianceDashboard() {
               </Card>
             ))}
           </div>
-        </div>
+        </section>
 
         {/* Findings Section */}
-        <div>
-          <h2 className="text-h4 font-bold text-neutral-900 mb-4">🔍 Open Findings</h2>
+        <section aria-label="Compliance findings">
+          <h2 className="text-h4 font-bold text-neutral-900 mb-4">
+            <span aria-hidden="true">🔍</span> Open Findings
+          </h2>
 
           <div className="mb-6">
             <Input
@@ -237,6 +272,7 @@ export default function ComplianceDashboard() {
               placeholder="Search findings..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              aria-label="Search compliance findings"
             />
           </div>
 
@@ -269,10 +305,20 @@ export default function ComplianceDashboard() {
                   </div>
 
                   <div className="flex gap-3">
-                    <Button variant="secondary" size="sm">
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-600"
+                      aria-label={`View evidence for ${finding.title}`}
+                    >
                       View Evidence
                     </Button>
-                    <Button variant="primary" size="sm">
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      className="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600"
+                      aria-label={`Update status for ${finding.title}`}
+                    >
                       Update Status
                     </Button>
                   </div>
@@ -285,11 +331,13 @@ export default function ComplianceDashboard() {
               <p className="text-sm text-neutral-500">Try adjusting your search</p>
             </div>
           )}
-        </div>
+        </section>
 
         {/* Info Banner */}
-        <div className="mt-12 bg-primary-50 border border-primary-200 rounded-lg p-6">
-          <h3 className="font-semibold text-neutral-900 mb-2">💡 Next Steps</h3>
+        <section className="mt-12 bg-primary-50 border border-primary-200 rounded-lg p-6" aria-label="Compliance next steps">
+          <h3 className="font-semibold text-neutral-900 mb-2">
+            <span aria-hidden="true">💡</span> Next Steps
+          </h3>
           <ul className="text-sm text-neutral-700 space-y-1">
             <li>• Address {criticalFindings} critical finding(s) to improve compliance score</li>
             <li>• Review and update all failing controls</li>

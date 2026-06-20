@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Button, Card, Tabs } from '@/components';
+import { a11y } from '@/lib/a11y';
 
 interface Settings {
   notificationsEnabled: boolean;
@@ -276,16 +277,32 @@ export default function SettingsPage() {
   ];
 
   return (
-    <main className="min-h-screen bg-neutral-50 pb-24 md:pb-0">
-      <div className="container-max py-8">
-        <h1 className="text-h2 font-bold text-neutral-900 mb-2">Settings</h1>
-        <p className="text-neutral-600 mb-8">Customize your security experience</p>
+    <>
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary-500 focus:text-white focus:rounded"
+        onClick={(e) => {
+          e.preventDefault();
+          const main = document.querySelector('#main-content');
+          if (main instanceof HTMLElement) {
+            main.focus();
+          }
+        }}
+      >
+        Skip to main content
+      </a>
 
-        {saved && (
-          <div className="bg-success/10 border border-success/20 text-success p-4 rounded-lg mb-6 animate-slideDown">
-            ✅ Settings saved successfully!
-          </div>
-        )}
+      <main id="main-content" className="min-h-screen bg-neutral-50 pb-24 md:pb-0" tabIndex={-1}>
+        <div className="container-max py-8">
+          <h1 className="text-h2 font-bold text-neutral-900 mb-2">Settings</h1>
+          <p className="text-neutral-600 mb-8">Customize your security experience</p>
+
+          {saved && (
+            <div role="status" aria-live="polite" aria-atomic="true" className="bg-success/10 border border-success/20 text-success p-4 rounded-lg mb-6">
+              <span aria-hidden="true">✅</span>
+              {' '}Settings saved successfully!
+            </div>
+          )}
 
         <Card padding="lg">
           <Tabs tabs={tabs.map(tab => ({
