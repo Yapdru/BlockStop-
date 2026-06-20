@@ -2,37 +2,74 @@
   "manifest_version": 3,
   "name": "BlockStop - Advanced Threat Scanner",
   "version": "1.0.0",
-  "description": "Universal threat scanner for emails, links, and files",
+  "description": "Universal threat scanner for emails, links, and files with offline mode support",
   "permissions": [
     "storage",
     "activeTab",
     "scripting",
     "tabs",
-    "downloads"
+    "downloads",
+    "webRequest"
   ],
   "host_permissions": [
     "https://mail.google.com/*",
     "https://inbox.google.com/*",
     "https://outlook.live.com/*",
     "https://outlook.office.com/*",
+    "https://api.blockstop.io/*",
+    "https://auth.blockstop.io/*",
     "<all_urls>"
   ],
   "background": {
-    "service_worker": "src/background/worker.ts"
+    "service_worker": "dist/background/worker.js",
+    "type": "module"
   },
   "action": {
-    "default_popup": "src/popup/popup.html",
-    "default_title": "BlockStop - Scan for threats"
+    "default_popup": "dist/popup.html",
+    "default_title": "BlockStop - Scan for threats",
+    "default_icons": {
+      "16": "icons/16.png",
+      "48": "icons/48.png",
+      "128": "icons/128.png"
+    }
   },
   "content_scripts": [
     {
-      "matches": ["https://mail.google.com/*"],
-      "js": ["src/content/email-injector.ts"],
-      "run_at": "document_start"
+      "matches": [
+        "https://mail.google.com/*",
+        "https://inbox.google.com/*"
+      ],
+      "js": ["dist/content/email-injector.js"],
+      "run_at": "document_start",
+      "all_frames": false
+    },
+    {
+      "matches": [
+        "https://mail.google.com/*",
+        "https://inbox.google.com/*",
+        "https://outlook.live.com/*",
+        "https://outlook.office.com/*",
+        "<all_urls>"
+      ],
+      "js": ["dist/content/link-checker.js"],
+      "run_at": "document_end"
     },
     {
       "matches": ["<all_urls>"],
-      "js": ["src/content/link-checker.ts"]
+      "js": ["dist/content/file-monitor.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "options_page": "dist/options.html",
+  "icons": {
+    "16": "icons/16.png",
+    "48": "icons/48.png",
+    "128": "icons/128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["dist/**/*.css"],
+      "matches": ["<all_urls>"]
     }
   ]
 }

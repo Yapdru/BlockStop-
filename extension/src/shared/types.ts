@@ -1,9 +1,11 @@
 // BlockStop Extension Types
 
+export type TierLevel = 'free' | 'neo' | 'pro' | 'office' | 'max';
+
 export interface User {
   id: string;
   email: string;
-  tier: 'free' | 'neo' | 'pro' | 'office' | 'health' | 'max';
+  tier: TierLevel;
   subscription?: {
     status: 'active' | 'cancelled' | 'expired';
     expiresAt: number;
@@ -78,9 +80,89 @@ export interface ExtensionConfig {
   };
 }
 
+// Offline Database Schema
+export interface ThreatSignature {
+  id: string;
+  hash: string;
+  type: 'phishing' | 'malware' | 'spam' | 'suspicious';
+  pattern: string;
+  severity: 'critical' | 'high' | 'medium' | 'low';
+  confidence: number;
+  description: string;
+}
+
+export interface SyncMetadata {
+  lastSyncTimestamp: number;
+  version: string;
+  tierLevel: TierLevel;
+  signatureCount: number;
+  databaseSize: number;
+}
+
 export interface OfflineDatabase {
-  threatSignatures: Map<string, Threat>;
+  threatSignatures: ThreatSignature[];
   phishingPatterns: string[];
+  malwareSignatures: string[];
   lastUpdated: number;
   version: string;
+  tierLevel: TierLevel;
+}
+
+export interface TierFeatures {
+  emailScanning: boolean;
+  linkChecking: boolean;
+  fileScanning: boolean;
+  offlineMode: boolean;
+  threatDatabase: 'full' | 'limited' | 'none';
+  maxScansPerDay: number;
+  aiPowered: boolean;
+}
+
+// Message Protocol Types
+export type MessageType =
+  | 'SCAN_EMAIL'
+  | 'SCAN_LINK'
+  | 'SCAN_FILE'
+  | 'AUTH_OAUTH'
+  | 'GET_AUTH_STATUS'
+  | 'GET_SCAN_HISTORY'
+  | 'CLEAR_HISTORY'
+  | 'GET_CONFIG'
+  | 'UPDATE_SETTINGS'
+  | 'SYNC_OFFLINE_DB'
+  | 'REPORT_THREAT'
+  | 'GET_TIER_INFO';
+
+export interface Message {
+  type: MessageType;
+  payload: Record<string, any>;
+  timestamp?: number;
+  correlationId?: string;
+}
+
+export interface MessageResponse {
+  success: boolean;
+  data?: any;
+  error?: string;
+  timestamp?: number;
+}
+
+// Subscription Token (JWT payload)
+export interface SubscriptionToken {
+  userId: string;
+  email: string;
+  tier: TierLevel;
+  issuedAt: number;
+  expiresAt: number;
+  features: TierFeatures;
+}
+
+// Offline Sync Queue
+export interface OfflineScanRequest {
+  id: string;
+  type: 'email' | 'link' | 'file';
+  target: string;
+  payload: any;
+  timestamp: number;
+  status: 'pending' | 'synced' | 'failed';
 }
