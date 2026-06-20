@@ -279,20 +279,24 @@ export default function TeamManagement() {
         {teams.length > 0 && (
           <Card padding="lg">
             <div className="mb-6">
-              <h2 className="text-h4 font-bold text-neutral-900">📋 Your Teams</h2>
+              <h2 className="text-h4 font-bold text-neutral-900">
+                <span aria-hidden="true">📋</span> Your Teams
+              </h2>
               <p className="text-sm text-neutral-600 mt-1">{teams.length} team(s)</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4" role="group" aria-label="Teams selection">
               {teams.map((team) => (
                 <button
                   key={team.id}
                   onClick={() => setSelectedTeam(team)}
-                  className={`relative p-4 rounded-lg border-2 text-left transition ${
+                  className={`relative p-4 rounded-lg border-2 text-left transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 ${
                     selectedTeam?.id === team.id
                       ? 'border-primary-500 bg-primary-50'
                       : 'border-neutral-200 bg-neutral-50 hover:border-primary-300'
                   }`}
+                  aria-pressed={selectedTeam?.id === team.id}
+                  aria-label={`${team.name} team, max ${team.maxUsers} members`}
                 >
                   {selectedTeam?.id === team.id && (
                     <Badge variant="primary" className="absolute top-2 right-2">
@@ -301,7 +305,7 @@ export default function TeamManagement() {
                   )}
                   <p className="text-h6 font-bold text-neutral-900">{team.name}</p>
                   <p className="text-xs text-neutral-600 mt-2">
-                    👥 Max {team.maxUsers} members
+                    <span aria-hidden="true">👥</span> Max {team.maxUsers} members
                   </p>
                 </button>
               ))}
@@ -315,7 +319,9 @@ export default function TeamManagement() {
             {/* Invite Members */}
             <Card padding="lg">
               <div className="mb-6">
-                <h2 className="text-h4 font-bold text-neutral-900">➕ Invite to {selectedTeam.name}</h2>
+                <h2 className="text-h4 font-bold text-neutral-900">
+                  <span aria-hidden="true">➕</span> Invite to {selectedTeam.name}
+                </h2>
                 <p className="text-sm text-neutral-600 mt-1">Add new team members</p>
               </div>
 
@@ -327,25 +333,34 @@ export default function TeamManagement() {
                     value={inviteEmail}
                     onChange={(e) => setInviteEmail(e.target.value)}
                     placeholder="user@example.com"
+                    aria-label="Invite email address"
                   />
 
                   <div>
-                    <label className="block text-sm font-medium text-neutral-900 mb-2">
+                    <label htmlFor="invite-role" className="block text-sm font-medium text-neutral-900 mb-2">
                       Role
                     </label>
                     <select
+                      id="invite-role"
                       value={inviteRole}
                       onChange={(e) => setInviteRole(e.target.value as 'member' | 'admin')}
-                      className="input w-full"
+                      className="input w-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600"
+                      aria-label="Invite role selection"
                     >
-                      <option value="member">👤 Member</option>
-                      <option value="admin">👑 Admin</option>
+                      <option value="member"><span aria-hidden="true">👤</span> Member</option>
+                      <option value="admin"><span aria-hidden="true">👑</span> Admin</option>
                     </select>
                   </div>
                 </div>
 
-                <Button variant="primary" className="w-full" disabled={isInviting}>
-                  {isInviting ? '⏳ Sending...' : '📧 Send Invitation'}
+                <Button
+                  variant="primary"
+                  className="w-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600"
+                  disabled={isInviting}
+                  aria-busy={isInviting}
+                  aria-label={isInviting ? 'Sending invitation' : 'Send team member invitation'}
+                >
+                  {isInviting ? <><span aria-hidden="true">⏳</span> Sending...</> : <><span aria-hidden="true">📧</span> Send Invitation</>}
                 </Button>
               </form>
             </Card>
@@ -354,11 +369,13 @@ export default function TeamManagement() {
             {members.length > 0 && (
               <Card padding="lg">
                 <div className="mb-6">
-                  <h2 className="text-h4 font-bold text-neutral-900">👥 Team Members</h2>
+                  <h2 className="text-h4 font-bold text-neutral-900">
+                    <span aria-hidden="true">👥</span> Team Members
+                  </h2>
                   <p className="text-sm text-neutral-600 mt-1">{members.length} member(s)</p>
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-3" role="region" aria-label="Team members list">
                   {members.map((member) => (
                     <div
                       key={member.id}
@@ -371,13 +388,15 @@ export default function TeamManagement() {
 
                       <div className="flex items-center gap-3">
                         <Badge variant={member.role === 'admin' ? 'primary' : 'info'}>
-                          {member.role === 'admin' ? '👑 Admin' : '👤 Member'}
+                          {member.role === 'admin' ? <><span aria-hidden="true">👑</span> Admin</> : <><span aria-hidden="true">👤</span> Member</>}
                         </Badge>
 
                         <Button
                           variant="danger"
                           size="sm"
+                          className="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-danger-600"
                           onClick={() => handleRemoveMember(member.id)}
+                          aria-label={`Remove ${member.userName || member.userEmail} from team`}
                         >
                           Remove
                         </Button>
@@ -393,9 +412,14 @@ export default function TeamManagement() {
         {/* Empty State */}
         {teams.length === 0 && (
           <Card padding="lg" className="text-center">
-            <p className="text-4xl mb-4">👥</p>
+            <p className="text-4xl mb-4" aria-hidden="true">👥</p>
             <p className="text-neutral-600 mb-4">No teams yet. Create your first team to start collaborating.</p>
-            <Button variant="primary" onClick={() => document.querySelector('input[placeholder="My Security Team"]')?.focus()}>
+            <Button
+              variant="primary"
+              onClick={() => document.querySelector('input[placeholder="My Security Team"]')?.focus()}
+              className="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600"
+              aria-label="Create your first team"
+            >
               Create Team
             </Button>
           </Card>

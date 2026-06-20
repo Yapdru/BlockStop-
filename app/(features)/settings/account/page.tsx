@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button, Card, Input, Badge } from '@/components';
+import { a11y } from '@/lib/a11y';
 
 interface AccountProfile {
   id: number;
@@ -149,37 +150,57 @@ export default function AccountSettings() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-neutral-50 flex items-center justify-center">
-        <div className="text-neutral-600">Loading account settings...</div>
+      <main className="min-h-screen bg-neutral-50 flex items-center justify-center" id="main-content" tabIndex={-1}>
+        <div className="text-neutral-600" role="status">Loading account settings...</div>
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-neutral-50 pb-24 md:pb-0">
-      {/* Header */}
-      <header className="bg-neutral-0 border-b border-neutral-200 sticky top-0 z-40">
-        <div className="container-max py-4 flex items-center gap-4">
-          <Link href="/settings" className="text-primary-600 hover:text-primary-700 font-medium">
-            ← Back
-          </Link>
-          <h1 className="text-h3 font-bold text-neutral-900">👤 Account Settings</h1>
-        </div>
-      </header>
+    <>
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary-500 focus:text-white focus:rounded"
+        onClick={(e) => {
+          e.preventDefault();
+          const main = document.querySelector('#main-content');
+          if (main instanceof HTMLElement) {
+            main.focus();
+          }
+        }}
+      >
+        Skip to main content
+      </a>
 
-      <div className="container-max py-8 space-y-6">
-        {/* Messages */}
-        {errors.form && (
-          <div className="bg-danger/10 border border-danger/20 text-danger p-4 rounded-lg animate-slideDown">
-            ❌ {errors.form}
+      <main id="main-content" className="min-h-screen bg-neutral-50 pb-24 md:pb-0" tabIndex={-1}>
+        {/* Header */}
+        <header className="bg-neutral-0 border-b border-neutral-200 sticky top-0 z-40">
+          <div className="container-max py-4 flex items-center gap-4">
+            <Link href="/settings" className="text-primary-600 hover:text-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 font-medium rounded">
+              ← Back
+            </Link>
+            <h1 className="text-h3 font-bold text-neutral-900">
+              <span aria-hidden="true">👤</span>
+              {' '}Account Settings
+            </h1>
           </div>
-        )}
+        </header>
 
-        {success && (
-          <div className="bg-success/10 border border-success/20 text-success p-4 rounded-lg animate-slideDown">
-            ✅ {success}
-          </div>
-        )}
+        <div className="container-max py-8 space-y-6">
+          {/* Messages */}
+          {errors.form && (
+            <div role="alert" className="bg-danger/10 border border-danger/20 text-danger p-4 rounded-lg">
+              <span aria-hidden="true">❌</span>
+              {' '}{errors.form}
+            </div>
+          )}
+
+          {success && (
+            <div role="status" aria-live="polite" aria-atomic="true" className="bg-success/10 border border-success/20 text-success p-4 rounded-lg">
+              <span aria-hidden="true">✅</span>
+              {' '}{success}
+            </div>
+          )}
 
         {/* Account Information */}
         {profile && (
@@ -225,20 +246,24 @@ export default function AccountSettings() {
 
           <form onSubmit={handleEmailChange} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-neutral-900 mb-2">
+              <label htmlFor="new-email" className="block text-sm font-medium text-neutral-900 mb-2">
                 New Email Address
               </label>
               <Input
+                id="new-email"
                 type="email"
                 value={newEmail}
                 onChange={(e) => setNewEmail(e.target.value)}
                 error={errors.email}
                 placeholder="your@email.com"
+                aria-describedby={errors.email ? "email-error" : undefined}
+                className="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
               />
+              {errors.email && <div id="email-error" className="text-sm text-danger mt-1">{errors.email}</div>}
             </div>
 
-            <Button variant="primary" className="w-full">
-              📧 Update Email
+            <Button variant="primary" className="w-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500" aria-label="Update email address">
+              Update Email
             </Button>
           </form>
         </Card>
@@ -252,46 +277,58 @@ export default function AccountSettings() {
 
           <form onSubmit={handlePasswordChange} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-neutral-900 mb-2">
+              <label htmlFor="current-password" className="block text-sm font-medium text-neutral-900 mb-2">
                 Current Password
               </label>
               <Input
+                id="current-password"
                 type="password"
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
                 error={errors.currentPassword}
                 placeholder="Enter current password"
+                aria-describedby={errors.currentPassword ? "current-password-error" : undefined}
+                className="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
               />
+              {errors.currentPassword && <div id="current-password-error" className="text-sm text-danger mt-1">{errors.currentPassword}</div>}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-neutral-900 mb-2">
-                New Password <span className="text-xs text-neutral-600">(min 8 characters)</span>
+              <label htmlFor="new-password" className="block text-sm font-medium text-neutral-900 mb-2">
+                New Password <span id="password-hint" className="text-xs text-neutral-600">(min 8 characters)</span>
               </label>
               <Input
+                id="new-password"
                 type="password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 error={errors.newPassword}
                 placeholder="Enter new password"
+                aria-describedby={errors.newPassword ? "new-password-error" : "password-hint"}
+                className="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
               />
+              {errors.newPassword && <div id="new-password-error" className="text-sm text-danger mt-1">{errors.newPassword}</div>}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-neutral-900 mb-2">
+              <label htmlFor="confirm-password" className="block text-sm font-medium text-neutral-900 mb-2">
                 Confirm Password
               </label>
               <Input
+                id="confirm-password"
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 error={errors.confirmPassword}
                 placeholder="Confirm new password"
+                aria-describedby={errors.confirmPassword ? "confirm-password-error" : undefined}
+                className="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
               />
+              {errors.confirmPassword && <div id="confirm-password-error" className="text-sm text-danger mt-1">{errors.confirmPassword}</div>}
             </div>
 
-            <Button variant="primary" className="w-full">
-              🔑 Change Password
+            <Button variant="primary" className="w-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500" aria-label="Change password">
+              Change Password
             </Button>
           </form>
         </Card>
@@ -305,53 +342,61 @@ export default function AccountSettings() {
 
           <div className="bg-white border border-danger/20 rounded-lg p-4 mb-4">
             <p className="text-sm text-neutral-700">
-              ⚠️ This action cannot be undone. You will have a 30-day grace period to cancel the deletion before it becomes permanent.
+              <span aria-hidden="true">⚠️</span>
+              {' '}This action cannot be undone. You will have a 30-day grace period to cancel the deletion before it becomes permanent.
             </p>
           </div>
 
           <Button
             variant="danger"
-            className="w-full"
+            className="w-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-danger"
             onClick={() => setIsDeleteOpen(true)}
+            aria-label="Request account deletion"
           >
-            🗑️ Request Account Deletion
+            Request Account Deletion
           </Button>
         </Card>
 
         {/* Delete Confirmation Modal */}
         {isDeleteOpen && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <Card padding="lg" className="max-w-md w-full">
-              <h3 className="text-h4 font-bold text-danger mb-2">Delete Account?</h3>
+            <Card padding="lg" className="max-w-md w-full" role="dialog" aria-modal="true" aria-labelledby="delete-dialog-title">
+              <h3 id="delete-dialog-title" className="text-h4 font-bold text-danger mb-2">Delete Account?</h3>
               <p className="text-sm text-neutral-600 mb-6">
                 Enter your password to confirm. This cannot be undone.
               </p>
 
               <div className="mb-6">
-                <label className="block text-sm font-medium text-neutral-900 mb-2">
+                <label htmlFor="delete-password" className="block text-sm font-medium text-neutral-900 mb-2">
                   Confirm Password
                 </label>
                 <Input
+                  id="delete-password"
                   type="password"
                   value={deletePassword}
                   onChange={(e) => setDeletePassword(e.target.value)}
                   error={errors.delete}
                   placeholder="Enter your password"
+                  aria-describedby={errors.delete ? "delete-error" : undefined}
+                  className="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
                 />
+                {errors.delete && <div id="delete-error" className="text-sm text-danger mt-1">{errors.delete}</div>}
               </div>
 
               <div className="flex gap-3">
                 <Button
                   variant="secondary"
-                  className="flex-1"
+                  className="flex-1 focus:outline-none focus:ring-2 focus:ring-offset-2"
                   onClick={() => setIsDeleteOpen(false)}
+                  aria-label="Cancel account deletion"
                 >
                   Cancel
                 </Button>
                 <Button
                   variant="danger"
-                  className="flex-1"
+                  className="flex-1 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-danger"
                   onClick={handleDeleteAccount}
+                  aria-label="Confirm account deletion"
                 >
                   Delete
                 </Button>
@@ -361,5 +406,6 @@ export default function AccountSettings() {
         )}
       </div>
     </main>
+    </>
   );
 }

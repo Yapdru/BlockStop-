@@ -124,14 +124,16 @@ export default function SettingsPage() {
           <div>
             <label className="flex items-center gap-3 cursor-pointer">
               <input
+                id="notifications-enabled"
                 type="checkbox"
                 checked={settings.notificationsEnabled}
                 onChange={e => setSettings({ ...settings, notificationsEnabled: e.target.checked })}
-                className="w-5 h-5"
+                className="w-5 h-5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                aria-describedby="notifications-enabled-desc"
               />
               <div>
                 <p className="font-medium text-neutral-900">All Notifications</p>
-                <p className="text-xs text-neutral-600">Receive all security alerts</p>
+                <p id="notifications-enabled-desc" className="text-xs text-neutral-600">Receive all security alerts</p>
               </div>
             </label>
           </div>
@@ -139,28 +141,32 @@ export default function SettingsPage() {
           <div>
             <label className="flex items-center gap-3 cursor-pointer">
               <input
+                id="email-notifications"
                 type="checkbox"
                 checked={settings.emailNotifications}
                 onChange={e => setSettings({ ...settings, emailNotifications: e.target.checked })}
-                className="w-5 h-5"
+                className="w-5 h-5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                aria-describedby="email-notifications-desc"
               />
               <div>
                 <p className="font-medium text-neutral-900">Email Alerts</p>
-                <p className="text-xs text-neutral-600">Get alerts via email</p>
+                <p id="email-notifications-desc" className="text-xs text-neutral-600">Get alerts via email</p>
               </div>
             </label>
           </div>
 
           <div>
-            <label className="block font-medium text-neutral-900 mb-3">Alert Threshold</label>
+            <label htmlFor="threat-alert-level" className="block font-medium text-neutral-900 mb-3">Alert Threshold</label>
             <select
+              id="threat-alert-level"
               value={settings.threatAlertLevel}
               onChange={e => setSettings({ ...settings, threatAlertLevel: e.target.value as any })}
-              className="input w-full"
+              className="input w-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+              aria-label="Threat alert level"
             >
-              <option value="all">📊 All Threats</option>
-              <option value="high">⚠️ High & Critical</option>
-              <option value="critical">🔴 Critical Only</option>
+              <option value="all">All Threats</option>
+              <option value="high">High & Critical</option>
+              <option value="critical">Critical Only</option>
             </select>
           </div>
         </div>
@@ -174,29 +180,33 @@ export default function SettingsPage() {
           <div>
             <label className="flex items-center gap-3 cursor-pointer">
               <input
+                id="auto-scan-enabled"
                 type="checkbox"
                 checked={settings.autoScanEnabled}
                 onChange={e => setSettings({ ...settings, autoScanEnabled: e.target.checked })}
-                className="w-5 h-5"
+                className="w-5 h-5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                aria-describedby="auto-scan-enabled-desc"
               />
               <div>
                 <p className="font-medium text-neutral-900">Auto Scanning</p>
-                <p className="text-xs text-neutral-600">Automatically scan files and emails</p>
+                <p id="auto-scan-enabled-desc" className="text-xs text-neutral-600">Automatically scan files and emails</p>
               </div>
             </label>
           </div>
 
           {settings.autoScanEnabled && (
             <div>
-              <label className="block font-medium text-neutral-900 mb-3">Scan Frequency</label>
+              <label htmlFor="scan-frequency" className="block font-medium text-neutral-900 mb-3">Scan Frequency</label>
               <select
+                id="scan-frequency"
                 value={settings.autoScanInterval}
                 onChange={e => setSettings({ ...settings, autoScanInterval: e.target.value as any })}
-                className="input w-full"
+                className="input w-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                aria-label="Scan frequency"
               >
-                <option value="hourly">⏱️ Hourly</option>
-                <option value="daily">📅 Daily</option>
-                <option value="weekly">📆 Weekly</option>
+                <option value="hourly">Hourly</option>
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
               </select>
             </div>
           )}
@@ -209,28 +219,32 @@ export default function SettingsPage() {
       content: (
         <div className="space-y-6">
           <div>
-            <label className="block font-medium text-neutral-900 mb-3">Theme</label>
+            <label htmlFor="theme" className="block font-medium text-neutral-900 mb-3">Theme</label>
             <select
+              id="theme"
               value={settings.theme}
               onChange={e => setSettings({ ...settings, theme: e.target.value as any })}
-              className="input w-full"
+              className="input w-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+              aria-label="Theme preference"
             >
-              <option value="light">☀️ Light Mode</option>
-              <option value="dark">🌙 Dark Mode</option>
+              <option value="light">Light Mode</option>
+              <option value="dark">Dark Mode</option>
             </select>
           </div>
 
           <div>
-            <label className="block font-medium text-neutral-900 mb-3">Language</label>
+            <label htmlFor="language" className="block font-medium text-neutral-900 mb-3">Language</label>
             <select
+              id="language"
               value={settings.language}
               onChange={e => setSettings({ ...settings, language: e.target.value as any })}
-              className="input w-full"
+              className="input w-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+              aria-label="Language preference"
             >
-              <option value="en">🇬🇧 English</option>
-              <option value="es">🇪🇸 Español</option>
-              <option value="fr">🇫🇷 Français</option>
-              <option value="hi">🇮🇳 हिन्दी</option>
+              <option value="en">English</option>
+              <option value="es">Español</option>
+              <option value="fr">Français</option>
+              <option value="hi">हिन्दी</option>
             </select>
           </div>
         </div>
@@ -312,15 +326,16 @@ export default function SettingsPage() {
           }))} />
         </Card>
 
-        <div className="mt-6 flex gap-3">
-          <Button variant="primary" onClick={handleSaveSettings} className="flex-1">
-            💾 Save Settings
-          </Button>
-          <Button variant="secondary" className="flex-1">
-            ⟲ Reset to Defaults
-          </Button>
+          <div className="mt-6 flex gap-3">
+            <Button variant="primary" onClick={handleSaveSettings} className="flex-1 focus:outline-none focus:ring-2 focus:ring-offset-2" aria-label="Save all settings changes">
+              Save Settings
+            </Button>
+            <Button variant="secondary" className="flex-1 focus:outline-none focus:ring-2 focus:ring-offset-2" aria-label="Reset settings to default values">
+              Reset to Defaults
+            </Button>
+          </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </>
   );
 }
