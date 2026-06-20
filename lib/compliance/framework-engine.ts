@@ -1,18 +1,15 @@
 /**
  * BlockStop Phase 17 - Compliance Framework Engine
- * Core framework registry, loader, and management system
- *
- * Handles:
- * - Framework loading and versioning
- * - Control registry initialization
- * - Framework comparison
- * - Multi-framework orchestration
+ * Core engine for managing multi-framework compliance across SOC2, ISO27001, HIPAA, PCI-DSS, GDPR, NIST
  */
 
 import {
   ComplianceFramework,
   ComplianceFrameworkType,
   ComplianceControl,
+  ComplianceScore,
+  CategoryScore,
+  ControlStatus,
   FrameworkRegistry,
   FrameworkComparison,
   ControlMapping,
@@ -20,23 +17,13 @@ import {
   ComplianceConfiguration,
 } from './types/compliance-types';
 
-export class FrameworkEngine {
-  private registry: FrameworkRegistry;
+export class ComplianceFrameworkEngine {
+  private frameworks: Map<ComplianceFrameworkType, ComplianceFramework> = new Map();
+  private controlRegistry: Map<string, ComplianceControl> = new Map();
+  private organizationFrameworks: Map<string, ComplianceFrameworkType[]> = new Map();
   private configuration: ComplianceConfiguration;
-  private controlIndex: Map<string, ComplianceControl> = new Map();
-  private frameworkVersions: Map<string, string[]> = new Map();
 
   constructor(organizationId: string) {
-    this.registry = {
-      registryId: `registry-${Date.now()}`,
-      frameworks: new Map(),
-      registryVersion: '1.0.0',
-      lastUpdated: new Date(),
-      totalFrameworks: 0,
-      totalControls: 0,
-      enabledFrameworks: [],
-    };
-
     this.configuration = {
       organizationId,
       configId: `config-${Date.now()}`,
