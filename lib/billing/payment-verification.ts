@@ -1,9 +1,15 @@
 import { jwtVerify, SignJWT } from 'jose';
 import crypto from 'crypto';
+import { pool } from '@/lib/db';
 
 const JWT_SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET || 'blockstop-secret-key-change-in-production'
 );
+
+// Hash token for storage
+function hashToken(token: string): string {
+  return crypto.createHash('sha256').update(token).digest('hex');
+}
 
 export interface PaymentToken {
   userId: string;
@@ -248,41 +254,194 @@ export class PaymentVerificationService {
     return hash === signature;
   }
 
-  // Database operations (implement with your DB)
+  // Database operations (PostgreSQL implementation)
+
+  /**
+   * Store payment record and create subscription in DB
+   */
   private static async storePaymentRecord(record: any): Promise<void> {
-    // TODO: Implement with your database
-    // INSERT INTO payments (user_id, subscription_id, tier, status, token, expires_at)
-    console.log('Storing payment record:', record);
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+
+      // Check if subscription already exists
+      const existingSubscription = await client.query(
+        'SELECT id FROM billing.subscriptions WHERE stripe_subscription_id = $1',
+        [record.stripeSubscriptionId]
+      );
+
+      if (existingSubscription.rows.length === 0) {
+        // Create new subscription
+        await client.query(
+          `INSERT INTO billing.subscriptions
+           (user_id, stripe_subscription_id, stripe_customer_id, tier, status, current_period_start, current_period_end)
+           VALUES ($1, $2, $3, $4, $5, NOW(), TO_TIMESTAMP($6/1000))`,
+          [record.userId, record.stripeSubscriptionId, 'cust_default', record.tier, record.status, record.expiresAt]
+        );
+      }
+
+      // Create payment record
+      await client.query(
+        `INSERT INTO billing.payment_records
+         (user_id, subscription_id, stripe_invoice_id, status, jwt_token, token_issued_at, token_expires_at, description)
+         VALUES ($1, (SELECT id FROM billing.subscriptions WHERE stripe_subscription_id = $2),
+                 $3, $4, $5, NOW(), TO_TIMESTAMP($6/1000), $7)`,
+        [record.userId, record.stripeSubscriptionId, record.stripeSubscriptionId, record.status, record.token, record.expiresAt, 'Payment verification token']
+      );
+
+      // Log subscription change
+      await client.query(
+        `INSERT INTO billing.subscription_audit_log
+         (subscription_id, user_id, action, new_status, new_tier, ip_address)
+         VALUES ((SELECT id FROM billing.subscriptions WHERE stripe_subscription_id = $1), $2, $3, $4, $5, $6)`,
+        [record.stripeSubscriptionId, record.userId, 'created', record.status, record.tier, '0.0.0.0']
+      );
+
+      await client.query('COMMIT');
+      console.log(`✅ Payment record stored for user ${record.userId}`);
+    } catch (error) {
+      await client.query('ROLLBACK');
+      console.error('Failed to store payment record:', error);
+      throw error;
+    } finally {
+      client.release();
+    }
   }
 
+  /**
+   * Get subscription status from DB
+   */
   private static async getSubscriptionFromDB(
     userId: string,
     subscriptionId: string
   ): Promise<any> {
-    // TODO: Implement with your database
-    // SELECT * FROM subscriptions WHERE user_id = ? AND stripe_id = ?
-    return null;
+    try {
+      const result = await pool.query(
+        `SELECT * FROM billing.subscriptions
+         WHERE user_id = $1 AND stripe_subscription_id = $2`,
+        [userId, subscriptionId]
+      );
+
+      if (result.rows.length === 0) {
+        return null;
+      }
+
+      const subscription = result.rows[0];
+      return {
+        id: subscription.id,
+        userId: subscription.user_id,
+        subscriptionId: subscription.stripe_subscription_id,
+        tier: subscription.tier,
+        status: subscription.status,
+        expiresAt: new Date(subscription.current_period_end).getTime(),
+      };
+    } catch (error) {
+      console.error('Failed to get subscription from DB:', error);
+      return null;
+    }
   }
 
+  /**
+   * Update subscription status in DB
+   */
   private static async updateSubscriptionStatus(
     userId: string,
     subscriptionId: string,
     status: string
   ): Promise<void> {
-    // TODO: Implement with your database
-    // UPDATE subscriptions SET status = ? WHERE user_id = ? AND stripe_id = ?
-    console.log(`Updated subscription ${subscriptionId} to ${status}`);
+    try {
+      const client = await pool.connect();
+      try {
+        await client.query('BEGIN');
+
+        // Update subscription
+        const result = await client.query(
+          `UPDATE billing.subscriptions
+           SET status = $1, updated_at = NOW()
+           WHERE user_id = $2 AND stripe_subscription_id = $3
+           RETURNING id, status`,
+          [status, userId, subscriptionId]
+        );
+
+        if (result.rows.length > 0) {
+          const subscription = result.rows[0];
+
+          // Log the change
+          await client.query(
+            `INSERT INTO billing.subscription_audit_log
+             (subscription_id, user_id, action, new_status)
+             VALUES ($1, $2, $3, $4)`,
+            [subscription.id, userId, 'status_update', status]
+          );
+
+          // If cancelling, set cancelled_at
+          if (status === 'cancelled') {
+            await client.query(
+              `UPDATE billing.subscriptions SET cancelled_at = NOW() WHERE id = $1`,
+              [subscription.id]
+            );
+          }
+        }
+
+        await client.query('COMMIT');
+        console.log(`✅ Updated subscription ${subscriptionId} to ${status}`);
+      } catch (error) {
+        await client.query('ROLLBACK');
+        throw error;
+      } finally {
+        client.release();
+      }
+    } catch (error) {
+      console.error('Failed to update subscription status:', error);
+      throw error;
+    }
   }
 
+  /**
+   * Check if token is valid (not revoked)
+   */
   private static async isTokenValid(token: string): Promise<boolean> {
-    // TODO: Implement with your database
-    // SELECT * FROM revoked_tokens WHERE token = ?
-    return true;
+    try {
+      const tokenHash = hashToken(token);
+      const result = await pool.query(
+        'SELECT id FROM billing.revoked_tokens WHERE token_hash = $1 LIMIT 1',
+        [tokenHash]
+      );
+
+      return result.rows.length === 0; // Token is valid if NOT in revoked list
+    } catch (error) {
+      console.error('Failed to check token validity:', error);
+      return false;
+    }
   }
 
+  /**
+   * Fetch subscription details from Stripe API
+   */
   private static async getStripeSubscription(id: string): Promise<any> {
-    // TODO: Call Stripe API to get subscription details
-    return null;
+    try {
+      const stripeApiKey = process.env.STRIPE_SECRET_KEY;
+      if (!stripeApiKey) {
+        throw new Error('STRIPE_SECRET_KEY not set');
+      }
+
+      const response = await fetch(`https://api.stripe.com/v1/subscriptions/${id}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${stripeApiKey}`,
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Stripe API error: ${response.statusText}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Failed to fetch Stripe subscription:', error);
+      return null;
+    }
   }
 }
 
