@@ -1,0 +1,235 @@
+###############################################################################
+# BlockStop Auto-Scaling Policies Configuration
+# Defines policies for automatic scaling based on various metrics
+###############################################################################
+
+policies:
+  # CPU-based scaling policies
+  - name: cpu-scale-out
+    metric: cpu
+    threshold: 70
+    comparison: '>'
+    scalingAdjustment: 1
+    cooldown: 300
+    description: 'Scale out when CPU usage exceeds 70% for sustained period'
+
+  - name: cpu-scale-in
+    metric: cpu
+    threshold: 30
+    comparison: '<'
+    scalingAdjustment: -1
+    cooldown: 900
+    description: 'Scale in when CPU usage drops below 30% for sustained period'
+
+  # Memory-based scaling policies
+  - name: memory-scale-out
+    metric: memory
+    threshold: 80
+    comparison: '>'
+    scalingAdjustment: 1
+    cooldown: 300
+    description: 'Scale out when memory usage exceeds 80%'
+
+  - name: memory-scale-in
+    metric: memory
+    threshold: 40
+    comparison: '<'
+    scalingAdjustment: -1
+    cooldown: 900
+    description: 'Scale in when memory usage drops below 40%'
+
+  # Request latency-based scaling policies
+  - name: latency-scale-out
+    metric: latency
+    threshold: 300
+    comparison: '>'
+    scalingAdjustment: 1
+    cooldown: 240
+    description: 'Scale out when average request latency exceeds 300ms'
+
+  - name: latency-scale-in
+    metric: latency
+    threshold: 100
+    comparison: '<'
+    scalingAdjustment: -1
+    cooldown: 600
+    description: 'Scale in when average request latency drops below 100ms'
+
+  # Request volume-based scaling policies
+  - name: request-rate-scale-out
+    metric: requests
+    threshold: 7500
+    comparison: '>'
+    scalingAdjustment: 2
+    cooldown: 240
+    description: 'Scale out by 2 instances when requests exceed 7500/sec'
+
+  - name: request-rate-scale-in
+    metric: requests
+    comparison: '<'
+    threshold: 2000
+    scalingAdjustment: -1
+    cooldown: 900
+    description: 'Scale in when request rate drops below 2000/sec'
+
+  # Peak load policies
+  - name: peak-load-protection
+    metric: cpu
+    threshold: 85
+    comparison: '>='
+    scalingAdjustment: 3
+    cooldown: 120
+    description: 'Aggressive scaling out for extreme load conditions'
+
+  # Stability policies
+  - name: stability-hold
+    metric: cpu
+    threshold: 50
+    comparison: '=='
+    scalingAdjustment: 0
+    cooldown: 600
+    description: 'Maintain current capacity when CPU is stable'
+
+###############################################################################
+# Scaling Configuration
+###############################################################################
+
+scaling:
+  # Minimum and maximum instance counts
+  minInstances: 1
+  maxInstances: 10
+
+  # Default instance size
+  defaultInstanceSize: medium
+
+  # Scaling thresholds
+  scaleOutThreshold: 70        # CPU % to trigger scale-out
+  scaleInThreshold: 30         # CPU % to trigger scale-in
+  scaleOutSteps: 1             # Number of instances to add per scale-out
+  scaleInSteps: 1              # Number of instances to remove per scale-in
+
+  # Cooldown periods (in seconds)
+  minCooldown: 120             # Minimum time between any scaling actions
+  scaleOutCooldown: 300        # Time between scale-out actions
+  scaleInCooldown: 900         # Time between scale-in actions (conservative)
+
+  # Metrics evaluation
+  metricsWindow: 300           # Evaluation window in seconds
+  metricsSampleInterval: 60    # Sampling interval in seconds
+
+###############################################################################
+# Load Balancer Configuration
+###############################################################################
+
+loadBalancer:
+  # Load balancing strategy
+  strategy: least-connections   # Options: round-robin, least-connections, random
+
+  # Health check settings
+  healthCheckEnabled: true
+  healthCheckInterval: 30       # Seconds
+  healthCheckTimeout: 5         # Seconds
+  healthyThreshold: 2           # Consecutive successful checks
+  unhealthyThreshold: 3         # Consecutive failed checks
+
+  # Connection settings
+  connectionTimeout: 30         # Seconds
+  maxConnections: 5000
+  keepAliveTimeout: 60          # Seconds
+
+###############################################################################
+# Vertical Scaling Configuration
+###############################################################################
+
+verticalScaling:
+  # Available instance sizes
+  sizes:
+    - name: small
+      cpu: 1
+      memory: 512MB
+      bandwidth: 125Mbps
+    - name: medium
+      cpu: 2
+      memory: 1GB
+      bandwidth: 500Mbps
+    - name: large
+      cpu: 4
+      memory: 2GB
+      bandwidth: 1Gbps
+    - name: xlarge
+      cpu: 8
+      memory: 4GB
+      bandwidth: 2Gbps
+    - name: 2xlarge
+      cpu: 16
+      memory: 8GB
+      bandwidth: 4Gbps
+
+  # Upgrade/downgrade settings
+  upgradeThreshold: 85         # CPU % threshold for upgrade
+  downgradeThreshold: 20       # CPU % threshold for downgrade
+  minTimeBeweenChanges: 3600   # Seconds (1 hour)
+
+###############################################################################
+# Notification Configuration
+###############################################################################
+
+notifications:
+  enabled: true
+
+  # Alert thresholds
+  criticalCpuThreshold: 90
+  warningCpuThreshold: 75
+  criticalMemoryThreshold: 95
+  warningMemoryThreshold: 80
+
+  # Notification channels
+  channels:
+    - type: email
+      enabled: true
+      recipients:
+        - ops@blockstop.io
+    - type: slack
+      enabled: true
+      webhookUrl: '${SLACK_WEBHOOK_URL}'
+    - type: webhook
+      enabled: true
+      url: '${WEBHOOK_URL}'
+
+###############################################################################
+# Logging Configuration
+###############################################################################
+
+logging:
+  enabled: true
+  level: info
+  logScalingActions: true
+  logMetrics: true
+  logHealthChecks: false
+  logBalancerEvents: false
+  retentionDays: 30
+
+###############################################################################
+# Cost Optimization
+###############################################################################
+
+costOptimization:
+  enabled: true
+  preferDowntime: false        # Prefer downtime over cost
+  maxDailyUpgrades: 5          # Maximum vertical scaling upgrades per day
+  businessHours:
+    startHour: 8               # 8 AM
+    endHour: 18                # 6 PM
+    timezone: UTC
+
+###############################################################################
+# Features and Flags
+###############################################################################
+
+features:
+  enableHorizontalScaling: true
+  enableVerticalScaling: true
+  enableAutoHealing: true
+  enablePredictiveScaling: false
+  enableCostOptimization: true
+  enableDetailedMetrics: true
