@@ -242,7 +242,7 @@ export default function UpgradePage() {
 
                 <div className="bg-neutral-100 rounded-lg p-4 flex items-center justify-center mb-6 min-h-64">
                   <img
-                    src="/images/paytm-qr/paytm-qr.jpg"
+                    src="/Herey QR/HelloQR.jpg"
                     alt="PayTM QR Code - Scan to pay"
                     className="w-full h-full object-contain max-w-48"
                   />
