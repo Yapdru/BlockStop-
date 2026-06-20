@@ -7,6 +7,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
   size?: ButtonSize;
   isLoading?: boolean;
+  ariaLabel?: string;
   children: React.ReactNode;
 }
 
@@ -15,6 +16,7 @@ export function Button({
   size = 'md',
   isLoading = false,
   disabled = false,
+  ariaLabel,
   className = '',
   children,
   ...props
@@ -38,6 +40,8 @@ export function Button({
     <button
       className={`${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${className}`}
       disabled={disabled || isLoading}
+      aria-label={ariaLabel}
+      aria-busy={isLoading}
       {...props}
     >
       {isLoading ? (
