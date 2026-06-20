@@ -164,3 +164,101 @@ CREATE TABLE IF NOT EXISTS behavioral_analysis (
   INDEX idx_behavior_threat_id (threat_id),
   INDEX idx_behavior_category (behavior_category)
 );
+
+-- Risk assessments table
+CREATE TABLE IF NOT EXISTS risk_assessments (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL UNIQUE,
+  risk_score NUMERIC(5,2) NOT NULL,
+  threat_factors JSONB DEFAULT '{}'::jsonb,
+  exposure_level VARCHAR(20),
+  assessment_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  metadata JSONB DEFAULT '{}'::jsonb,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  INDEX idx_risk_user_id (user_id),
+  INDEX idx_risk_score (risk_score DESC)
+);
+
+-- Compliance reports table
+CREATE TABLE IF NOT EXISTS compliance_reports (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL,
+  framework VARCHAR(100) NOT NULL,
+  compliance_score NUMERIC(5,2) NOT NULL,
+  status VARCHAR(50) NOT NULL DEFAULT 'pending',
+  checked_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  findings JSONB DEFAULT '{}'::jsonb,
+  metadata JSONB DEFAULT '{}'::jsonb,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  INDEX idx_compliance_user_id (user_id),
+  INDEX idx_compliance_framework (framework),
+  INDEX idx_compliance_status (status)
+);
+
+-- Security posture table
+CREATE TABLE IF NOT EXISTS security_posture (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL,
+  posture_score NUMERIC(5,2) NOT NULL,
+  category VARCHAR(100) NOT NULL,
+  assessment TEXT,
+  recommendations JSONB DEFAULT '[]'::jsonb,
+  assessment_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  metadata JSONB DEFAULT '{}'::jsonb,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  INDEX idx_posture_user_id (user_id),
+  INDEX idx_posture_category (category),
+  INDEX idx_posture_score (posture_score DESC)
+);
+
+-- Playbooks table
+CREATE TABLE IF NOT EXISTS playbooks (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title VARCHAR(512) NOT NULL,
+  content TEXT,
+  category VARCHAR(100) NOT NULL,
+  steps JSONB NOT NULL,
+  estimated_time INTEGER,
+  difficulty VARCHAR(50),
+  prerequisites TEXT[] DEFAULT ARRAY[]::text[],
+  success_criteria JSONB DEFAULT '[]'::jsonb,
+  tags TEXT[] DEFAULT ARRAY[]::text[],
+  created_by VARCHAR(255),
+  is_published BOOLEAN NOT NULL DEFAULT TRUE,
+  metadata JSONB DEFAULT '{}'::jsonb,
+  version INTEGER DEFAULT 1,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  INDEX idx_playbooks_category (category),
+  INDEX idx_playbooks_published (is_published),
+  INDEX idx_playbooks_created_at (created_at DESC)
+);
+
+-- Runbooks table
+CREATE TABLE IF NOT EXISTS runbooks (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title VARCHAR(512) NOT NULL,
+  content TEXT,
+  category VARCHAR(100) NOT NULL,
+  automation_level VARCHAR(50) NOT NULL,
+  scripts JSONB DEFAULT '[]'::jsonb,
+  triggers JSONB DEFAULT '[]'::jsonb,
+  on_success TEXT,
+  on_failure TEXT,
+  max_retries INTEGER DEFAULT 3,
+  timeout INTEGER DEFAULT 300000,
+  tags TEXT[] DEFAULT ARRAY[]::text[],
+  created_by VARCHAR(255),
+  is_published BOOLEAN NOT NULL DEFAULT TRUE,
+  metadata JSONB DEFAULT '{}'::jsonb,
+  version INTEGER DEFAULT 1,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  INDEX idx_runbooks_category (category),
+  INDEX idx_runbooks_automation (automation_level),
+  INDEX idx_runbooks_published (is_published),
+  INDEX idx_runbooks_created_at (created_at DESC)
+);
