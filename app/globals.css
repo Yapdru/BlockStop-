@@ -18,6 +18,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  @apply bg-neutral-0 text-neutral-900;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -25,5 +26,168 @@ body {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: more) {
+  body {
+    --tw-text-opacity: 1;
+  }
+
+  .btn-primary {
+    @apply border-2 border-current;
+  }
+
+  .btn-secondary {
+    @apply border-2 border-current;
+  }
+
+  .focus-ring {
+    @apply focus:outline-4 focus:outline-offset-2;
+  }
+
+  button, a, [role="button"], [role="link"] {
+    @apply focus:outline-2 focus:outline-offset-1;
+  }
+}
+
+/* Enhanced Focus Indicators for Keyboard Navigation */
+@layer components {
+  .focus-visible-ring {
+    @apply focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary-500 focus-visible:ring-offset-2;
+  }
+
+  button, a, input, select, textarea, [role="button"], [role="link"], [role="tab"], [role="menuitem"] {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2;
+  }
+
+  /* Screen reader only content */
+  .sr-only {
+    @apply absolute -inset-1 h-1 w-1 overflow-hidden whitespace-nowrap border-0 p-0 clip;
+  }
+
+  .sr-only:focus {
+    @apply relative inset-auto h-auto w-auto overflow-visible whitespace-normal border-0 p-auto clip-auto bg-primary-500 text-white px-4 py-2 rounded z-50;
+  }
+
+  /* Focus visible for skip links */
+  a:focus:not(.sr-only) {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2;
+  }
+}
+
+/* Base Component Styles */
+@layer components {
+  /* Buttons */
+  .btn-primary {
+    @apply px-4 py-2 bg-primary-500 text-white font-semibold rounded-lg hover:bg-primary-600 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 bg-neutral-200 text-neutral-900 font-semibold rounded-lg hover:bg-neutral-300 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 disabled:opacity-50;
+  }
+
+  .btn-danger {
+    @apply px-4 py-2 bg-danger text-white font-semibold rounded-lg hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-400 disabled:opacity-50;
+  }
+
+  .btn-ghost {
+    @apply px-4 py-2 text-primary-500 hover:bg-primary-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400;
+  }
+
+  .btn-sm {
+    @apply px-3 py-1 text-sm;
+  }
+
+  .btn-lg {
+    @apply px-6 py-3 text-lg;
+  }
+
+  /* Cards */
+  .card {
+    @apply bg-neutral-0 rounded-lg border border-neutral-200 shadow-sm hover:shadow-md transition-shadow;
+  }
+
+  .card-lg {
+    @apply p-6;
+  }
+
+  .card-md {
+    @apply p-4;
+  }
+
+  .card-sm {
+    @apply p-3;
+  }
+
+  /* Form Inputs */
+  .input {
+    @apply w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:bg-neutral-100 disabled:cursor-not-allowed;
+  }
+
+  .input-lg {
+    @apply px-4 py-3 text-base;
+  }
+
+  .input-sm {
+    @apply px-2 py-1 text-sm;
+  }
+
+  /* Badges */
+  .badge {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold;
+  }
+
+  .badge-primary {
+    @apply badge bg-primary-100 text-primary-700;
+  }
+
+  .badge-success {
+    @apply badge bg-success/10 text-success;
+  }
+
+  .badge-warning {
+    @apply badge bg-warning/10 text-warning;
+  }
+
+  .badge-danger {
+    @apply badge bg-danger/10 text-danger;
+  }
+
+  /* Focus Ring */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+  }
+
+  /* Container */
+  .container-max {
+    @apply max-w-7xl mx-auto px-4;
+  }
+
+  /* Divider */
+  .divider {
+    @apply h-px bg-neutral-200;
+  }
+
+  /* Text Utilities */
+  .text-muted {
+    @apply text-neutral-600;
+  }
+
+  .text-subtle {
+    @apply text-neutral-500;
+  }
+
+  .text-truncate {
+    @apply truncate;
+  }
+
+  /* Skeleton Loading */
+  .skeleton {
+    @apply bg-neutral-200 rounded animate-pulse;
   }
 }

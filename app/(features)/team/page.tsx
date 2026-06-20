@@ -1,10 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { SettingsSection } from '@/components/settings/SettingsSection';
-import { FormField } from '@/components/settings/FormField';
+import { Button, Card, Badge, Input } from '@/components';
+import { a11y } from '@/lib/a11y';
 
 interface Team {
   id: number;
@@ -185,194 +184,246 @@ export default function TeamManagement() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-gradient-to-br from-light-bg to-primary-50 flex items-center justify-center">
-        <div className="animate-spin text-primary-600">⏳</div>
+      <main className="min-h-screen bg-neutral-50 flex items-center justify-center">
+        <div className="text-neutral-600">Loading teams...</div>
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-light-bg to-primary-50">
+    <main className="min-h-screen bg-neutral-50 pb-24 md:pb-0" id="main-content">
+      {/* Skip to main content link */}
+      <a
+        href="#main-content"
+        className="absolute top-0 left-0 p-2 bg-primary-600 text-white rounded-b-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 -translate-y-full focus:translate-y-0 transition-transform"
+        aria-label="Skip to main content"
+      >
+        Skip to main content
+      </a>
+
       {/* Header */}
-      <header className="bg-white border-b border-light-border sticky top-0 z-40">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center gap-4">
-          <Link href="/" className="text-primary-600 hover:text-primary-700">
-            ← Home
-          </Link>
-          <h1 className="text-2xl font-bold text-gray-900">👥 Team Management</h1>
+      <header className="bg-neutral-0 border-b border-neutral-200 sticky top-0 z-40">
+        <div className="container-max py-4">
+          <div className="flex items-center gap-4 mb-2">
+            <Link
+              href="/dashboard"
+              className="text-primary-600 hover:text-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 rounded font-medium"
+              aria-label="Back to dashboard"
+            >
+              ← Back
+            </Link>
+            <h1 className="text-h3 font-bold text-neutral-900">
+              <span aria-hidden="true">👥</span> Team Management
+            </h1>
+          </div>
+          <p className="text-sm text-neutral-600">Manage your team members and collaborators</p>
         </div>
       </header>
 
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="space-y-6"
-        >
-          {/* Alerts */}
-          {error && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg"
-            >
-              {error}
-            </motion.div>
-          )}
-
-          {success && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg"
-            >
-              ✓ {success}
-            </motion.div>
-          )}
-
-          {/* Create Team */}
-          <SettingsSection
-            title="Create a New Team"
-            description="Collaborate with your team members"
-            icon="🚀"
+      <div className="container-max py-8 space-y-6">
+        {/* Messages */}
+        {error && (
+          <div
+            className="bg-danger/10 border border-danger/20 text-danger p-4 rounded-lg"
+            role="alert"
+            aria-live="polite"
+            aria-atomic="true"
           >
-            <form onSubmit={handleCreateTeam} className="space-y-4">
-              <FormField label="Team Name">
-                <input
-                  type="text"
-                  value={teamName}
-                  onChange={(e) => setTeamName(e.target.value)}
-                  placeholder="My Team"
-                  className="w-full px-4 py-2 border border-light-border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                />
-              </FormField>
+            <span aria-hidden="true">❌</span> {error}
+          </div>
+        )}
 
-              <button
-                type="submit"
-                disabled={isCreating}
-                className="w-full px-4 py-2 bg-primary-600 text-white font-semibold rounded-lg hover:bg-primary-700 transition disabled:opacity-50"
-              >
-                {isCreating ? 'Creating...' : 'Create Team'}
-              </button>
-            </form>
-          </SettingsSection>
+        {success && (
+          <div
+            className="bg-success/10 border border-success/20 text-success p-4 rounded-lg"
+            role="alert"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            <span aria-hidden="true">✅</span> {success}
+          </div>
+        )}
 
-          {/* Teams List */}
-          {teams.length > 0 && (
-            <SettingsSection title="Your Teams" icon="📋">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {teams.map((team) => (
-                  <button
-                    key={team.id}
-                    onClick={() => setSelectedTeam(team)}
-                    className={`p-4 rounded-lg border-2 transition text-left ${
-                      selectedTeam?.id === team.id
-                        ? 'border-primary-600 bg-primary-50'
-                        : 'border-light-border bg-white hover:border-primary-400'
-                    }`}
-                  >
-                    <h3 className="font-bold text-gray-900">{team.name}</h3>
-                    <p className="text-xs text-gray-600 mt-1">
-                      Max {team.maxUsers} members
-                    </p>
-                  </button>
-                ))}
+        {/* Create Team */}
+        <Card padding="lg">
+          <div className="mb-6">
+            <h2 className="text-h4 font-bold text-neutral-900">
+              <span aria-hidden="true">🚀</span> Create a New Team
+            </h2>
+            <p className="text-sm text-neutral-600 mt-1">Collaborate with your team members</p>
+          </div>
+
+          <form onSubmit={handleCreateTeam} className="space-y-4">
+            <Input
+              type="text"
+              label="Team Name"
+              value={teamName}
+              onChange={(e) => setTeamName(e.target.value)}
+              placeholder="My Security Team"
+              aria-label="Team name input"
+            />
+
+            <Button
+              variant="primary"
+              className="w-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600"
+              disabled={isCreating}
+              aria-busy={isCreating}
+              aria-label={isCreating ? 'Creating team' : 'Create new team'}
+            >
+              {isCreating ? <><span aria-hidden="true">⏳</span> Creating...</> : <><span aria-hidden="true">🚀</span> Create Team</>}
+            </Button>
+          </form>
+        </Card>
+
+        {/* Teams List */}
+        {teams.length > 0 && (
+          <Card padding="lg">
+            <div className="mb-6">
+              <h2 className="text-h4 font-bold text-neutral-900">
+                <span aria-hidden="true">📋</span> Your Teams
+              </h2>
+              <p className="text-sm text-neutral-600 mt-1">{teams.length} team(s)</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4" role="group" aria-label="Teams selection">
+              {teams.map((team) => (
+                <button
+                  key={team.id}
+                  onClick={() => setSelectedTeam(team)}
+                  className={`relative p-4 rounded-lg border-2 text-left transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 ${
+                    selectedTeam?.id === team.id
+                      ? 'border-primary-500 bg-primary-50'
+                      : 'border-neutral-200 bg-neutral-50 hover:border-primary-300'
+                  }`}
+                  aria-pressed={selectedTeam?.id === team.id}
+                  aria-label={`${team.name} team, max ${team.maxUsers} members`}
+                >
+                  {selectedTeam?.id === team.id && (
+                    <Badge variant="primary" className="absolute top-2 right-2">
+                      Selected
+                    </Badge>
+                  )}
+                  <p className="text-h6 font-bold text-neutral-900">{team.name}</p>
+                  <p className="text-xs text-neutral-600 mt-2">
+                    <span aria-hidden="true">👥</span> Max {team.maxUsers} members
+                  </p>
+                </button>
+              ))}
+            </div>
+          </Card>
+        )}
+
+        {/* Team Members Section */}
+        {selectedTeam && (
+          <>
+            {/* Invite Members */}
+            <Card padding="lg">
+              <div className="mb-6">
+                <h2 className="text-h4 font-bold text-neutral-900">
+                  <span aria-hidden="true">➕</span> Invite to {selectedTeam.name}
+                </h2>
+                <p className="text-sm text-neutral-600 mt-1">Add new team members</p>
               </div>
-            </SettingsSection>
-          )}
 
-          {/* Team Members */}
-          {selectedTeam && (
-            <>
-              {/* Invite Members */}
-              <SettingsSection
-                title={`Invite to ${selectedTeam.name}`}
-                description="Add new team members"
-                icon="👤"
-              >
-                <form onSubmit={handleInviteMember} className="space-y-4">
-                  <FormField label="Email Address">
-                    <input
-                      type="email"
-                      value={inviteEmail}
-                      onChange={(e) => setInviteEmail(e.target.value)}
-                      placeholder="user@example.com"
-                      className="w-full px-4 py-2 border border-light-border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    />
-                  </FormField>
+              <form onSubmit={handleInviteMember} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Input
+                    type="email"
+                    label="Email Address"
+                    value={inviteEmail}
+                    onChange={(e) => setInviteEmail(e.target.value)}
+                    placeholder="user@example.com"
+                    aria-label="Invite email address"
+                  />
 
-                  <FormField label="Role">
+                  <div>
+                    <label htmlFor="invite-role" className="block text-sm font-medium text-neutral-900 mb-2">
+                      Role
+                    </label>
                     <select
+                      id="invite-role"
                       value={inviteRole}
                       onChange={(e) => setInviteRole(e.target.value as 'member' | 'admin')}
-                      className="w-full px-4 py-2 border border-light-border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      className="input w-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600"
+                      aria-label="Invite role selection"
                     >
-                      <option value="member">Member (can scan)</option>
-                      <option value="admin">Admin (manage team)</option>
+                      <option value="member"><span aria-hidden="true">👤</span> Member</option>
+                      <option value="admin"><span aria-hidden="true">👑</span> Admin</option>
                     </select>
-                  </FormField>
+                  </div>
+                </div>
 
-                  <button
-                    type="submit"
-                    disabled={isInviting}
-                    className="w-full px-4 py-2 bg-primary-600 text-white font-semibold rounded-lg hover:bg-primary-700 transition disabled:opacity-50"
-                  >
-                    {isInviting ? 'Sending...' : 'Send Invitation'}
-                  </button>
-                </form>
-              </SettingsSection>
+                <Button
+                  variant="primary"
+                  className="w-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600"
+                  disabled={isInviting}
+                  aria-busy={isInviting}
+                  aria-label={isInviting ? 'Sending invitation' : 'Send team member invitation'}
+                >
+                  {isInviting ? <><span aria-hidden="true">⏳</span> Sending...</> : <><span aria-hidden="true">📧</span> Send Invitation</>}
+                </Button>
+              </form>
+            </Card>
 
-              {/* Members List */}
-              <SettingsSection
-                title={`Team Members (${members.length})`}
-                icon="👥"
-              >
-                {members.length === 0 ? (
-                  <p className="text-gray-600">No members in this team yet</p>
-                ) : (
-                  <div className="space-y-2">
-                    {members.map((member) => (
-                      <div
-                        key={member.id}
-                        className="flex items-center justify-between p-3 bg-light-surface rounded-lg"
-                      >
-                        <div>
-                          <p className="font-semibold text-gray-900">
-                            {member.userName || member.userEmail}
-                          </p>
-                          <p className="text-xs text-gray-600">
-                            {member.role === 'admin' ? '👑 Admin' : 'Member'} •{' '}
-                            {new Date(member.joinedAt).toLocaleDateString()}
-                          </p>
-                        </div>
+            {/* Team Members List */}
+            {members.length > 0 && (
+              <Card padding="lg">
+                <div className="mb-6">
+                  <h2 className="text-h4 font-bold text-neutral-900">
+                    <span aria-hidden="true">👥</span> Team Members
+                  </h2>
+                  <p className="text-sm text-neutral-600 mt-1">{members.length} member(s)</p>
+                </div>
 
-                        <button
+                <div className="space-y-3" role="region" aria-label="Team members list">
+                  {members.map((member) => (
+                    <div
+                      key={member.id}
+                      className="flex items-center justify-between p-4 bg-neutral-50 border border-neutral-200 rounded-lg"
+                    >
+                      <div className="flex-1">
+                        <p className="font-medium text-neutral-900">{member.userName || member.userEmail}</p>
+                        <p className="text-xs text-neutral-600">{member.userEmail}</p>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <Badge variant={member.role === 'admin' ? 'primary' : 'info'}>
+                          {member.role === 'admin' ? <><span aria-hidden="true">👑</span> Admin</> : <><span aria-hidden="true">👤</span> Member</>}
+                        </Badge>
+
+                        <Button
+                          variant="danger"
+                          size="sm"
+                          className="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-danger-600"
                           onClick={() => handleRemoveMember(member.id)}
-                          className="px-3 py-1 bg-red-100 text-red-700 text-sm font-semibold rounded hover:bg-red-200 transition"
+                          aria-label={`Remove ${member.userName || member.userEmail} from team`}
                         >
                           Remove
-                        </button>
+                        </Button>
                       </div>
-                    ))}
-                  </div>
-                )}
-              </SettingsSection>
-            </>
-          )}
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            )}
+          </>
+        )}
 
-          {teams.length === 0 && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center py-12"
+        {/* Empty State */}
+        {teams.length === 0 && (
+          <Card padding="lg" className="text-center">
+            <p className="text-4xl mb-4" aria-hidden="true">👥</p>
+            <p className="text-neutral-600 mb-4">No teams yet. Create your first team to start collaborating.</p>
+            <Button
+              variant="primary"
+              onClick={() => document.querySelector('input[placeholder="My Security Team"]')?.focus()}
+              className="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600"
+              aria-label="Create your first team"
             >
-              <p className="text-gray-600 mb-4">You haven't created any teams yet</p>
-              <p className="text-sm text-gray-500">
-                Create a team above to start collaborating with others
-              </p>
-            </motion.div>
-          )}
-        </motion.div>
+              Create Team
+            </Button>
+          </Card>
+        )}
       </div>
     </main>
   );

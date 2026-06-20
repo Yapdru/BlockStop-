@@ -88,6 +88,108 @@ npm run dev
 
 ## Development Phases
 
+### Phase 25: ✅ Massive UX Redesign (Complete - 70%)
+**Status:** Phases 25.1-25.3 complete, 25.4-25.5 framework ready
+
+- **Phase 25.1:** Design System Foundation ✅
+  - Light blue primary (#1E88FF), yellow accent (#FFE500), neutral palette
+  - Typography system (h1-h6, body, small, xs)
+  - Spacing scale (xs-xxl, 4px-48px)
+  - Tailwind config extended with custom tokens
+
+- **Phase 25.2:** Core Component Library ✅
+  - 12 production-ready components (Button, Card, Input, Badge, BottomNav, CommandPalette, Sidebar, Modal, Tabs, Dropdown, SmartToolbar, AnimatedCard)
+  - TypeScript interfaces for all props
+  - Responsive design and accessibility built-in
+
+- **Phase 25.3:** Page Redesigns (16 pages) ✅
+  - **Tier 1-2:** Dashboard, Email Checker, File Scanner, BetterBot, Pricing, Settings
+  - **Tier 3:** Account, Security, Privacy, Integrations
+  - **Tier 4:** VPN Selector, WiFi Checker, Compliance Dashboard
+  - **Tier 5-7:** Home, Upgrade, Team Management
+  - Mobile-first responsive design
+  - Bottom navigation for mobile users
+
+- **Phase 25.4:** Accessibility & Mobile Polish ⏳
+  - ARIA labels and keyboard navigation
+  - WCAG 2.1 AAA compliance target
+  - High-contrast mode support
+  - Screen reader testing
+  - Mobile device testing
+
+- **Phase 25.5:** Testing & Deployment ⏳
+  - Unit tests (Jest, 80% coverage target)
+  - E2E tests (critical flows)
+  - Performance testing (Lighthouse)
+  - Cross-browser testing
+  - Production deployment
+
+### Phase 26: Native App Distribution (Planning)
+**Status:** Planning phase - awaiting clarification on 26.3-26.6
+
+- **Phase 26.1:** iOS App Distribution ⏳
+  - **IBlock** - Universal iOS/iPad app (.ipa)
+  - Install via Feather or similar tools
+  - Tier availability:
+    - FREE: No native app
+    - NEO: No native app
+    - PRO: ✅ iPhone (NOT iPad)
+    - MAX: ✅ iPhone + iPad with animations
+  - Features:
+    - Full threat analysis interface
+    - Quick scan capability
+    - Notification integration
+    - Offline capability for scans
+
+- **Phase 26.2:** macOS App Distribution ⏳
+  - **MACBlock** - Native macOS app (.app)
+  - Menu bar integration:
+    - Shield icon in menu bar
+    - Quick review tap option
+    - "Full" button opens main app window
+  - Full Mac-optimized UI with all integrations
+  - Tier availability:
+    - FREE: Very limited badge (degraded)
+    - NEO: ✅ Mac app with basic controls
+    - PRO: ✅ Mac app with full features
+    - MAX: ✅ Mac app with advanced animations
+  - Features:
+    - Menu bar quick access
+    - Desktop notifications
+    - Spotlight integration
+    - Keyboard shortcuts
+    - Background scanning
+
+### ❓ CLARIFICATION NEEDED FOR PHASES 26.3-26.6
+
+Please answer the following to finalize Phase 26 architecture:
+
+**Phase 26.3 - Cloud Sync & Cross-Device**
+1. Should native apps sync data with web app in real-time?
+2. For PRO (Mac only): Should users have one unified account across web + Mac?
+3. For MAX (all devices): Sync strategy - CloudKit (Apple), custom server, or both?
+4. Offline mode: Store last N scans locally or always require connection?
+
+**Phase 26.4 - Advanced Mac Features**
+1. Context menu integration for right-click file scanning?
+2. Safari extension for email/link checking?
+3. Mail app integration for automatic email scanning?
+4. Accessibility features (VoiceOver support, keyboard-only navigation)?
+
+**Phase 26.5 - iOS Advanced Features**
+1. Should IBlock support URLSchemes for deep linking from Safari?
+2. Share extension to scan files from Files app?
+3. Siri shortcuts integration?
+4. Background app refresh for periodic scans?
+
+**Phase 26.6 - Distribution & Updates**
+1. App Store distribution or side-loading only?
+2. Auto-update mechanism (in-app or OS-level)?
+3. Beta testing channel (TestFlight for iOS, separate macOS builds)?
+4. License key management for tier verification?
+
+---
+
 ### Phase 1.0: ✅ Project Setup (Complete)
 - Initialize Next.js with TypeScript and Tailwind CSS
 - Set up folder structure and configuration

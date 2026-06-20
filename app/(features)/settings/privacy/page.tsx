@@ -1,10 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { SettingsSection } from '@/components/settings/SettingsSection';
-import { FormField } from '@/components/settings/FormField';
+import { Button, Card, Input } from '@/components';
+import { a11y } from '@/lib/a11y';
 
 interface PrivacySettings {
   dataRetentionDays: number;
@@ -85,201 +84,226 @@ export default function PrivacySettings() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-gradient-to-br from-light-bg to-primary-50 flex items-center justify-center">
-        <div className="animate-spin text-primary-600">⏳</div>
+      <main className="min-h-screen bg-neutral-50 flex items-center justify-center">
+        <div className="text-neutral-600">Loading privacy settings...</div>
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-light-bg to-primary-50">
+    <main className="min-h-screen bg-neutral-50 pb-24 md:pb-0" id="main-content">
+      {/* Skip to main content link */}
+      <a
+        href="#main-content"
+        className="absolute top-0 left-0 p-2 bg-primary-600 text-white rounded-b-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 -translate-y-full focus:translate-y-0 transition-transform"
+        aria-label="Skip to main content"
+      >
+        Skip to main content
+      </a>
+
       {/* Header */}
-      <header className="bg-white border-b border-light-border sticky top-0 z-40">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center gap-4">
-          <Link href="/settings" className="text-primary-600 hover:text-primary-700">
+      <header className="bg-neutral-0 border-b border-neutral-200 sticky top-0 z-40">
+        <div className="container-max py-4 flex items-center gap-4">
+          <Link
+            href="/settings"
+            className="text-primary-600 hover:text-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 rounded font-medium"
+            aria-label="Back to settings"
+          >
             ← Back
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900">🔐 Privacy Settings</h1>
+          <h1 className="text-h3 font-bold text-neutral-900">
+            <span aria-hidden="true">🔐</span> Privacy Settings
+          </h1>
         </div>
       </header>
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="space-y-6"
-        >
-          {/* Error */}
-          {error && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg"
-            >
-              {error}
-            </motion.div>
-          )}
+      <div className="container-max py-8">
+        {/* Messages */}
+        {error && (
+          <div
+            className="bg-danger/10 border border-danger/20 text-danger p-4 rounded-lg mb-6"
+            role="alert"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            <span aria-hidden="true">❌</span> {error}
+          </div>
+        )}
 
-          {/* Success */}
-          {success && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg"
-            >
-              ✓ {success}
-            </motion.div>
-          )}
+        {success && (
+          <div
+            className="bg-success/10 border border-success/20 text-success p-4 rounded-lg mb-6"
+            role="alert"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            <span aria-hidden="true">✅</span> {success}
+          </div>
+        )}
 
-          <form onSubmit={handleSave} className="space-y-6">
-            {/* Data Retention */}
-            <SettingsSection
-              title="Data Retention"
-              description="How long we keep your scan history and data"
-              icon="📅"
-            >
-              <FormField
-                label="Retention Period (days)"
-                description="Your scan history will be automatically deleted after this period"
-              >
-                <div className="flex items-center gap-4">
-                  <input
-                    type="range"
-                    min="1"
-                    max="365"
-                    value={dataRetentionDays}
-                    onChange={(e) => setDataRetentionDays(parseInt(e.target.value))}
-                    className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                  />
-                  <span className="text-2xl font-bold text-primary-600 min-w-16 text-right">
-                    {dataRetentionDays}
-                  </span>
+        <form onSubmit={handleSave} className="space-y-6">
+          {/* Data Retention */}
+          <Card padding="lg">
+            <div className="mb-6">
+              <h2 className="text-h4 font-bold text-neutral-900">📅 Data Retention</h2>
+              <p className="text-sm text-neutral-600 mt-1">How long we keep your scan history</p>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <label htmlFor="retention-slider" className="text-sm font-medium text-neutral-900">
+                    Retention Period
+                  </label>
+                  <span className="text-2xl font-bold text-primary-500" aria-live="polite">{dataRetentionDays}</span>
                 </div>
-              </FormField>
-
-              <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <p className="text-sm text-blue-700">
-                  <strong>Note:</strong> Deleted data cannot be recovered. This applies to email scans,
-                  file scans, and all associated metadata.
-                </p>
+                <input
+                  id="retention-slider"
+                  type="range"
+                  min="1"
+                  max="365"
+                  value={dataRetentionDays}
+                  onChange={(e) => setDataRetentionDays(parseInt(e.target.value))}
+                  className="w-full h-2 bg-neutral-200 rounded-lg cursor-pointer appearance-none accent-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600"
+                  aria-describedby="retention-hint"
+                />
+                <div className="flex justify-between text-xs text-neutral-600 mt-2" id="retention-hint">
+                  <span>1 day</span>
+                  <span>365 days</span>
+                </div>
               </div>
 
-              <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2" role="group" aria-label="Quick retention period selection">
                 {[30, 90, 180, 365].map((days) => (
                   <button
                     key={days}
                     type="button"
                     onClick={() => setDataRetentionDays(days)}
-                    className={`px-3 py-2 rounded border transition ${
+                    className={`px-3 py-2 rounded-lg font-medium text-sm transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 ${
                       dataRetentionDays === days
-                        ? 'bg-primary-600 text-white border-primary-600'
-                        : 'bg-white border-light-border hover:border-primary-400'
+                        ? 'bg-primary-500 text-white'
+                        : 'bg-neutral-100 text-neutral-900 hover:bg-neutral-200'
                     }`}
+                    aria-pressed={dataRetentionDays === days}
                   >
                     {days} days
                   </button>
                 ))}
               </div>
-            </SettingsSection>
 
-            {/* Analytics */}
-            <SettingsSection
-              title="Analytics & Usage Tracking"
-              description="Help us improve by sharing anonymized usage data"
-              icon="📊"
-            >
-              <label className="flex items-center justify-between p-4 bg-light-surface rounded-lg cursor-pointer hover:bg-primary-50 transition">
-                <div>
-                  <p className="font-semibold text-gray-900">Analytics Tracking</p>
-                  <p className="text-sm text-gray-600">
-                    Share anonymized usage data to help us improve your experience
-                  </p>
-                </div>
-
-                <input
-                  type="checkbox"
-                  checked={analyticsEnabled}
-                  onChange={(e) => setAnalyticsEnabled(e.target.checked)}
-                  className="w-6 h-6 text-primary-600 cursor-pointer"
-                />
-              </label>
-
-              <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                <p className="text-xs text-gray-700 mb-2">
-                  <strong>What we collect:</strong>
+              <div className="bg-primary-50 border border-primary-200 rounded-lg p-4">
+                <p className="text-sm text-neutral-700">
+                  <strong>Note:</strong> Deleted data cannot be recovered. This applies to email scans, file scans, and all metadata.
                 </p>
-                <ul className="text-xs text-gray-600 space-y-1 list-disc list-inside">
-                  <li>Feature usage (email scanner, file scanner, etc.)</li>
-                  <li>General scan statistics (not scan contents)</li>
-                  <li>App performance metrics</li>
-                  <li>Device type (desktop, mobile, tablet)</li>
-                </ul>
-                <p className="text-xs text-gray-700 mt-3 mb-2">
-                  <strong>What we don't collect:</strong>
-                </p>
-                <ul className="text-xs text-gray-600 space-y-1 list-disc list-inside">
-                  <li>Email contents or attachments</li>
-                  <li>File contents</li>
-                  <li>Personal information</li>
-                  <li>IP addresses or location data</li>
-                </ul>
               </div>
-            </SettingsSection>
-
-            {/* Email Notifications */}
-            <SettingsSection
-              title="Email Notifications"
-              description="Receive important alerts about your account"
-              icon="📧"
-            >
-              <label className="flex items-center justify-between p-4 bg-light-surface rounded-lg cursor-pointer hover:bg-primary-50 transition">
-                <div>
-                  <p className="font-semibold text-gray-900">Threat Alerts</p>
-                  <p className="text-sm text-gray-600">
-                    Get notified when threats are detected in your scans
-                  </p>
-                </div>
-
-                <input
-                  type="checkbox"
-                  checked={emailNotificationsEnabled}
-                  onChange={(e) => setEmailNotificationsEnabled(e.target.checked)}
-                  className="w-6 h-6 text-primary-600 cursor-pointer"
-                />
-              </label>
-
-              <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                <p className="text-xs text-gray-700 mb-2">
-                  <strong>You will receive emails for:</strong>
-                </p>
-                <ul className="text-xs text-gray-600 space-y-1 list-disc list-inside">
-                  <li>High-risk threats detected</li>
-                  <li>Malware found in file scans</li>
-                  <li>Suspicious email patterns</li>
-                  <li>Security alerts</li>
-                </ul>
-              </div>
-            </SettingsSection>
-
-            {/* Save Button */}
-            <div className="flex justify-end gap-4 pt-6 border-t border-light-border">
-              <Link
-                href="/settings"
-                className="px-6 py-3 bg-gray-200 text-gray-900 font-semibold rounded-lg hover:bg-gray-300 transition"
-              >
-                Cancel
-              </Link>
-
-              <button
-                type="submit"
-                disabled={saving}
-                className="px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-semibold rounded-lg hover:shadow-lg transition disabled:opacity-50"
-              >
-                {saving ? 'Saving...' : '💾 Save Changes'}
-              </button>
             </div>
-          </form>
-        </motion.div>
+          </Card>
+
+          {/* Analytics */}
+          <Card padding="lg">
+            <div className="mb-6">
+              <h2 className="text-h4 font-bold text-neutral-900">📊 Analytics & Usage</h2>
+              <p className="text-sm text-neutral-600 mt-1">Help us improve by sharing anonymized data</p>
+            </div>
+
+            <label className="flex items-center justify-between p-4 bg-neutral-50 rounded-lg cursor-pointer hover:bg-primary-50 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary-600 transition border border-neutral-200">
+              <div>
+                <p className="font-medium text-neutral-900">Analytics Tracking</p>
+                <p className="text-xs text-neutral-600 mt-1">
+                  Share anonymized usage data
+                </p>
+              </div>
+
+              <input
+                type="checkbox"
+                checked={analyticsEnabled}
+                onChange={(e) => setAnalyticsEnabled(e.target.checked)}
+                className="w-5 h-5 text-primary-500 cursor-pointer focus:outline-none"
+                aria-label="Enable analytics tracking"
+              />
+            </label>
+
+            <div className="mt-4 grid md:grid-cols-2 gap-4">
+              <div className="bg-neutral-50 rounded-lg p-4 border border-neutral-200">
+                <p className="text-xs font-semibold text-neutral-900 mb-3">We collect:</p>
+                <ul className="text-xs text-neutral-700 space-y-1">
+                  <li>✓ Feature usage patterns</li>
+                  <li>✓ Scan statistics</li>
+                  <li>✓ App performance</li>
+                  <li>✓ Device type</li>
+                </ul>
+              </div>
+
+              <div className="bg-neutral-50 rounded-lg p-4 border border-neutral-200">
+                <p className="text-xs font-semibold text-neutral-900 mb-3">We don&apos;t collect:</p>
+                <ul className="text-xs text-neutral-700 space-y-1">
+                  <li>✗ Email contents</li>
+                  <li>✗ File contents</li>
+                  <li>✗ Personal info</li>
+                  <li>✗ IP/location</li>
+                </ul>
+              </div>
+            </div>
+          </Card>
+
+          {/* Email Notifications */}
+          <Card padding="lg">
+            <div className="mb-6">
+              <h2 className="text-h4 font-bold text-neutral-900">📧 Email Notifications</h2>
+              <p className="text-sm text-neutral-600 mt-1">Security alerts about your account</p>
+            </div>
+
+            <label className="flex items-center justify-between p-4 bg-neutral-50 rounded-lg cursor-pointer hover:bg-primary-50 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary-600 transition border border-neutral-200">
+              <div>
+                <p className="font-medium text-neutral-900">Threat Alerts</p>
+                <p className="text-xs text-neutral-600 mt-1">
+                  Get notified of detected threats
+                </p>
+              </div>
+
+              <input
+                type="checkbox"
+                checked={emailNotificationsEnabled}
+                onChange={(e) => setEmailNotificationsEnabled(e.target.checked)}
+                className="w-5 h-5 text-primary-500 cursor-pointer focus:outline-none"
+                aria-label="Enable threat alert notifications"
+              />
+            </label>
+
+            <div className="mt-4 bg-neutral-50 rounded-lg p-4 border border-neutral-200">
+              <p className="text-xs font-semibold text-neutral-900 mb-3">You&apos;ll receive alerts for:</p>
+              <ul className="text-xs text-neutral-700 space-y-1">
+                <li>⚠️ High-risk threats detected</li>
+                <li>⚠️ Malware in file scans</li>
+                <li>⚠️ Suspicious email patterns</li>
+                <li>⚠️ Security incidents</li>
+              </ul>
+            </div>
+          </Card>
+
+          {/* Save Button */}
+          <div className="flex gap-3 pt-4 border-t border-neutral-200">
+            <Link href="/settings" className="flex-1">
+              <Button
+                variant="secondary"
+                className="w-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-600"
+                aria-label="Cancel and go back to settings"
+              >
+                ← Cancel
+              </Button>
+            </Link>
+
+            <button
+              type="submit"
+              disabled={saving}
+              className="flex-1 px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-lg transition disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600"
+              aria-busy={saving}
+              aria-label={saving ? 'Saving privacy settings' : 'Save privacy settings changes'}
+            >
+              {saving ? 'Saving...' : <><span aria-hidden="true">💾</span> Save Changes</>}
+            </button>
+          </div>
+        </form>
       </div>
     </main>
   );

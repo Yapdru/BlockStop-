@@ -1,9 +1,10 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { motion } from "framer-motion";
-import Link from "next/link";
-import { ResultCard } from "@/components/ResultCard";
+import { useState } from 'react';
+import Link from 'next/link';
+import { Button, Card } from '@/components';
+import { ResultCard } from '@/components/ResultCard';
+import { a11y } from '@/lib/a11y';
 
 export default function FileScanner() {
   const [file, setFile] = useState<File | null>(null);
@@ -14,9 +15,9 @@ export default function FileScanner() {
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
+    if (e.type === 'dragenter' || e.type === 'dragover') {
       setDragActive(true);
-    } else if (e.type === "dragleave") {
+    } else if (e.type === 'dragleave') {
       setDragActive(false);
     }
   };
@@ -25,10 +26,10 @@ export default function FileScanner() {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-
     const files = e.dataTransfer.files;
     if (files && files[0]) {
       setFile(files[0]);
+      a11y.announce(`File selected: ${files[0].name}`, 'polite');
     }
   };
 
@@ -38,113 +39,168 @@ export default function FileScanner() {
 
     setLoading(true);
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append('file', file);
 
     try {
-      const response = await fetch("/api/file/upload", {
-        method: "POST",
+      const response = await fetch('/api/file/upload', {
+        method: 'POST',
         body: formData,
       });
       const data = await response.json();
       setResult(data);
     } catch (error) {
-      console.error("Error scanning file:", error);
+      console.error('Error scanning file:', error);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-light-bg to-primary-50">
+    <main className="min-h-screen bg-neutral-50 pb-24 md:pb-0" id="main-content">
+      <a
+        href="#file-input"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary-500 focus:text-white focus:rounded"
+        onClick={(e) => {
+          e.preventDefault();
+          const input = document.querySelector('#file-input');
+          if (input instanceof HTMLElement) {
+            input.focus();
+          }
+        }}
+      >
+        Skip to file upload
+      </a>
       {/* Header */}
-      <header className="bg-white border-b border-light-border">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center gap-4">
-          <Link href="/" className="text-primary-600 hover:text-primary-700">
+      <header className="bg-neutral-0 border-b border-neutral-200 sticky top-0 z-40">
+        <div className="container-max py-4 flex items-center gap-4">
+          <Link
+            href="/dashboard"
+            className="text-primary-600 hover:text-primary-700 font-medium focus:outline-none focus:ring-2 focus:ring-primary-500 rounded"
+            aria-label="Back to dashboard"
+          >
             ← Back
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900">📁 File Scanner</h1>
+          <h1 className="text-h3 font-bold text-neutral-900">
+            <span aria-hidden="true">📁</span> File Scanner
+          </h1>
         </div>
       </header>
 
-      <div className="max-w-4xl mx-auto px-4 py-12">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-xl shadow-lg p-8 mb-8"
-        >
-          <h2 className="text-3xl font-bold text-gray-900 mb-6">
-            Scan Files for Malware
-          </h2>
+      <div className="container-max py-8">
+        {/* Upload Section */}
+        <Card padding="lg" className="mb-8">
+          <h2 className="text-h4 font-bold text-neutral-900 mb-4">Scan Files for Threats</h2>
+          <p className="text-neutral-600 text-sm mb-6">
+            Check your files for malware, ransomware, and suspicious patterns using BetterBot PRO
+          </p>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div
               onDragEnter={handleDrag}
               onDragLeave={handleDrag}
               onDragOver={handleDrag}
               onDrop={handleDrop}
-              className={`relative border-2 border-dashed rounded-lg p-12 text-center transition ${
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  const input = document.querySelector('#file-input') as HTMLInputElement;
+                  input?.click();
+                }
+              }}
+              role="button"
+              aria-label="Drag and drop file upload area, or press Enter to browse files"
+              aria-disabled={loading}
+              className={`relative border-2 border-dashed rounded-lg p-12 text-center transition focus:outline-none focus:ring-2 focus:ring-primary-500 ${
                 dragActive
-                  ? "border-primary-500 bg-primary-50"
-                  : "border-light-border hover:border-primary-400"
+                  ? 'border-primary-500 bg-primary-50'
+                  : 'border-neutral-300 hover:border-primary-400 hover:bg-neutral-100/50'
               }`}
             >
               <input
                 type="file"
-                onChange={(e) => e.target.files && setFile(e.target.files[0])}
+                onChange={e => {
+                  e.target.files && setFile(e.target.files[0]);
+                  a11y.announce(`File selected: ${e.target.files?.[0]?.name}`, 'polite');
+                }}
                 className="hidden"
                 id="file-input"
               />
-              <label
-                htmlFor="file-input"
-                className="cursor-pointer block"
-              >
-                <div className="text-4xl mb-4">📤</div>
-                <p className="text-lg font-semibold text-gray-900 mb-2">
-                  Drag and drop your file here
+              <label htmlFor="file-input" className="cursor-pointer block">
+                <div className="text-5xl mb-3" aria-hidden="true">📤</div>
+                <p className="text-lg font-semibold text-neutral-900 mb-1">
+                  Drag your file here
                 </p>
-                <p className="text-gray-600">or click to browse</p>
+                <p className="text-sm text-neutral-600">or click to browse your device</p>
               </label>
 
               {file && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="mt-4 p-4 bg-primary-50 rounded-lg border border-primary-200"
-                >
-                  <p className="text-sm text-gray-700">
-                    <strong>Selected:</strong> {file.name}
+                <div className="mt-6 p-4 bg-success/10 border border-success/20 rounded-lg" role="status">
+                  <p className="text-sm font-medium text-neutral-900">
+                    <span aria-hidden="true">✓</span> Selected: {file.name}
                   </p>
-                  <p className="text-xs text-gray-600">
+                  <p className="text-xs text-neutral-600 mt-1">
                     {(file.size / 1024 / 1024).toFixed(2)} MB
                   </p>
-                </motion.div>
+                </div>
               )}
             </div>
 
-            <button
+            <Button
               type="submit"
-              disabled={!file || loading}
-              className="w-full px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-semibold rounded-lg hover:shadow-lg transition disabled:opacity-50"
+              variant="primary"
+              size="lg"
+              isLoading={loading}
+              disabled={!file}
+              className="w-full"
+              aria-label={loading ? 'Scanning file, please wait' : 'Scan file for threats'}
+              aria-busy={loading}
             >
-              {loading ? "Scanning..." : "Scan File"}
-            </button>
+              {loading ? 'Scanning file...' : '🔍 Scan File'}
+            </Button>
           </form>
-        </motion.div>
+        </Card>
 
         {/* Results */}
         {result && (
-          <ResultCard
-            title={`File Scan: ${result.fileName}`}
-            threatLevel={result.threatLevel}
-            threats={result.threats || []}
-            timestamp={result.scanTimestamp}
-            details={{
-              "File Type": result.fileType,
-              "File Size": result.fileSize,
-              "Malware Signatures": result.analysis?.malwareSignatures,
-              "Ransomware Risk": result.analysis?.ransomwareRisk,
-            }}
-          />
+          <section role="region" aria-labelledby="results-heading" aria-live="polite">
+            <h2 id="results-heading" className="text-h4 font-bold text-neutral-900 mb-4">
+              Scan Results
+            </h2>
+            <ResultCard
+              title={`File Scan: ${result.fileName}`}
+              threatLevel={result.threatLevel}
+              threats={result.threats || []}
+              timestamp={result.scanTimestamp}
+              details={{
+                'File Type': result.fileType,
+                'File Size': result.fileSize,
+                'Malware Signatures': result.analysis?.malwareSignatures,
+                'Ransomware Risk': result.analysis?.ransomwareRisk,
+              }}
+            />
+
+            {/* Action Buttons */}
+            <div className="mt-6 flex gap-3">
+              <Button
+                variant="secondary"
+                onClick={() => setResult(null)}
+                aria-label="Scan another file"
+              >
+                ← Scan Another File
+              </Button>
+              <Link href="/email-checker">
+                <Button variant="secondary" aria-label="Go to email checker">
+                  Check Email →</Button>
+              </Link>
+            </div>
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!loading && !result && !file && (
+          <div className="text-center py-12">
+            <p className="text-neutral-600">Upload a file above to get started</p>
+          </div>
         )}
       </div>
     </main>
