@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { motion } from "framer-motion";
-import Link from "next/link";
-import { ResultCard } from "@/components/ResultCard";
+import { useState } from 'react';
+import Link from 'next/link';
+import { Button, Card, Input } from '@/components';
+import { ResultCard } from '@/components/ResultCard';
 
 export default function EmailChecker() {
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
 
@@ -15,75 +15,98 @@ export default function EmailChecker() {
     setLoading(true);
 
     try {
-      const response = await fetch("/api/email/check", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/api/email/check', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
       });
       const data = await response.json();
       setResult(data);
     } catch (error) {
-      console.error("Error checking email:", error);
+      console.error('Error checking email:', error);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-light-bg to-primary-50">
+    <main className="min-h-screen bg-neutral-50 pb-24 md:pb-0">
       {/* Header */}
-      <header className="bg-white border-b border-light-border">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center gap-4">
-          <Link href="/" className="text-primary-600 hover:text-primary-700">
+      <header className="bg-neutral-0 border-b border-neutral-200 sticky top-0 z-40">
+        <div className="container-max py-4 flex items-center gap-4">
+          <Link href="/dashboard" className="text-primary-600 hover:text-primary-700 font-medium">
             ← Back
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900">📧 Email Checker</h1>
+          <h1 className="text-h3 font-bold text-neutral-900">📧 Email Checker</h1>
         </div>
       </header>
 
-      <div className="max-w-4xl mx-auto px-4 py-12">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-xl shadow-lg p-8 mb-8"
-        >
-          <h2 className="text-3xl font-bold text-gray-900 mb-6">
-            Analyze Email Security
-          </h2>
+      <div className="container-max py-8">
+        {/* Input Section */}
+        <Card padding="lg" className="mb-8 animate-slideUp">
+          <h2 className="text-h4 font-bold text-neutral-900 mb-4">Analyze Email Security</h2>
+          <p className="text-neutral-600 text-sm mb-6">
+            Check emails for phishing, malicious links, and suspicious patterns using DRAR AI
+          </p>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-semibold text-neutral-900 mb-2">
                 Email Address or Content
               </label>
               <textarea
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter email address or paste email content..."
-                className="w-full h-32 px-4 py-3 border border-light-border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                onChange={e => setEmail(e.target.value)}
+                placeholder="Enter email address or paste entire email content..."
+                className="input w-full min-h-40 rounded-lg"
                 required
               />
+              <p className="text-xs text-neutral-600 mt-2">
+                💡 Tip: Paste full email headers for better analysis
+              </p>
             </div>
 
-            <button
+            <Button
               type="submit"
-              disabled={loading}
-              className="w-full px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-semibold rounded-lg hover:shadow-lg transition disabled:opacity-50"
+              variant="primary"
+              size="lg"
+              isLoading={loading}
+              className="w-full"
             >
-              {loading ? "Analyzing..." : "Check Email"}
-            </button>
+              {loading ? 'Analyzing...' : '🔍 Check Email'}
+            </Button>
           </form>
-        </motion.div>
+        </Card>
 
-        {/* Results */}
+        {/* Results Section */}
         {result && (
-          <ResultCard
-            title="Email Analysis Result"
-            riskScore={result.riskScore}
-            threats={result.threats || []}
-            timestamp={result.timestamp}
-            details={result.analysis}
-          />
+          <div className="animate-slideUp">
+            <h2 className="text-h4 font-bold text-neutral-900 mb-4">Analysis Result</h2>
+            <ResultCard
+              title="Email Security Analysis"
+              riskScore={result.riskScore}
+              threats={result.threats || []}
+              timestamp={result.timestamp}
+              details={result.analysis}
+            />
+
+            {/* Action Buttons */}
+            <div className="mt-6 flex gap-3">
+              <Button variant="secondary" onClick={() => setResult(null)}>
+                ← Analyze Another Email
+              </Button>
+              <Link href="/file-scanner">
+                <Button variant="secondary">Check File →</Button>
+              </Link>
+            </div>
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!loading && !result && (
+          <div className="text-center py-12">
+            <p className="text-neutral-600">Enter an email above to get started</p>
+          </div>
         )}
       </div>
     </main>
