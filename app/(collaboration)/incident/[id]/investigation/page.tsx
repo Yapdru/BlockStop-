@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Incident, TimelineEvent, Evidence, ChatMessage } from "@/types/collaboration";
+import { Incident, TimelineEvent, Evidence } from "@/types/collaboration";
 import WarRoomHeader from "@/components/collaboration/war-room-header";
 import TimelineView from "@/components/collaboration/timeline-view";
 import EvidenceBoard from "@/components/collaboration/evidence-board";

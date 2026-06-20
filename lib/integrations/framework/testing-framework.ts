@@ -23,7 +23,7 @@ export interface TestSuite {
 
 export interface IntegrationTest {
   name: string;
-  async run(context: TestContext): Promise<void>;
+  run(context: TestContext): Promise<void>;
 }
 
 export interface TestContext {

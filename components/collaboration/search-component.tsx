@@ -133,7 +133,7 @@ export default function SearchComponent({
 
       {showResults && query.trim() && results.length === 0 && !searching && (
         <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-light-border rounded-lg shadow-lg z-50 p-4 text-center text-gray-500 text-sm">
-          No results found for "{query}"
+          No results found for &quot;{query}&quot;
         </div>
       )}
     </div>

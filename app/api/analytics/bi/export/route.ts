@@ -279,11 +279,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     });
 
     if (typeof fileContent === 'string') {
-      return new NextResponse(fileContent, {
+      return new NextResponse(Buffer.isBuffer(fileContent) ? new Uint8Array(fileContent) : fileContent, {
         headers: responseHeaders,
       });
     } else {
-      return new NextResponse(fileContent, {
+      return new NextResponse(Buffer.isBuffer(fileContent) ? new Uint8Array(fileContent) : fileContent, {
         headers: responseHeaders,
       });
     }

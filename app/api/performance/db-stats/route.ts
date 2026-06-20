@@ -385,5 +385,3 @@ export async function OPTIONS(request: NextRequest): Promise<NextResponse> {
     }
   );
 }
-
-export default GET;

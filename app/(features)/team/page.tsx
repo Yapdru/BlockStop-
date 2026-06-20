@@ -366,7 +366,7 @@ export default function TeamManagement() {
               animate={{ opacity: 1 }}
               className="text-center py-12"
             >
-              <p className="text-gray-600 mb-4">You haven't created any teams yet</p>
+              <p className="text-gray-600 mb-4">You haven&apos;t created any teams yet</p>
               <p className="text-sm text-gray-500">
                 Create a team above to start collaborating with others
               </p>

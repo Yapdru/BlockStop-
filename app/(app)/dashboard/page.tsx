@@ -40,7 +40,6 @@ export default function DashboardPage() {
   const handleStartScan = async () => {
     setScanning(true);
     try {
-      const userId = localStorage.getItem('userId');
       // Trigger scan - would need integration IDs
       alert('Scan initiated. Check your integrations in Settings.');
     } catch (error) {

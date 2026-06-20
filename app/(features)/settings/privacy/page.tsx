@@ -215,7 +215,7 @@ export default function PrivacySettings() {
                   <li>Device type (desktop, mobile, tablet)</li>
                 </ul>
                 <p className="text-xs text-gray-700 mt-3 mb-2">
-                  <strong>What we don't collect:</strong>
+                  <strong>What we don&apos;t collect:</strong>
                 </p>
                 <ul className="text-xs text-gray-600 space-y-1 list-disc list-inside">
                   <li>Email contents or attachments</li>

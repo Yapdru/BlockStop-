@@ -54,7 +54,7 @@ export class ThreatCorrelationEngine {
       commonIndicators,
       commonActors,
       commonTargets,
-      temporalRelationship: this.determineTemporal Relationship(threatId1, threatId2),
+      temporalRelationship: this.determineTemporalRelationship(threatId1, threatId2),
     };
 
     this.correlations.set(correlationId, correlation);

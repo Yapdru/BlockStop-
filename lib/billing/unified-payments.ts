@@ -161,7 +161,7 @@ export class UnifiedPaymentService {
         paymentData = await this.initiateBHIM(transactionId, amount, product);
         break;
       case 'paytm':
-        paymentData = await this.initiatePay TMTransfer(transactionId, amount, product);
+        paymentData = await this.initiatePayTMTransfer(transactionId, amount, product);
         break;
       case 'apple_pay':
         paymentData = await this.initiateApplePay(transactionId, amount, product);
@@ -218,7 +218,7 @@ export class UnifiedPaymentService {
     return { method: 'bhim', deepLink, transactionId: txnId };
   }
 
-  private async initiatePay TMTransfer(txnId: string, amount: number, product: string): Promise<any> {
+  private async initiatePayTMTransfer(txnId: string, amount: number, product: string): Promise<any> {
     // Existing PayTM integration
     return { method: 'paytm', transactionId: txnId };
   }

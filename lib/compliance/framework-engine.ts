@@ -479,8 +479,8 @@ export class FrameworkLoader {
 
     for (const frameworkType of Object.values(ComplianceFrameworkType)) {
       try {
-        const module = await this.loadFrameworkModule(frameworkType as ComplianceFrameworkType);
-        const frameworkFactory = module.default || module.createFramework;
+        const frameworkModule = await this.loadFrameworkModule(frameworkType as ComplianceFrameworkType);
+        const frameworkFactory = frameworkModule.default || frameworkModule.createFramework;
         if (frameworkFactory) {
           const framework = frameworkFactory();
           frameworks.push(framework);

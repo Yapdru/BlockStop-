@@ -79,7 +79,7 @@ export default function SettingsPage() {
       });
 
       if (response.ok) {
-        const data = await response.json();
+        await response.json();
         setAdminSuccess(true);
         setAdminPasscode('');
         setTimeout(() => {

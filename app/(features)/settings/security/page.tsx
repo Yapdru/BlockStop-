@@ -287,7 +287,7 @@ export default function SecuritySettings() {
 
           {/* Disable 2FA Dialog */}
           <ConfirmationDialog
-            isOpen={isDisabling && twoFactorStatus?.enabled}
+            isOpen={Boolean(isDisabling && twoFactorStatus?.enabled)}
             title="Disable Two-Factor Authentication?"
             description="This will remove the extra security from your account. You'll need to confirm with your password."
             confirmText="Disable"

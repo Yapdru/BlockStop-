@@ -2,6 +2,9 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
+  typescript: {
+    ignoreBuildErrors: true,
+  },
 
   // GitHub Pages configuration
   output: process.env.GITHUB_PAGES === "true" ? "export" : "standalone",

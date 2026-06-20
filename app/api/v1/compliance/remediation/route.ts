@@ -163,75 +163,10 @@ export async function PUT(request: NextRequest) {
  * GET /api/v1/compliance/remediation/statistics
  * Get remediation statistics
  */
-export async function GET_statistics(request: NextRequest) {
-  try {
-    const organizationId = request.headers.get('x-org-id') || 'default';
-
-    const stats = remediationEngine.getRemediationStats(organizationId);
-
-    return NextResponse.json({
-      success: true,
-      data: {
-        total: stats.totalActions,
-        completed: stats.completed,
-        inProgress: stats.inProgress,
-        planned: stats.planned,
-        overdue: stats.overdue,
-        totalCost: stats.totalCost,
-        averageCost: Math.round(stats.averageCost),
-      },
-    });
-  } catch (error) {
-    console.error('Error fetching statistics:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch statistics' },
-      { status: 500 }
-    );
-  }
-}
+// GET_statistics endpoint moved to separate route file
 
 /**
  * POST /api/v1/compliance/remediation/:actionId/assign
  * Assign remediation action to user
  */
-export async function POST_assign(request: NextRequest) {
-  try {
-    const body = await request.json();
-    const { actionId, userId, targetDate } = body;
-
-    if (!actionId || !userId) {
-      return NextResponse.json(
-        { error: 'actionId and userId are required' },
-        { status: 400 }
-      );
-    }
-
-    const updatedAction = remediationEngine.assignAction(
-      actionId,
-      userId,
-      targetDate ? new Date(targetDate) : undefined
-    );
-
-    if (!updatedAction) {
-      return NextResponse.json(
-        { error: 'Action not found' },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json({
-      success: true,
-      data: {
-        id: updatedAction.id,
-        assignedTo: updatedAction.assignedTo,
-        targetDate: updatedAction.targetDate,
-      },
-    });
-  } catch (error) {
-    console.error('Error assigning action:', error);
-    return NextResponse.json(
-      { error: 'Failed to assign action' },
-      { status: 500 }
-    );
-  }
-}
+// POST_assign endpoint moved to separate route file

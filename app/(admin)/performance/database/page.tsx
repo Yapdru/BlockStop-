@@ -392,7 +392,7 @@ const DatabasePerformancePage: React.FC = () => {
   );
 };
 
-const Tab: React.FC<TabProps> = ({ id, label, active, onClick }) => (
+const Tab: React.FC<TabProps> = ({ label, active, onClick }) => (
   <button
     onClick={onClick}
     role="tab"

@@ -41,6 +41,13 @@ export async function POST(req: NextRequest) {
 
     const productConfig = paymentService.getProductConfig(product as any);
 
+    const instructionsMap: Record<string, string> = {
+      upi: 'Scan QR or use UPI ID',
+      bhim: 'Open BHIM app or use deep link',
+      paytm: 'Redirect to PayTM gateway',
+      apple_pay: 'Use Apple Pay on iOS/Mac'
+    };
+
     return NextResponse.json({
       transactionId: transaction.id,
       product: productConfig,
@@ -49,12 +56,7 @@ export async function POST(req: NextRequest) {
       method,
       frequency,
       paymentData: transaction.metadata,
-      instructions: {
-        upi: 'Scan QR or use UPI ID',
-        bhim: 'Open BHIM app or use deep link',
-        paytm: 'Redirect to PayTM gateway',
-        apple_pay: 'Use Apple Pay on iOS/Mac'
-      }[method]
+      instructions: instructionsMap[method]
     }, { status: 201 });
   } catch (error) {
     console.error('Payment initiation error:', error);

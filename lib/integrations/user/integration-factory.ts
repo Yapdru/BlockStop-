@@ -26,9 +26,9 @@ interface ProviderConfig {
   redirectUri: string;
 }
 
-interface ProviderConfigMap {
-  [key in ServiceProvider]?: ProviderConfig;
-}
+type ProviderConfigMap = {
+  [K in ServiceProvider]?: ProviderConfig;
+};
 
 export class IntegrationFactory {
   private configs: ProviderConfigMap = {};
