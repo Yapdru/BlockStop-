@@ -7,14 +7,17 @@ const products = [
   { id: 'neo', name: 'BlockStop NEO', price: 99, annualPrice: 999 },
   { id: 'pro', name: 'BlockStop PRO', price: 299, annualPrice: 2999 },
   { id: 'office', name: 'BlockStop OFFICE', price: 499, annualPrice: 4999 },
-  { id: 'health', name: 'BlockStop HEALTH', price: 599, annualPrice: 5999 }
+  { id: 'health', name: 'BlockStop HEALTH', price: 599, annualPrice: 5999 },
+  { id: 'max', name: 'BlockStop MAX', price: 299, annualPrice: 2999 }
 ];
 
 const paymentMethods = [
   { id: 'upi', name: 'UPI (QR Code)', icon: '₹' },
   { id: 'bhim', name: 'BHIM', icon: '💳' },
   { id: 'paytm', name: 'PayTM', icon: '📱' },
-  { id: 'apple_pay', name: 'Apple Pay', icon: '🍎' }
+  { id: 'apple_pay', name: 'Apple Pay', icon: '🍎' },
+  { id: 'credit_card', name: 'Credit Card', icon: '💳' },
+  { id: 'debit_card', name: 'Debit Card', icon: '🏦' }
 ];
 
 export default function UpgradePage() {

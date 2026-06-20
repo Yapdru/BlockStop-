@@ -124,6 +124,12 @@ export default function DashboardPage() {
           <h2 className="text-xl font-bold mb-4">Quick Actions</h2>
           <div className="space-y-3">
             <Link
+              href="/betterbot"
+              className="block bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white text-center py-2 rounded transition font-medium"
+            >
+              🤖 BetterBot AI (MAX)
+            </Link>
+            <Link
               href="/integrations"
               className="block bg-blue-600 hover:bg-blue-700 text-white text-center py-2 rounded transition font-medium"
             >

@@ -20,7 +20,7 @@ const products = [
     description: 'Team security with AI',
     features: ['All Free features', 'Team collaboration (6 users)', 'Unlimited scans', 'WiFi security', 'VPN integration', '2FA authentication'],
     cta: 'Start Free Trial',
-    highlight: true
+    highlight: false
   },
   {
     name: 'BlockStop PRO',
@@ -48,6 +48,15 @@ const products = [
     features: ['All OFFICE features', 'HIPAA + HITECH compliance', 'Patient data protection', 'Epic/Cerner integration', 'Healthcare threat detection', 'Healthcare support'],
     cta: 'Contact Sales',
     highlight: false
+  },
+  {
+    name: 'BlockStop MAX',
+    price: 299,
+    period: '/month or ₹2,999/year',
+    description: 'Ultimate AI-powered security',
+    features: ['All OFFICE features', 'BetterBot AI natural language queries', 'Custom threat intelligence', 'Automated recommendations', 'Smart feature auto-addition', 'Available worldwide (except China)'],
+    cta: 'Start MAX Trial',
+    highlight: true
   }
 ];
 

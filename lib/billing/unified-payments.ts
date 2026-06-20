@@ -1,8 +1,8 @@
 import { getDb } from '@/lib/db';
 import crypto from 'crypto';
 
-export type PaymentMethod = 'upi' | 'bhim' | 'paytm' | 'apple_pay';
-export type ProductTier = 'free' | 'neo' | 'pro' | 'office' | 'health';
+export type PaymentMethod = 'upi' | 'bhim' | 'paytm' | 'apple_pay' | 'credit_card' | 'debit_card';
+export type ProductTier = 'free' | 'neo' | 'pro' | 'office' | 'health' | 'max';
 
 export interface PaymentTransaction {
   id: string;
@@ -127,6 +127,31 @@ export const PRODUCTS: Record<ProductTier, ProductConfig> = {
     ],
     maxTeamSize: 5000,
     integrations: ['slack', 'teams', 'discord', 'gmail', 'outlook', 'google-drive', 'onedrive', 'dropbox', 'box', 'jira', 'servicenow', 'splunk', 'active-directory', 'okta', 'azure-ad', 'salesforce', 'epic-emr', 'cerner']
+  },
+  max: {
+    tier: 'max',
+    name: 'BlockStop MAX',
+    description: 'Ultimate AI-powered security intelligence',
+    monthlyPrice: 299,
+    annualPrice: 2999,
+    features: [
+      'All Office features',
+      'BetterBot AI - Natural language data queries',
+      'Custom threat intelligence generation',
+      'Automated security recommendations',
+      'Smart feature auto-addition system',
+      'Unlimited custom integrations',
+      'Advanced ML threat hunting',
+      'Real-time threat correlation',
+      'Global threat intelligence feeds',
+      'Executive AI insights',
+      'Custom alert policies via AI',
+      'Predictive threat analysis',
+      'Priority AI-powered support',
+      'Available worldwide (except China)'
+    ],
+    maxTeamSize: 5000,
+    integrations: ['slack', 'teams', 'discord', 'gmail', 'outlook', 'google-drive', 'onedrive', 'dropbox', 'box', 'jira', 'servicenow', 'splunk', 'active-directory', 'okta', 'azure-ad', 'salesforce', 'epic-emr', 'cerner', 'siem', 'splunk', 'crowdstrike', 'okta', 'datadog']
   }
 };
 
