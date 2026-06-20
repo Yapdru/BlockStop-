@@ -1,50 +1,92 @@
 version: '3.8'
 
 services:
-  blockos:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: blockstop-pro
-    ports:
-      - "3000:3000"
-      - "5432:5432"
-    environment:
-      - NODE_ENV=production
-      - BLOCKOS_VERSION=1.0.0
-      - DATABASE_URL=postgresql://blockstop:secure_password@postgres:5432/blockstop_pro
-      - NEXTAUTH_URL=http://localhost:3000
-      - NEXTAUTH_SECRET=your-secret-key-here
-    volumes:
-      - blockstop_data:/var/lib/blockstop
-      - blockstop_logs:/var/log/blockstop
-      - ./app:/app/app
-      - ./lib:/app/lib
-    depends_on:
-      - postgres
-    networks:
-      - blockstop_network
-    restart: unless-stopped
-
+  # PostgreSQL Database
   postgres:
     image: postgres:15-alpine
     container_name: blockstop-db
     environment:
-      - POSTGRES_USER=blockstop
-      - POSTGRES_PASSWORD=secure_password
-      - POSTGRES_DB=blockstop_pro
+      POSTGRES_USER: blockstop
+      POSTGRES_PASSWORD: blockstop
+      POSTGRES_DB: blockstop_db
+    ports:
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./blockos/init-db.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U blockstop"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
-      - blockstop_network
+      - blockstop-network
+
+  # BlockStop Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: blockstop-app
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://blockstop:blockstop@postgres:5432/blockstop_db
+      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_SECRET: dev-secret-change-in-production
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      PAYTM_MERCHANT_ID: ${PAYTM_MERCHANT_ID}
+      PAYTM_MERCHANT_KEY: ${PAYTM_MERCHANT_KEY}
+      PAYTM_CALLBACK_URL: http://localhost:3000/api/billing/paytm/callback
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    networks:
+      - blockstop-network
+    restart: unless-stopped
+
+  # Redis (for caching)
+  redis:
+    image: redis:7-alpine
+    container_name: blockstop-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - blockstop-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # pgAdmin for Database Management
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: blockstop-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@blockstop.local
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    networks:
+      - blockstop-network
     restart: unless-stopped
 
 volumes:
-  blockstop_data:
-  blockstop_logs:
   postgres_data:
+  redis_data:
 
 networks:
-  blockstop_network:
+  blockstop-network:
     driver: bridge
