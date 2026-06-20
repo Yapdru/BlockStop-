@@ -1,11 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { SettingsSection } from '@/components/settings/SettingsSection';
-import { FormField } from '@/components/settings/FormField';
-import { ConfirmationDialog } from '@/components/settings/ConfirmationDialog';
+import { Button, Card, Input, Badge } from '@/components';
 
 interface TwoFactorStatus {
   enabled: boolean;
@@ -20,9 +17,9 @@ export default function SecuritySettings() {
   const [backupCodes, setBackupCodes] = useState<string[]>([]);
   const [verificationToken, setVerificationToken] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
+  const [isDisablingConfirm, setIsDisablingConfirm] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [isDisabling, setIsDisabling] = useState(false);
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(true);
 
@@ -102,7 +99,11 @@ export default function SecuritySettings() {
   };
 
   const handleDisable2FA = async () => {
-    setIsDisabling(true);
+    if (!password) {
+      setError('Password is required');
+      return;
+    }
+
     try {
       setError('');
       const response = await fetch('/api/settings/security/2fa/disable', {
@@ -120,183 +121,203 @@ export default function SecuritySettings() {
 
       setSuccess('2FA disabled');
       setPassword('');
+      setIsDisablingConfirm(false);
       await fetchTwoFactorStatus();
     } catch (err) {
       setError('Failed to disable 2FA');
-    } finally {
-      setIsDisabling(false);
     }
   };
 
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-neutral-50 flex items-center justify-center">
+        <div className="text-neutral-600">Loading security settings...</div>
+      </main>
+    );
+  }
+
   return (
-    <main className="min-h-screen bg-gradient-to-br from-light-bg to-primary-50">
+    <main className="min-h-screen bg-neutral-50 pb-24 md:pb-0">
       {/* Header */}
-      <header className="bg-white border-b border-light-border sticky top-0 z-40">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center gap-4">
-          <Link href="/settings" className="text-primary-600 hover:text-primary-700">
+      <header className="bg-neutral-0 border-b border-neutral-200 sticky top-0 z-40">
+        <div className="container-max py-4 flex items-center gap-4">
+          <Link href="/settings" className="text-primary-600 hover:text-primary-700 font-medium">
             ← Back
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900">🔒 Security Settings</h1>
+          <h1 className="text-h3 font-bold text-neutral-900">🔒 Security Settings</h1>
         </div>
       </header>
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="space-y-6"
-        >
-          {/* Error */}
-          {error && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg"
-            >
-              {error}
-            </motion.div>
-          )}
+      <div className="container-max py-8 space-y-6">
+        {/* Messages */}
+        {error && (
+          <div className="bg-danger/10 border border-danger/20 text-danger p-4 rounded-lg animate-slideDown">
+            ❌ {error}
+          </div>
+        )}
 
-          {/* Success */}
-          {success && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg"
-            >
-              {success}
-            </motion.div>
-          )}
+        {success && (
+          <div className="bg-success/10 border border-success/20 text-success p-4 rounded-lg animate-slideDown">
+            ✅ {success}
+          </div>
+        )}
 
-          {/* Two-Factor Authentication */}
-          {!loading && (
-            <SettingsSection
-              title="Two-Factor Authentication"
-              description="Add an extra layer of security to your account"
-              icon="🔐"
-            >
-              <div className="flex items-center justify-between p-4 bg-light-surface rounded-lg">
-                <div>
-                  <p className="font-semibold text-gray-900">
-                    {twoFactorStatus?.enabled ? '✓ Enabled' : 'Not Enabled'}
-                  </p>
-                  {twoFactorStatus?.enabled && (
-                    <p className="text-xs text-gray-600 mt-1">
-                      {twoFactorStatus.backupCodesCount} backup codes remaining
-                    </p>
-                  )}
-                </div>
-
-                {!twoFactorStatus?.enabled ? (
-                  <button
-                    onClick={handleSetup2FA}
-                    className="px-4 py-2 bg-primary-600 text-white font-semibold rounded-lg hover:bg-primary-700 transition"
-                  >
-                    Enable 2FA
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => setIsDisabling(true)}
-                    className="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition"
-                  >
-                    Disable 2FA
-                  </button>
-                )}
+        {/* Two-Factor Authentication */}
+        {!loading && twoFactorStatus && (
+          <Card padding="lg">
+            <div className="flex items-start justify-between mb-6">
+              <div>
+                <h2 className="text-h4 font-bold text-neutral-900">Two-Factor Authentication</h2>
+                <p className="text-sm text-neutral-600 mt-1">Add an extra layer of security</p>
               </div>
-            </SettingsSection>
-          )}
+              <Badge variant={twoFactorStatus.enabled ? 'success' : 'info'}>
+                {twoFactorStatus.enabled ? '✓ Enabled' : 'Disabled'}
+              </Badge>
+            </div>
 
-          {/* 2FA Setup Dialog */}
-          {isSetupOpen && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="bg-blue-50 border border-blue-200 rounded-xl p-6"
-            >
-              <h3 className="font-bold text-lg text-gray-900 mb-4">Setup Two-Factor Authentication</h3>
+            {twoFactorStatus.enabled && (
+              <div className="bg-success/10 border border-success/20 rounded-lg p-4 mb-6">
+                <p className="text-sm text-neutral-700">
+                  {twoFactorStatus.backupCodesCount} backup codes remaining. Keep these safe in case you lose access to your authenticator.
+                </p>
+              </div>
+            )}
 
-              {qrCode && (
-                <div className="mb-6">
-                  <p className="text-sm text-gray-700 mb-3">
-                    Scan this QR code with your authenticator app (Google Authenticator, Authy, etc.):
-                  </p>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={qrCode} alt="2FA QR Code" className="w-48 h-48 mx-auto" />
-                </div>
-              )}
-
-              <FormField
-                label="Verification Code"
-                description="Enter the 6-digit code from your authenticator app"
-                error={error}
+            {!twoFactorStatus.enabled ? (
+              <Button variant="primary" onClick={handleSetup2FA} className="w-full">
+                🔐 Enable 2FA
+              </Button>
+            ) : (
+              <Button
+                variant="danger"
+                onClick={() => setIsDisablingConfirm(true)}
+                className="w-full"
               >
-                <input
-                  type="text"
-                  value={verificationToken}
-                  onChange={(e) => setVerificationToken(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                  placeholder="000000"
-                  maxLength={6}
-                  className="w-full px-4 py-2 border border-light-border rounded-lg text-center text-lg font-mono focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                />
-              </FormField>
+                ⚠️ Disable 2FA
+              </Button>
+            )}
+          </Card>
+        )}
 
-              <button
-                onClick={handleVerify2FA}
-                disabled={isVerifying || verificationToken.length !== 6}
-                className="w-full mt-4 px-4 py-2 bg-primary-600 text-white font-semibold rounded-lg hover:bg-primary-700 transition disabled:opacity-50"
-              >
-                {isVerifying ? 'Verifying...' : 'Verify & Enable 2FA'}
-              </button>
-            </motion.div>
-          )}
+        {/* 2FA Setup Card */}
+        {isSetupOpen && qrCode && (
+          <Card padding="lg" className="border-primary-200 bg-primary-50">
+            <h3 className="text-h5 font-bold text-neutral-900 mb-4">Setup Two-Factor Authentication</h3>
 
-          {/* Backup Codes Display */}
-          {backupCodes.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="bg-amber-50 border border-amber-200 rounded-xl p-6"
-            >
-              <h3 className="font-bold text-lg text-gray-900 mb-4">
-                ⚠️ Save Your Backup Codes
-              </h3>
-              <p className="text-sm text-gray-700 mb-4">
-                Keep these codes safe. You can use one to sign in if you lose access to your authenticator app.
+            <div className="mb-6">
+              <p className="text-sm text-neutral-700 mb-4">
+                Scan this QR code with your authenticator app (Google Authenticator, Microsoft Authenticator, Authy, etc.):
               </p>
-              <div className="grid grid-cols-2 gap-2 mb-4 font-mono text-sm">
-                {backupCodes.map((code, i) => (
-                  <div
-                    key={i}
-                    className="bg-white p-2 rounded border border-amber-200 text-center"
-                  >
-                    {code}
-                  </div>
-                ))}
-              </div>
-              <button
-                onClick={() => {
-                  const text = backupCodes.join('\n');
-                  navigator.clipboard.writeText(text);
-                }}
-                className="w-full px-4 py-2 bg-white border border-amber-300 text-amber-700 font-semibold rounded-lg hover:bg-amber-50 transition"
-              >
-                Copy Codes
-              </button>
-            </motion.div>
-          )}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={qrCode}
+                alt="2FA QR Code"
+                className="w-40 h-40 mx-auto border border-primary-200 rounded-lg"
+              />
+            </div>
 
-          {/* Disable 2FA Dialog */}
-          <ConfirmationDialog
-            isOpen={Boolean(isDisabling && twoFactorStatus?.enabled)}
-            title="Disable Two-Factor Authentication?"
-            description="This will remove the extra security from your account. You'll need to confirm with your password."
-            confirmText="Disable"
-            cancelText="Cancel"
-            isDangerous
-            onConfirm={() => handleDisable2FA()}
-            onCancel={() => setIsDisabling(false)}
-          />
-        </motion.div>
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-neutral-900 mb-2">
+                Verification Code <span className="text-xs text-neutral-600">(6 digits)</span>
+              </label>
+              <Input
+                type="text"
+                value={verificationToken}
+                onChange={(e) => setVerificationToken(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                placeholder="000000"
+                maxLength={6}
+                className="text-center text-lg font-mono"
+              />
+            </div>
+
+            <Button
+              variant="primary"
+              onClick={handleVerify2FA}
+              disabled={isVerifying || verificationToken.length !== 6}
+              className="w-full"
+            >
+              {isVerifying ? 'Verifying...' : '✓ Verify & Enable 2FA'}
+            </Button>
+          </Card>
+        )}
+
+        {/* Backup Codes Display */}
+        {backupCodes.length > 0 && (
+          <Card padding="lg" className="border-accent-200 bg-accent-50">
+            <h3 className="text-h5 font-bold text-neutral-900 mb-3">
+              ⚠️ Save Your Backup Codes
+            </h3>
+            <p className="text-sm text-neutral-700 mb-6">
+              Keep these codes safe. You can use one to sign in if you lose access to your authenticator app. Each code can be used only once.
+            </p>
+
+            <div className="grid grid-cols-2 gap-2 mb-6 font-mono text-sm">
+              {backupCodes.map((code, i) => (
+                <div
+                  key={i}
+                  className="bg-white border border-accent-200 rounded-lg p-3 text-center text-neutral-900"
+                >
+                  {code}
+                </div>
+              ))}
+            </div>
+
+            <Button
+              variant="secondary"
+              onClick={() => {
+                navigator.clipboard.writeText(backupCodes.join('\n'));
+                setSuccess('Backup codes copied!');
+              }}
+              className="w-full"
+            >
+              📋 Copy All Codes
+            </Button>
+          </Card>
+        )}
+
+        {/* Disable 2FA Confirmation */}
+        {isDisablingConfirm && twoFactorStatus?.enabled && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <Card padding="lg" className="max-w-md w-full">
+              <h3 className="text-h5 font-bold text-danger mb-3">Disable 2FA?</h3>
+              <p className="text-sm text-neutral-600 mb-6">
+                This will remove the extra security from your account. Confirm with your password.
+              </p>
+
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-neutral-900 mb-2">
+                  Confirm Password
+                </label>
+                <Input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your password"
+                />
+              </div>
+
+              <div className="flex gap-3">
+                <Button
+                  variant="secondary"
+                  className="flex-1"
+                  onClick={() => {
+                    setIsDisablingConfirm(false);
+                    setPassword('');
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="danger"
+                  className="flex-1"
+                  onClick={handleDisable2FA}
+                >
+                  Disable
+                </Button>
+              </div>
+            </Card>
+          </div>
+        )}
       </div>
     </main>
   );

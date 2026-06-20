@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Button, Card, Tabs } from '@/components';
 
 interface Settings {
   notificationsEnabled: boolean;
@@ -12,14 +13,19 @@ interface Settings {
   language: 'en' | 'es' | 'fr' | 'hi';
 }
 
+interface SettingOption {
+  id: string;
+  label: string;
+  content: React.ReactNode;
+}
+
 export default function SettingsPage() {
   const [settings, setSettings] = useState<Settings | null>(null);
   const [loading, setLoading] = useState(true);
   const [saved, setSaved] = useState(false);
-  const [adminSection, setAdminSection] = useState(false);
-  const [adminPasscode, setAdminPasscode] = useState('');
   const [adminError, setAdminError] = useState('');
   const [adminSuccess, setAdminSuccess] = useState(false);
+  const [adminPasscode, setAdminPasscode] = useState('');
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -79,7 +85,6 @@ export default function SettingsPage() {
       });
 
       if (response.ok) {
-        await response.json();
         setAdminSuccess(true);
         setAdminPasscode('');
         setTimeout(() => {
@@ -94,175 +99,211 @@ export default function SettingsPage() {
   };
 
   if (loading) {
-    return <div className="text-center py-10 text-gray-400">Loading settings...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-lg text-neutral-600">Loading settings...</div>
+      </div>
+    );
   }
 
   if (!settings) {
-    return <div className="text-center py-10 text-gray-400">Failed to load settings</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-lg text-neutral-600">Failed to load settings</div>
+      </div>
+    );
   }
 
-  return (
-    <div className="max-w-2xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-8">Settings</h1>
-
-      {saved && (
-        <div className="bg-green-900/20 border border-green-700 text-green-400 p-4 rounded mb-6">
-          Settings saved successfully!
-        </div>
-      )}
-
-      {/* Notifications Section */}
-      <div className="bg-slate-800 border border-slate-700 rounded-lg p-6 mb-6">
-        <h2 className="text-xl font-bold mb-4">Notifications</h2>
-        <div className="space-y-4">
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              checked={settings.notificationsEnabled}
-              onChange={(e) => setSettings({ ...settings, notificationsEnabled: e.target.checked })}
-              className="mr-3"
-            />
-            <span>Enable all notifications</span>
-          </label>
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              checked={settings.emailNotifications}
-              onChange={(e) => setSettings({ ...settings, emailNotifications: e.target.checked })}
-              className="mr-3"
-            />
-            <span>Email notifications</span>
-          </label>
+  const tabs: SettingOption[] = [
+    {
+      id: 'notifications',
+      label: '🔔 Notifications',
+      content: (
+        <div className="space-y-6">
+          <div>
+            <label className="flex items-center gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={settings.notificationsEnabled}
+                onChange={e => setSettings({ ...settings, notificationsEnabled: e.target.checked })}
+                className="w-5 h-5"
+              />
+              <div>
+                <p className="font-medium text-neutral-900">All Notifications</p>
+                <p className="text-xs text-neutral-600">Receive all security alerts</p>
+              </div>
+            </label>
+          </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Threat Alert Level</label>
+            <label className="flex items-center gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={settings.emailNotifications}
+                onChange={e => setSettings({ ...settings, emailNotifications: e.target.checked })}
+                className="w-5 h-5"
+              />
+              <div>
+                <p className="font-medium text-neutral-900">Email Alerts</p>
+                <p className="text-xs text-neutral-600">Get alerts via email</p>
+              </div>
+            </label>
+          </div>
+
+          <div>
+            <label className="block font-medium text-neutral-900 mb-3">Alert Threshold</label>
             <select
               value={settings.threatAlertLevel}
-              onChange={(e) => setSettings({ ...settings, threatAlertLevel: e.target.value as any })}
-              className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white"
+              onChange={e => setSettings({ ...settings, threatAlertLevel: e.target.value as any })}
+              className="input w-full"
             >
-              <option value="all">All threats</option>
-              <option value="high">High and above</option>
-              <option value="critical">Critical only</option>
+              <option value="all">📊 All Threats</option>
+              <option value="high">⚠️ High & Critical</option>
+              <option value="critical">🔴 Critical Only</option>
             </select>
           </div>
         </div>
-      </div>
-
-      {/* Scanning Section */}
-      <div className="bg-slate-800 border border-slate-700 rounded-lg p-6 mb-6">
-        <h2 className="text-xl font-bold mb-4">Auto Scanning</h2>
-        <div className="space-y-4">
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              checked={settings.autoScanEnabled}
-              onChange={(e) => setSettings({ ...settings, autoScanEnabled: e.target.checked })}
-              className="mr-3"
-            />
-            <span>Enable automatic scanning</span>
-          </label>
+      )
+    },
+    {
+      id: 'scanning',
+      label: '🔍 Scanning',
+      content: (
+        <div className="space-y-6">
+          <div>
+            <label className="flex items-center gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={settings.autoScanEnabled}
+                onChange={e => setSettings({ ...settings, autoScanEnabled: e.target.checked })}
+                className="w-5 h-5"
+              />
+              <div>
+                <p className="font-medium text-neutral-900">Auto Scanning</p>
+                <p className="text-xs text-neutral-600">Automatically scan files and emails</p>
+              </div>
+            </label>
+          </div>
 
           {settings.autoScanEnabled && (
             <div>
-              <label className="block text-sm font-medium mb-2">Scan Interval</label>
+              <label className="block font-medium text-neutral-900 mb-3">Scan Frequency</label>
               <select
                 value={settings.autoScanInterval}
-                onChange={(e) => setSettings({ ...settings, autoScanInterval: e.target.value as any })}
-                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white"
+                onChange={e => setSettings({ ...settings, autoScanInterval: e.target.value as any })}
+                className="input w-full"
               >
-                <option value="hourly">Hourly</option>
-                <option value="daily">Daily</option>
-                <option value="weekly">Weekly</option>
+                <option value="hourly">⏱️ Hourly</option>
+                <option value="daily">📅 Daily</option>
+                <option value="weekly">📆 Weekly</option>
               </select>
             </div>
           )}
         </div>
-      </div>
-
-      {/* Preferences Section */}
-      <div className="bg-slate-800 border border-slate-700 rounded-lg p-6 mb-6">
-        <h2 className="text-xl font-bold mb-4">Preferences</h2>
-        <div className="space-y-4">
+      )
+    },
+    {
+      id: 'preferences',
+      label: '⚙️ Preferences',
+      content: (
+        <div className="space-y-6">
           <div>
-            <label className="block text-sm font-medium mb-2">Theme</label>
+            <label className="block font-medium text-neutral-900 mb-3">Theme</label>
             <select
               value={settings.theme}
-              onChange={(e) => setSettings({ ...settings, theme: e.target.value as any })}
-              className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white"
+              onChange={e => setSettings({ ...settings, theme: e.target.value as any })}
+              className="input w-full"
             >
-              <option value="dark">Dark</option>
-              <option value="light">Light</option>
+              <option value="light">☀️ Light Mode</option>
+              <option value="dark">🌙 Dark Mode</option>
             </select>
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Language</label>
+            <label className="block font-medium text-neutral-900 mb-3">Language</label>
             <select
               value={settings.language}
-              onChange={(e) => setSettings({ ...settings, language: e.target.value as any })}
-              className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white"
+              onChange={e => setSettings({ ...settings, language: e.target.value as any })}
+              className="input w-full"
             >
-              <option value="en">English</option>
-              <option value="es">Español</option>
-              <option value="fr">Français</option>
-              <option value="hi">हिन्दी</option>
+              <option value="en">🇬🇧 English</option>
+              <option value="es">🇪🇸 Español</option>
+              <option value="fr">🇫🇷 Français</option>
+              <option value="hi">🇮🇳 हिन्दी</option>
             </select>
           </div>
         </div>
-      </div>
+      )
+    },
+    {
+      id: 'admin',
+      label: '🔐 Admin',
+      content: (
+        <div className="space-y-4">
+          <p className="text-sm text-neutral-600">Enter admin passcode for PRO upgrade</p>
 
-      {/* Admin Section */}
-      <div className="bg-slate-800 border border-slate-700 rounded-lg p-6 mb-6">
-        <button
-          onClick={() => setAdminSection(!adminSection)}
-          className="text-lg font-bold mb-4 text-blue-400 hover:text-blue-300"
-        >
-          {adminSection ? '▼ ADMIN' : '▶ ADMIN'}
-        </button>
+          {adminError && (
+            <div className="bg-danger/10 border border-danger/20 text-danger p-3 rounded text-sm">
+              ❌ {adminError}
+            </div>
+          )}
 
-        {adminSection && (
-          <div className="space-y-4 pt-4 border-t border-slate-600">
-            <p className="text-gray-400 text-sm">Enter admin passcode for instant PRO upgrade</p>
+          {adminSuccess && (
+            <div className="bg-success/10 border border-success/20 text-success p-3 rounded text-sm">
+              ✅ Upgraded! Refreshing...
+            </div>
+          )}
 
-            {adminError && (
-              <div className="bg-red-900/20 border border-red-700 text-red-400 p-3 rounded text-sm">
-                {adminError}
-              </div>
-            )}
+          <input
+            type="password"
+            value={adminPasscode}
+            onChange={e => setAdminPasscode(e.target.value)}
+            onKeyPress={e => e.key === 'Enter' && handleAdminAccess()}
+            placeholder="Enter passcode"
+            className="input w-full"
+          />
 
-            {adminSuccess && (
-              <div className="bg-green-900/20 border border-green-700 text-green-400 p-3 rounded text-sm">
-                ✓ Upgraded to PRO! Refreshing...
-              </div>
-            )}
+          <Button
+            onClick={handleAdminAccess}
+            variant="primary"
+            className="w-full"
+          >
+            Verify Passcode
+          </Button>
+        </div>
+      )
+    }
+  ];
 
-            <input
-              type="password"
-              value={adminPasscode}
-              onChange={(e) => setAdminPasscode(e.target.value)}
-              placeholder="Enter passcode"
-              className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white placeholder-gray-500"
-              onKeyPress={(e) => e.key === 'Enter' && handleAdminAccess()}
-            />
+  return (
+    <main className="min-h-screen bg-neutral-50 pb-24 md:pb-0">
+      <div className="container-max py-8">
+        <h1 className="text-h2 font-bold text-neutral-900 mb-2">Settings</h1>
+        <p className="text-neutral-600 mb-8">Customize your security experience</p>
 
-            <button
-              onClick={handleAdminAccess}
-              className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded font-bold transition"
-            >
-              Verify & Upgrade
-            </button>
+        {saved && (
+          <div className="bg-success/10 border border-success/20 text-success p-4 rounded-lg mb-6 animate-slideDown">
+            ✅ Settings saved successfully!
           </div>
         )}
-      </div>
 
-      {/* Save Button */}
-      <button
-        onClick={handleSaveSettings}
-        className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded font-bold transition"
-      >
-        Save Settings
-      </button>
-    </div>
+        <Card padding="lg">
+          <Tabs tabs={tabs.map(tab => ({
+            id: tab.id,
+            label: tab.label,
+            content: <div className="pt-4">{tab.content}</div>
+          }))} />
+        </Card>
+
+        <div className="mt-6 flex gap-3">
+          <Button variant="primary" onClick={handleSaveSettings} className="flex-1">
+            💾 Save Settings
+          </Button>
+          <Button variant="secondary" className="flex-1">
+            ⟲ Reset to Defaults
+          </Button>
+        </div>
+      </div>
+    </main>
   );
 }

@@ -1,18 +1,23 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { Button, Card, Badge, Input } from '@/components';
 
 interface Integration {
   name: string;
   category: string;
   auth: string;
   connected: boolean;
+  icon?: string;
+  description?: string;
 }
 
 export default function IntegrationsPage() {
   const [integrations, setIntegrations] = useState<Integration[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const fetchIntegrations = async () => {
@@ -23,7 +28,6 @@ export default function IntegrationsPage() {
         });
         if (response.ok) {
           const data = await response.json();
-          // Map to integration format
           const mapped = data.availableConnectors.map((c: any) => ({
             ...c,
             connected: false
@@ -41,92 +45,158 @@ export default function IntegrationsPage() {
   }, []);
 
   const categories = ['all', ...new Set(integrations.map(i => i.category))];
-  const filtered = selectedCategory === 'all'
+  let filtered = selectedCategory === 'all'
     ? integrations
     : integrations.filter(i => i.category === selectedCategory);
 
+  if (searchQuery) {
+    filtered = filtered.filter(i =>
+      i.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }
+
   const handleConnect = (name: string) => {
     alert(`Connect ${name} - Redirecting to authorization...`);
-    // In production, would redirect to OAuth flow
+  };
+
+  const getCategoryIcon = (category: string): string => {
+    const icons: Record<string, string> = {
+      email: '📧',
+      cloud: '☁️',
+      communication: '💬',
+      monitoring: '📊',
+      workflow: '🔄',
+      security: '🔒',
+      all: '🔗'
+    };
+    return icons[category.toLowerCase()] || '🔗';
   };
 
   if (loading) {
-    return <div className="text-center py-10 text-gray-400">Loading integrations...</div>;
+    return (
+      <main className="min-h-screen bg-neutral-50 flex items-center justify-center">
+        <div className="text-neutral-600">Loading integrations...</div>
+      </main>
+    );
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-8">Integrations</h1>
-
-      {/* Category Filter */}
-      <div className="flex flex-wrap gap-2 mb-8">
-        {categories.map(cat => (
-          <button
-            key={cat}
-            onClick={() => setSelectedCategory(cat)}
-            className={`px-4 py-2 rounded capitalize transition ${
-              selectedCategory === cat
-                ? 'bg-blue-600 text-white'
-                : 'bg-slate-700 text-gray-300 hover:bg-slate-600'
-            }`}
-          >
-            {cat}
-          </button>
-        ))}
-      </div>
-
-      {/* Integration Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filtered.map(integration => (
-          <div
-            key={integration.name}
-            className="bg-slate-800 border border-slate-700 rounded-lg p-6 hover:border-blue-600 transition"
-          >
-            <div className="flex items-start justify-between mb-4">
-              <h3 className="text-lg font-bold">{integration.name}</h3>
-              <span className="text-xs bg-slate-700 px-2 py-1 rounded capitalize">
-                {integration.category}
-              </span>
-            </div>
-
-            <p className="text-gray-400 text-sm mb-4 min-h-10">
-              Connect your {integration.name} account for enhanced security scanning.
-            </p>
-
-            <div className="mb-4">
-              <p className="text-xs text-gray-500">
-                Auth: <span className="text-gray-300 capitalize">{integration.auth}</span>
-              </p>
-            </div>
-
-            {integration.connected ? (
-              <div className="flex items-center space-x-2 py-2 px-3 bg-green-900/20 border border-green-700 rounded text-green-400 text-sm font-medium">
-                <span>✓</span>
-                <span>Connected</span>
-                <button
-                  onClick={() => alert(`Disconnect ${integration.name}`)}
-                  className="ml-auto text-xs hover:underline"
-                >
-                  Remove
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={() => handleConnect(integration.name)}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded font-medium transition"
-              >
-                Connect
-              </button>
-            )}
+    <main className="min-h-screen bg-neutral-50 pb-24 md:pb-0">
+      {/* Header */}
+      <header className="bg-neutral-0 border-b border-neutral-200 sticky top-0 z-40">
+        <div className="container-max py-4">
+          <div className="flex items-center gap-4 mb-4">
+            <Link href="/dashboard" className="text-primary-600 hover:text-primary-700 font-medium">
+              ← Back
+            </Link>
+            <h1 className="text-h3 font-bold text-neutral-900">🔗 Integrations</h1>
           </div>
-        ))}
-      </div>
-
-      {filtered.length === 0 && (
-        <div className="text-center py-12 text-gray-400">
-          No integrations available for your plan in this category.
+          <p className="text-sm text-neutral-600">Connect your favorite tools and services</p>
         </div>
-      )}
-    </div>
+      </header>
+
+      <div className="container-max py-8">
+        {/* Search and Filters */}
+        <div className="space-y-4 mb-8">
+          <Input
+            type="search"
+            placeholder="Search integrations..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+
+          {/* Category Tabs */}
+          <div className="flex flex-wrap gap-2">
+            {categories.map(cat => (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`px-4 py-2 rounded-lg font-medium text-sm transition ${
+                  selectedCategory === cat
+                    ? 'bg-primary-500 text-white'
+                    : 'bg-neutral-100 text-neutral-900 hover:bg-neutral-200'
+                }`}
+              >
+                {getCategoryIcon(cat)} {cat.charAt(0).toUpperCase() + cat.slice(1)}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Integration Grid */}
+        {filtered.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {filtered.map((integration) => (
+              <Card
+                key={integration.name}
+                padding="lg"
+                className={`flex flex-col transition ${
+                  integration.connected
+                    ? 'border-success/30 bg-success/5'
+                    : 'border-neutral-200 hover:border-primary-300'
+                }`}
+              >
+                {/* Header */}
+                <div className="flex items-start justify-between mb-4">
+                  <h3 className="text-h5 font-bold text-neutral-900">{integration.name}</h3>
+                  <Badge variant={integration.connected ? 'success' : 'info'}>
+                    {integration.connected ? '✓' : '○'} {integration.category}
+                  </Badge>
+                </div>
+
+                {/* Description */}
+                <p className="text-sm text-neutral-600 mb-4 flex-1">
+                  {integration.description || `Connect your ${integration.name} account for enhanced security integration.`}
+                </p>
+
+                {/* Auth Method */}
+                <div className="mb-6 pb-4 border-b border-neutral-200">
+                  <p className="text-xs text-neutral-600 mb-1">Authentication</p>
+                  <p className="text-sm font-medium text-neutral-900 capitalize">
+                    {integration.auth === 'oauth' ? '🔑 OAuth 2.0' : '⚙️ ' + integration.auth}
+                  </p>
+                </div>
+
+                {/* Action Button */}
+                {integration.connected ? (
+                  <Button
+                    variant="secondary"
+                    className="w-full"
+                    onClick={() => alert(`Manage ${integration.name}`)}
+                  >
+                    ⚙️ Manage
+                  </Button>
+                ) : (
+                  <Button
+                    variant="primary"
+                    className="w-full"
+                    onClick={() => handleConnect(integration.name)}
+                  >
+                    🔗 Connect
+                  </Button>
+                )}
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-16">
+            <div className="text-4xl mb-4">🔍</div>
+            <p className="text-neutral-600 mb-2">No integrations found</p>
+            <p className="text-sm text-neutral-500">Try adjusting your search or category filter</p>
+          </div>
+        )}
+
+        {/* Info Banner */}
+        <div className="mt-12 bg-primary-50 border border-primary-200 rounded-lg p-6">
+          <h3 className="font-semibold text-neutral-900 mb-2">💡 Need more integrations?</h3>
+          <p className="text-sm text-neutral-700 mb-4">
+            We&apos;re constantly adding new integrations to BlockStop. Let us know which tools you&apos;d like to see integrated.
+          </p>
+          <Button variant="primary" size="sm">
+            Request Integration
+          </Button>
+        </div>
+      </div>
+    </main>
   );
 }
