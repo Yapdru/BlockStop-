@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button, Card, Badge, Input } from '@/components';
+import { a11y } from '@/lib/a11y';
 
 interface Integration {
   name: string;
@@ -56,7 +57,7 @@ export default function IntegrationsPage() {
   }
 
   const handleConnect = (name: string) => {
-    alert(`Connect ${name} - Redirecting to authorization...`);
+    a11y.announce(`Connecting to ${name}. Redirecting to authorization...`);
   };
 
   const getCategoryIcon = (category: string): string => {
@@ -81,15 +82,30 @@ export default function IntegrationsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-neutral-50 pb-24 md:pb-0">
+    <main className="min-h-screen bg-neutral-50 pb-24 md:pb-0" id="main-content">
+      {/* Skip to main content link */}
+      <a
+        href="#main-content"
+        className="absolute top-0 left-0 p-2 bg-primary-600 text-white rounded-b-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 -translate-y-full focus:translate-y-0 transition-transform"
+        aria-label="Skip to main content"
+      >
+        Skip to main content
+      </a>
+
       {/* Header */}
       <header className="bg-neutral-0 border-b border-neutral-200 sticky top-0 z-40">
         <div className="container-max py-4">
           <div className="flex items-center gap-4 mb-4">
-            <Link href="/dashboard" className="text-primary-600 hover:text-primary-700 font-medium">
+            <Link
+              href="/dashboard"
+              className="text-primary-600 hover:text-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 rounded font-medium"
+              aria-label="Back to dashboard"
+            >
               ← Back
             </Link>
-            <h1 className="text-h3 font-bold text-neutral-900">🔗 Integrations</h1>
+            <h1 className="text-h3 font-bold text-neutral-900">
+              <span aria-hidden="true">🔗</span> Integrations
+            </h1>
           </div>
           <p className="text-sm text-neutral-600">Connect your favorite tools and services</p>
         </div>
@@ -103,21 +119,25 @@ export default function IntegrationsPage() {
             placeholder="Search integrations..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            aria-label="Search integrations"
           />
 
           {/* Category Tabs */}
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2" role="tablist" aria-label="Integration categories">
             {categories.map(cat => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-4 py-2 rounded-lg font-medium text-sm transition ${
+                className={`px-4 py-2 rounded-lg font-medium text-sm transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 ${
                   selectedCategory === cat
                     ? 'bg-primary-500 text-white'
                     : 'bg-neutral-100 text-neutral-900 hover:bg-neutral-200'
                 }`}
+                role="tab"
+                aria-selected={selectedCategory === cat}
+                aria-label={`${cat.charAt(0).toUpperCase() + cat.slice(1)} integrations`}
               >
-                {getCategoryIcon(cat)} {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                <span aria-hidden="true">{getCategoryIcon(cat)}</span> {cat.charAt(0).toUpperCase() + cat.slice(1)}
               </button>
             ))}
           </div>
@@ -161,18 +181,20 @@ export default function IntegrationsPage() {
                 {integration.connected ? (
                   <Button
                     variant="secondary"
-                    className="w-full"
-                    onClick={() => alert(`Manage ${integration.name}`)}
+                    className="w-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-600"
+                    onClick={() => a11y.announce(`Manage ${integration.name} settings`)}
+                    aria-label={`Manage ${integration.name} integration settings`}
                   >
-                    ⚙️ Manage
+                    <span aria-hidden="true">⚙️</span> Manage
                   </Button>
                 ) : (
                   <Button
                     variant="primary"
-                    className="w-full"
+                    className="w-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600"
                     onClick={() => handleConnect(integration.name)}
+                    aria-label={`Connect to ${integration.name} integration`}
                   >
-                    🔗 Connect
+                    <span aria-hidden="true">🔗</span> Connect
                   </Button>
                 )}
               </Card>
@@ -187,15 +209,22 @@ export default function IntegrationsPage() {
         )}
 
         {/* Info Banner */}
-        <div className="mt-12 bg-primary-50 border border-primary-200 rounded-lg p-6">
-          <h3 className="font-semibold text-neutral-900 mb-2">💡 Need more integrations?</h3>
+        <section className="mt-12 bg-primary-50 border border-primary-200 rounded-lg p-6" aria-label="Integration requests">
+          <h3 className="font-semibold text-neutral-900 mb-2">
+            <span aria-hidden="true">💡</span> Need more integrations?
+          </h3>
           <p className="text-sm text-neutral-700 mb-4">
             We&apos;re constantly adding new integrations to BlockStop. Let us know which tools you&apos;d like to see integrated.
           </p>
-          <Button variant="primary" size="sm">
+          <Button
+            variant="primary"
+            size="sm"
+            className="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600"
+            aria-label="Request a new integration"
+          >
             Request Integration
           </Button>
-        </div>
+        </section>
       </div>
     </main>
   );

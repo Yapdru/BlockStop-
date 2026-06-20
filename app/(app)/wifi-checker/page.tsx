@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button, Card, Badge, Input } from '@/components';
+import { a11y } from '@/lib/a11y';
 
 interface WiFiNetwork {
   id: string;
@@ -105,15 +106,30 @@ export default function WiFiCheckerPage() {
   };
 
   return (
-    <main className="min-h-screen bg-neutral-50 pb-24 md:pb-0">
+    <main className="min-h-screen bg-neutral-50 pb-24 md:pb-0" id="main-content">
+      {/* Skip to main content link */}
+      <a
+        href="#main-content"
+        className="absolute top-0 left-0 p-2 bg-primary-600 text-white rounded-b-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 -translate-y-full focus:translate-y-0 transition-transform"
+        aria-label="Skip to main content"
+      >
+        Skip to main content
+      </a>
+
       {/* Header */}
       <header className="bg-neutral-0 border-b border-neutral-200 sticky top-0 z-40">
         <div className="container-max py-4">
           <div className="flex items-center gap-4 mb-4">
-            <Link href="/dashboard" className="text-primary-600 hover:text-primary-700 font-medium">
+            <Link
+              href="/dashboard"
+              className="text-primary-600 hover:text-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 rounded font-medium"
+              aria-label="Back to dashboard"
+            >
               ← Back
             </Link>
-            <h1 className="text-h3 font-bold text-neutral-900">📡 WiFi Security Checker</h1>
+            <h1 className="text-h3 font-bold text-neutral-900">
+              <span aria-hidden="true">📡</span> WiFi Security Checker
+            </h1>
           </div>
           <p className="text-sm text-neutral-600">Scan nearby networks for security vulnerabilities</p>
         </div>
@@ -124,11 +140,13 @@ export default function WiFiCheckerPage() {
         <div className="mb-8">
           <Button
             variant="primary"
-            className="w-full"
+            className="w-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600"
             onClick={handleRescan}
             disabled={scanning}
+            aria-busy={scanning}
+            aria-label={scanning ? 'Scanning networks' : 'Refresh WiFi scan'}
           >
-            {scanning ? '🔄 Scanning networks...' : '📡 Refresh Scan'}
+            {scanning ? <><span aria-hidden="true">🔄</span> Scanning networks...</> : <><span aria-hidden="true">📡</span> Refresh Scan</>}
           </Button>
         </div>
 

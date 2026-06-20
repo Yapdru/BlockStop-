@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button, Card, Input } from '@/components';
+import { a11y } from '@/lib/a11y';
 
 interface PrivacySettings {
   dataRetentionDays: number;
@@ -90,28 +91,53 @@ export default function PrivacySettings() {
   }
 
   return (
-    <main className="min-h-screen bg-neutral-50 pb-24 md:pb-0">
+    <main className="min-h-screen bg-neutral-50 pb-24 md:pb-0" id="main-content">
+      {/* Skip to main content link */}
+      <a
+        href="#main-content"
+        className="absolute top-0 left-0 p-2 bg-primary-600 text-white rounded-b-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 -translate-y-full focus:translate-y-0 transition-transform"
+        aria-label="Skip to main content"
+      >
+        Skip to main content
+      </a>
+
       {/* Header */}
       <header className="bg-neutral-0 border-b border-neutral-200 sticky top-0 z-40">
         <div className="container-max py-4 flex items-center gap-4">
-          <Link href="/settings" className="text-primary-600 hover:text-primary-700 font-medium">
+          <Link
+            href="/settings"
+            className="text-primary-600 hover:text-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 rounded font-medium"
+            aria-label="Back to settings"
+          >
             ← Back
           </Link>
-          <h1 className="text-h3 font-bold text-neutral-900">🔐 Privacy Settings</h1>
+          <h1 className="text-h3 font-bold text-neutral-900">
+            <span aria-hidden="true">🔐</span> Privacy Settings
+          </h1>
         </div>
       </header>
 
       <div className="container-max py-8">
         {/* Messages */}
         {error && (
-          <div className="bg-danger/10 border border-danger/20 text-danger p-4 rounded-lg animate-slideDown mb-6">
-            ❌ {error}
+          <div
+            className="bg-danger/10 border border-danger/20 text-danger p-4 rounded-lg mb-6"
+            role="alert"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            <span aria-hidden="true">❌</span> {error}
           </div>
         )}
 
         {success && (
-          <div className="bg-success/10 border border-success/20 text-success p-4 rounded-lg animate-slideDown mb-6">
-            ✅ {success}
+          <div
+            className="bg-success/10 border border-success/20 text-success p-4 rounded-lg mb-6"
+            role="alert"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            <span aria-hidden="true">✅</span> {success}
           </div>
         )}
 
@@ -126,36 +152,39 @@ export default function PrivacySettings() {
             <div className="space-y-4">
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <label className="text-sm font-medium text-neutral-900">
+                  <label htmlFor="retention-slider" className="text-sm font-medium text-neutral-900">
                     Retention Period
                   </label>
-                  <span className="text-2xl font-bold text-primary-500">{dataRetentionDays}</span>
+                  <span className="text-2xl font-bold text-primary-500" aria-live="polite">{dataRetentionDays}</span>
                 </div>
                 <input
+                  id="retention-slider"
                   type="range"
                   min="1"
                   max="365"
                   value={dataRetentionDays}
                   onChange={(e) => setDataRetentionDays(parseInt(e.target.value))}
-                  className="w-full h-2 bg-neutral-200 rounded-lg cursor-pointer appearance-none accent-primary-500"
+                  className="w-full h-2 bg-neutral-200 rounded-lg cursor-pointer appearance-none accent-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600"
+                  aria-describedby="retention-hint"
                 />
-                <div className="flex justify-between text-xs text-neutral-600 mt-2">
+                <div className="flex justify-between text-xs text-neutral-600 mt-2" id="retention-hint">
                   <span>1 day</span>
                   <span>365 days</span>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2" role="group" aria-label="Quick retention period selection">
                 {[30, 90, 180, 365].map((days) => (
                   <button
                     key={days}
                     type="button"
                     onClick={() => setDataRetentionDays(days)}
-                    className={`px-3 py-2 rounded-lg font-medium text-sm transition ${
+                    className={`px-3 py-2 rounded-lg font-medium text-sm transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 ${
                       dataRetentionDays === days
                         ? 'bg-primary-500 text-white'
                         : 'bg-neutral-100 text-neutral-900 hover:bg-neutral-200'
                     }`}
+                    aria-pressed={dataRetentionDays === days}
                   >
                     {days} days
                   </button>
@@ -177,7 +206,7 @@ export default function PrivacySettings() {
               <p className="text-sm text-neutral-600 mt-1">Help us improve by sharing anonymized data</p>
             </div>
 
-            <label className="flex items-center justify-between p-4 bg-neutral-50 rounded-lg cursor-pointer hover:bg-primary-50 transition border border-neutral-200">
+            <label className="flex items-center justify-between p-4 bg-neutral-50 rounded-lg cursor-pointer hover:bg-primary-50 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary-600 transition border border-neutral-200">
               <div>
                 <p className="font-medium text-neutral-900">Analytics Tracking</p>
                 <p className="text-xs text-neutral-600 mt-1">
@@ -189,7 +218,8 @@ export default function PrivacySettings() {
                 type="checkbox"
                 checked={analyticsEnabled}
                 onChange={(e) => setAnalyticsEnabled(e.target.checked)}
-                className="w-5 h-5 text-primary-500 cursor-pointer"
+                className="w-5 h-5 text-primary-500 cursor-pointer focus:outline-none"
+                aria-label="Enable analytics tracking"
               />
             </label>
 
@@ -223,7 +253,7 @@ export default function PrivacySettings() {
               <p className="text-sm text-neutral-600 mt-1">Security alerts about your account</p>
             </div>
 
-            <label className="flex items-center justify-between p-4 bg-neutral-50 rounded-lg cursor-pointer hover:bg-primary-50 transition border border-neutral-200">
+            <label className="flex items-center justify-between p-4 bg-neutral-50 rounded-lg cursor-pointer hover:bg-primary-50 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary-600 transition border border-neutral-200">
               <div>
                 <p className="font-medium text-neutral-900">Threat Alerts</p>
                 <p className="text-xs text-neutral-600 mt-1">
@@ -235,7 +265,8 @@ export default function PrivacySettings() {
                 type="checkbox"
                 checked={emailNotificationsEnabled}
                 onChange={(e) => setEmailNotificationsEnabled(e.target.checked)}
-                className="w-5 h-5 text-primary-500 cursor-pointer"
+                className="w-5 h-5 text-primary-500 cursor-pointer focus:outline-none"
+                aria-label="Enable threat alert notifications"
               />
             </label>
 
@@ -253,7 +284,11 @@ export default function PrivacySettings() {
           {/* Save Button */}
           <div className="flex gap-3 pt-4 border-t border-neutral-200">
             <Link href="/settings" className="flex-1">
-              <Button variant="secondary" className="w-full">
+              <Button
+                variant="secondary"
+                className="w-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-600"
+                aria-label="Cancel and go back to settings"
+              >
                 ← Cancel
               </Button>
             </Link>
@@ -261,9 +296,11 @@ export default function PrivacySettings() {
             <button
               type="submit"
               disabled={saving}
-              className="flex-1 px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-lg transition disabled:opacity-50"
+              className="flex-1 px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-lg transition disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600"
+              aria-busy={saving}
+              aria-label={saving ? 'Saving privacy settings' : 'Save privacy settings changes'}
             >
-              {saving ? 'Saving...' : '💾 Save Changes'}
+              {saving ? 'Saving...' : <><span aria-hidden="true">💾</span> Save Changes</>}
             </button>
           </div>
         </form>

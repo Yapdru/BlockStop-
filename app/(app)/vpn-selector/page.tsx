@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button, Card, Badge, Input } from '@/components';
+import { a11y } from '@/lib/a11y';
 
 interface VPNProvider {
   id: string;
@@ -117,15 +118,30 @@ export default function VPNSelectorPage() {
   };
 
   return (
-    <main className="min-h-screen bg-neutral-50 pb-24 md:pb-0">
+    <main className="min-h-screen bg-neutral-50 pb-24 md:pb-0" id="main-content">
+      {/* Skip to main content link */}
+      <a
+        href="#main-content"
+        className="absolute top-0 left-0 p-2 bg-primary-600 text-white rounded-b-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 -translate-y-full focus:translate-y-0 transition-transform"
+        aria-label="Skip to main content"
+      >
+        Skip to main content
+      </a>
+
       {/* Header */}
       <header className="bg-neutral-0 border-b border-neutral-200 sticky top-0 z-40">
         <div className="container-max py-4">
           <div className="flex items-center gap-4 mb-4">
-            <Link href="/dashboard" className="text-primary-600 hover:text-primary-700 font-medium">
+            <Link
+              href="/dashboard"
+              className="text-primary-600 hover:text-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 rounded font-medium"
+              aria-label="Back to dashboard"
+            >
               ← Back
             </Link>
-            <h1 className="text-h3 font-bold text-neutral-900">🌐 VPN Selector</h1>
+            <h1 className="text-h3 font-bold text-neutral-900">
+              <span aria-hidden="true">🌐</span> VPN Selector
+            </h1>
           </div>
           <p className="text-sm text-neutral-600">Choose your preferred VPN provider for secure browsing</p>
         </div>
@@ -146,21 +162,25 @@ export default function VPNSelectorPage() {
             placeholder="Search by VPN name or country..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            aria-label="Search VPN providers by name or country"
           />
 
           {/* Tier Filters */}
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2" role="tablist" aria-label="VPN tier filters">
             {(['all', 'free', 'pro', 'max'] as const).map(tier => (
               <button
                 key={tier}
                 onClick={() => setSelectedTier(tier)}
-                className={`px-4 py-2 rounded-lg font-medium text-sm transition ${
+                className={`px-4 py-2 rounded-lg font-medium text-sm transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 ${
                   selectedTier === tier
                     ? 'bg-primary-500 text-white'
                     : 'bg-neutral-100 text-neutral-900 hover:bg-neutral-200'
                 }`}
+                role="tab"
+                aria-selected={selectedTier === tier}
+                aria-label={`${tier.toUpperCase()} tier VPNs`}
               >
-                {tier === 'all' ? '🔗 All' : tier === 'free' ? '🆓 Free' : tier === 'pro' ? '⭐ PRO' : '✨ MAX'}
+                {tier === 'all' ? <><span aria-hidden="true">🔗</span> All</> : tier === 'free' ? <><span aria-hidden="true">🆓</span> Free</> : tier === 'pro' ? <><span aria-hidden="true">⭐</span> PRO</> : <><span aria-hidden="true">✨</span> MAX</>}
               </button>
             ))}
           </div>
@@ -224,11 +244,16 @@ export default function VPNSelectorPage() {
                 {/* Action Button */}
                 <Button
                   variant={vpn.enabled ? 'secondary' : 'primary'}
-                  className="w-full"
-                  onClick={() => handleToggleVPN(vpn.id)}
+                  className="w-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600"
+                  onClick={() => {
+                    handleToggleVPN(vpn.id);
+                    a11y.announce(`${vpn.name} VPN ${vpn.enabled ? 'disabled' : 'enabled'}`);
+                  }}
                   disabled={loading}
+                  aria-pressed={vpn.enabled}
+                  aria-label={`${vpn.enabled ? 'Disable' : 'Enable'} ${vpn.name} VPN`}
                 >
-                  {vpn.enabled ? '✓ Enabled' : '⚙️ Enable'}
+                  {vpn.enabled ? <><span aria-hidden="true">✓</span> Enabled</> : <><span aria-hidden="true">⚙️</span> Enable</>}
                 </Button>
               </Card>
             ))}
@@ -242,15 +267,17 @@ export default function VPNSelectorPage() {
         )}
 
         {/* Recommendation Banner */}
-        <Card padding="lg" className="border-accent-200 bg-accent-50">
-          <h3 className="font-semibold text-neutral-900 mb-2">⚡ Recommended Setup</h3>
+        <section className="mt-12 border-accent-200 bg-accent-50 rounded-lg p-6" aria-label="VPN setup recommendations">
+          <h3 className="font-semibold text-neutral-900 mb-2">
+            <span aria-hidden="true">⚡</span> Recommended Setup
+          </h3>
           <p className="text-sm text-neutral-700 mb-4">
             For optimal security and performance, enable multiple VPNs and rotate between them.
           </p>
-          <div className="text-xs text-neutral-600">
+          <div className="text-xs text-neutral-600" aria-live="polite">
             <strong>Currently enabled:</strong> {vpns.filter(v => v.enabled).length} VPN(s)
           </div>
-        </Card>
+        </section>
       </div>
     </main>
   );
