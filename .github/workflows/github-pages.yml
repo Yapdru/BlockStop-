@@ -31,6 +31,11 @@ jobs:
         env:
           GITHUB_PAGES: "true"
 
+      - name: Copy documentation site
+        run: |
+          cp -r docs/* out/ || true
+          cp docs/api-docs.html out/api.html || true
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:

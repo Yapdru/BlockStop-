@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="BlockStop PRO - Advanced email and file security analysis tool with DRAR AI and BetterBot PRO engines">
+    <meta name="keywords" content="security, email analysis, malware detection, phishing detection, BlockStop">
+    <meta name="author" content="BlockStop Team">
+    <title>BlockStop PRO - Email & File Security Analysis</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%231E88FF' width='100' height='100'/><path fill='white' d='M50,20 L70,35 L70,65 Q70,80 50,85 Q30,80 30,65 L30,35 Z'/></svg>">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary: #1E88FF;
+            --primary-dark: #1565C0;
+            --accent: #FFE500;
+            --accent-dark: #FBC500;
+            --success: #4CAF50;
+            --warning: #FF9800;
+            --danger: #F44336;
+            --light-bg: #F5F7FA;
+            --text-primary: #1A1A1A;
+            --text-secondary: #666666;
+            --border-color: #E0E0E0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FFFFFF;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .navbar-nav .nav-link {
+            color: var(--text-secondary);
+            font-weight: 500;
+            margin: 0 0.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .navbar-nav .nav-link:hover,
+        .navbar-nav .nav-link.active {
+            color: var(--primary);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, rgba(30, 136, 255, 0.1), rgba(255, 229, 0, 0.05));
+            padding: 6rem 0;
+            text-align: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(30, 136, 255, 0.1), transparent);
+            border-radius: 50%;
+            top: -100px;
+            right: -100px;
+        }
+
+        .hero .container {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .hero .lead {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 3rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(30, 136, 255, 0.3);
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Feature Grid */
+        .features {
+            padding: 6rem 0;
+            background-color: var(--light-bg);
+        }
+
+        .features h2 {
+            font-size: clamp(1.75rem, 4vw, 2.5rem);
+            font-weight: 700;
+            margin-bottom: 4rem;
+            text-align: center;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+            text-align: center;
+            height: 100%;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        /* Pricing Section */
+        .pricing {
+            padding: 6rem 0;
+        }
+
+        .pricing h2 {
+            font-size: clamp(1.75rem, 4vw, 2.5rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-align: center;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .pricing-intro {
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 4rem;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .pricing-card {
+            background: white;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            height: 100%;
+        }
+
+        .pricing-card.featured {
+            border-color: var(--primary);
+            box-shadow: 0 16px 32px rgba(30, 136, 255, 0.15);
+            transform: scale(1.05);
+        }
+
+        .pricing-card:hover:not(.featured) {
+            border-color: var(--primary);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .pricing-card .badge {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--accent);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .pricing-card h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .price {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .price-period {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .price-features {
+            list-style: none;
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+
+        .price-features li {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+        }
+
+        .price-features li::before {
+            content: '✓';
+            color: var(--success);
+            font-weight: 700;
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+        }
+
+        /* CTA Section */
+        .cta {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 4rem 0;
+            text-align: center;
+            border-radius: 16px;
+            margin: 4rem 0;
+        }
+
+        .cta h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .cta p {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+
+        .cta .btn-secondary {
+            color: white;
+            border-color: white;
+        }
+
+        .cta .btn-secondary:hover {
+            background-color: white;
+            color: var(--primary);
+        }
+
+        /* Footer */
+        footer {
+            background-color: #1A1A1A;
+            color: #FFFFFF;
+            padding: 3rem 0 1rem;
+            margin-top: 4rem;
+        }
+
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        .footer-section h5 {
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #333;
+            padding-top: 2rem;
+            margin-top: 2rem;
+            text-align: center;
+            color: #888;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero {
+                padding: 4rem 0;
+            }
+
+            .hero h1 {
+                margin-bottom: 1rem;
+            }
+
+            .features,
+            .pricing {
+                padding: 4rem 0;
+            }
+
+            .pricing-card.featured {
+                transform: scale(1);
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .hero-buttons .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .navbar-nav {
+                gap: 1rem;
+            }
+        }
+
+        /* Animations */
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: slideInUp 0.6s ease-out forwards;
+        }
+
+        /* SEO improvements */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+    </style>
+
+    <!-- Analytics (Google Analytics placeholder) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        // gtag('config', 'G-XXXXXXXXXX'); // Replace with your GA ID
+    </script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <i class="fas fa-shield-alt"></i> BlockStop PRO
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="pricing.html">Pricing</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="setup.html">Getting Started</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="api-docs.html">API Docs</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="support.html">Support</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1 class="fade-in">Advanced Email & File Security Analysis</h1>
+            <p class="lead fade-in">Protect your organization from phishing, malware, and file-based threats with BlockStop PRO's AI-powered detection engines.</p>
+            <div class="hero-buttons">
+                <a href="setup.html" class="btn btn-primary">Get Started</a>
+                <a href="features.html" class="btn btn-secondary">Learn More</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <h2>Powerful Security Features</h2>
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card fade-in">
+                        <div class="feature-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <h3>DRAR AI Email Analysis</h3>
+                        <p>Heuristic-based phishing detection with keyword analysis, sender reputation evaluation, and malicious link detection.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card fade-in">
+                        <div class="feature-icon">
+                            <i class="fas fa-file"></i>
+                        </div>
+                        <h3>BetterBot PRO Malware Scanning</h3>
+                        <p>Signature-based detection with entropy analysis, dangerous extension classification, and ransomware behavior indicators.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card fade-in">
+                        <div class="feature-icon">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <h3>Real-Time Alerts</h3>
+                        <p>Get instant notifications directly in your Gmail inbox when threats are detected. Stay informed, stay protected.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card fade-in">
+                        <div class="feature-icon">
+                            <i class="fas fa-history"></i>
+                        </div>
+                        <h3>Comprehensive History</h3>
+                        <p>Track all scans with detailed reports, threat timelines, and historical analysis of your security events.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card fade-in">
+                        <div class="feature-icon">
+                            <i class="fas fa-docker"></i>
+                        </div>
+                        <h3>BlockOS Environment</h3>
+                        <p>Containerized security platform with custom CLI for advanced users and enterprise deployments.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card fade-in">
+                        <div class="feature-icon">
+                            <i class="fas fa-cloud"></i>
+                        </div>
+                        <h3>Multi-Platform Support</h3>
+                        <p>Web app, desktop applications, and mobile support with synchronized accounts and data.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="pricing">
+        <div class="container">
+            <h2>Simple, Transparent Pricing</h2>
+            <p class="pricing-intro">Choose the plan that's right for you. All plans include core security features with unlimited scans.</p>
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-3">
+                    <div class="pricing-card">
+                        <h3>FREE</h3>
+                        <div class="price">$0</div>
+                        <div class="price-period">Forever free</div>
+                        <ul class="price-features">
+                            <li>10 scans/day</li>
+                            <li>Email analysis</li>
+                            <li>Basic file scanning</li>
+                            <li>Web app access</li>
+                            <li>7-day history</li>
+                        </ul>
+                        <a href="setup.html" class="btn btn-primary">Get Started</a>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="pricing-card">
+                        <h3>NEO</h3>
+                        <div class="price">$9.99</div>
+                        <div class="price-period">per month</div>
+                        <ul class="price-features">
+                            <li>Unlimited scans</li>
+                            <li>Advanced analysis</li>
+                            <li>Desktop app</li>
+                            <li>90-day history</li>
+                            <li>Priority support</li>
+                        </ul>
+                        <a href="setup.html" class="btn btn-primary">Subscribe</a>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="pricing-card featured">
+                        <span class="badge">POPULAR</span>
+                        <h3>PRO</h3>
+                        <div class="price">$19.99</div>
+                        <div class="price-period">per month</div>
+                        <ul class="price-features">
+                            <li>Everything in NEO</li>
+                            <li>Mobile app (iPhone)</li>
+                            <li>Threat intelligence</li>
+                            <li>API access</li>
+                            <li>1-year history</li>
+                            <li>Team features</li>
+                        </ul>
+                        <a href="setup.html" class="btn btn-primary">Subscribe</a>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="pricing-card">
+                        <h3>MAX</h3>
+                        <div class="price">$49.99</div>
+                        <div class="price-period">per month</div>
+                        <ul class="price-features">
+                            <li>Everything in PRO</li>
+                            <li>Mac app + iOS app</li>
+                            <li>Advanced analytics</li>
+                            <li>Custom integrations</li>
+                            <li>Unlimited history</li>
+                            <li>Dedicated support</li>
+                        </ul>
+                        <a href="setup.html" class="btn btn-primary">Subscribe</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+        <div class="container">
+            <h2>Ready to Protect Your Organization?</h2>
+            <p>Start securing your emails and files today with BlockStop PRO</p>
+            <a href="setup.html" class="btn btn-secondary">Start Free Trial</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="footer-section">
+                        <h5>Product</h5>
+                        <ul>
+                            <li><a href="features.html">Features</a></li>
+                            <li><a href="pricing.html">Pricing</a></li>
+                            <li><a href="setup.html">Getting Started</a></li>
+                            <li><a href="api-docs.html">API Docs</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="footer-section">
+                        <h5>Resources</h5>
+                        <ul>
+                            <li><a href="https://github.com/Yapdru/BlockStop-">GitHub Repository</a></li>
+                            <li><a href="support.html">Support Center</a></li>
+                            <li><a href="#">Blog</a></li>
+                            <li><a href="#">Documentation</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="footer-section">
+                        <h5>Company</h5>
+                        <ul>
+                            <li><a href="#">About Us</a></li>
+                            <li><a href="#">Privacy Policy</a></li>
+                            <li><a href="#">Terms of Service</a></li>
+                            <li><a href="#">Contact</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 BlockStop. All rights reserved. | <a href="#">Privacy</a> | <a href="#">Terms</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Simple scroll animation
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in');
+                }
+            });
+        });
+
+        document.querySelectorAll('.feature-card, .pricing-card').forEach(el => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>

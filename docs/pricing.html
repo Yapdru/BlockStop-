@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="BlockStop PRO pricing plans - Choose the perfect plan for your security needs">
+    <title>Pricing - BlockStop PRO</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #1E88FF;
+            --primary-dark: #1565C0;
+            --accent: #FFE500;
+            --success: #4CAF50;
+            --light-bg: #F5F7FA;
+            --text-primary: #1A1A1A;
+            --text-secondary: #666666;
+            --border-color: #E0E0E0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FFFFFF;
+            color: var(--text-primary);
+        }
+
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .navbar-nav .nav-link {
+            color: var(--text-secondary);
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .navbar-nav .nav-link:hover,
+        .navbar-nav .nav-link.active {
+            color: var(--primary);
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, rgba(30, 136, 255, 0.1), rgba(255, 229, 0, 0.05));
+            padding: 4rem 0 3rem;
+            text-align: center;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .pricing-section {
+            padding: 4rem 0;
+        }
+
+        .pricing-cards {
+            margin-bottom: 4rem;
+        }
+
+        .pricing-card {
+            background: white;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .pricing-card.featured {
+            border-color: var(--primary);
+            box-shadow: 0 16px 32px rgba(30, 136, 255, 0.15);
+            transform: scale(1.05);
+        }
+
+        .pricing-card:hover:not(.featured) {
+            border-color: var(--primary);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .pricing-card .badge {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--accent);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .pricing-card h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .price {
+            font-size: 2.75rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .price-period {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .price-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            min-height: 50px;
+        }
+
+        .price-features {
+            list-style: none;
+            margin-bottom: 2rem;
+            text-align: left;
+            flex-grow: 1;
+        }
+
+        .price-features li {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            font-size: 0.95rem;
+        }
+
+        .price-features li:last-child {
+            border-bottom: none;
+        }
+
+        .price-features li::before {
+            content: '✓';
+            color: var(--success);
+            font-weight: 700;
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(30, 136, 255, 0.3);
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .faq-section {
+            background-color: var(--light-bg);
+            padding: 4rem 0;
+            margin-top: 4rem;
+        }
+
+        .faq-section h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 3rem;
+            text-align: center;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .faq-item {
+            background: white;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .faq-item h4 {
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+
+        .faq-item p {
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        .toggle-icon {
+            float: right;
+            transition: transform 0.3s ease;
+        }
+
+        .faq-item.active .toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .feature-box {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .feature-box i {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .feature-box h4 {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-box p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        footer {
+            background-color: #1A1A1A;
+            color: #FFFFFF;
+            padding: 3rem 0 1rem;
+            margin-top: 4rem;
+        }
+
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .page-header h1 {
+                font-size: 2rem;
+            }
+
+            .pricing-card.featured {
+                transform: scale(1);
+            }
+
+            .price {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <i class="fas fa-shield-alt"></i> BlockStop PRO
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="features.html">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="pricing.html">Pricing</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="setup.html">Getting Started</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="api-docs.html">API Docs</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="support.html">Support</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <h1>Simple, Transparent Pricing</h1>
+            <p class="lead">Choose the perfect plan for your security needs</p>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <main class="pricing-section">
+        <div class="container">
+            <div class="row g-4 pricing-cards">
+                <!-- FREE Tier -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="pricing-card">
+                        <h3>FREE</h3>
+                        <div class="price">$0</div>
+                        <div class="price-period">Forever</div>
+                        <div class="price-description">Perfect for individuals just getting started</div>
+                        <ul class="price-features">
+                            <li>10 scans per day</li>
+                            <li>Email analysis</li>
+                            <li>Basic file scanning</li>
+                            <li>Web app access</li>
+                            <li>7-day history</li>
+                            <li>Community support</li>
+                        </ul>
+                        <a href="setup.html" class="btn btn-secondary">Get Started</a>
+                    </div>
+                </div>
+
+                <!-- NEO Tier -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="pricing-card">
+                        <h3>NEO</h3>
+                        <div class="price">$9.99</div>
+                        <div class="price-period">per month</div>
+                        <div class="price-description">Great for power users and small teams</div>
+                        <ul class="price-features">
+                            <li>Unlimited scans</li>
+                            <li>Advanced analysis</li>
+                            <li>Desktop app (Mac/Windows)</li>
+                            <li>90-day history</li>
+                            <li>Email support</li>
+                            <li>Priority support</li>
+                            <li>Custom filters</li>
+                        </ul>
+                        <a href="setup.html" class="btn btn-primary">Subscribe Now</a>
+                    </div>
+                </div>
+
+                <!-- PRO Tier -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="pricing-card featured">
+                        <span class="badge">MOST POPULAR</span>
+                        <h3>PRO</h3>
+                        <div class="price">$19.99</div>
+                        <div class="price-period">per month</div>
+                        <div class="price-description">Best for serious security professionals</div>
+                        <ul class="price-features">
+                            <li>Everything in NEO</li>
+                            <li>Mobile app (iPhone)</li>
+                            <li>Threat intelligence</li>
+                            <li>API access</li>
+                            <li>1-year history</li>
+                            <li>Team management (5 users)</li>
+                            <li>Priority support</li>
+                        </ul>
+                        <a href="setup.html" class="btn btn-primary">Subscribe Now</a>
+                    </div>
+                </div>
+
+                <!-- MAX Tier -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="pricing-card">
+                        <h3>MAX</h3>
+                        <div class="price">$49.99</div>
+                        <div class="price-period">per month</div>
+                        <div class="price-description">Enterprise-grade security solution</div>
+                        <ul class="price-features">
+                            <li>Everything in PRO</li>
+                            <li>Mac app + iOS (all devices)</li>
+                            <li>Advanced analytics</li>
+                            <li>Custom integrations</li>
+                            <li>Unlimited history</li>
+                            <li>Unlimited team users</li>
+                            <li>Dedicated support</li>
+                        </ul>
+                        <a href="setup.html" class="btn btn-primary">Subscribe Now</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- What's Included -->
+            <section style="margin-top: 4rem; margin-bottom: 4rem;">
+                <h2 style="text-align: center; font-size: 2rem; font-weight: 700; margin-bottom: 3rem; font-family: 'Poppins', sans-serif;">What's Included in Every Plan</h2>
+                <div class="features-grid">
+                    <div class="feature-box">
+                        <i class="fas fa-shield-alt"></i>
+                        <h4>Core Security</h4>
+                        <p>DRAR AI email analysis and BetterBot PRO malware detection on all plans</p>
+                    </div>
+                    <div class="feature-box">
+                        <i class="fas fa-database"></i>
+                        <h4>Cloud Storage</h4>
+                        <p>Secure cloud storage for scan history and reports with encrypted data</p>
+                    </div>
+                    <div class="feature-box">
+                        <i class="fas fa-sync"></i>
+                        <h4>Cross-Device Sync</h4>
+                        <p>Sync your accounts and settings across all your devices seamlessly</p>
+                    </div>
+                    <div class="feature-box">
+                        <i class="fas fa-lock"></i>
+                        <h4>Encryption</h4>
+                        <p>End-to-end encryption for all your sensitive data and communications</p>
+                    </div>
+                    <div class="feature-box">
+                        <i class="fas fa-chart-line"></i>
+                        <h4>Analytics</h4>
+                        <p>Detailed threat analytics and reporting to understand your security posture</p>
+                    </div>
+                    <div class="feature-box">
+                        <i class="fas fa-headset"></i>
+                        <h4>Support</h4>
+                        <p>Community support on FREE, email/chat support on paid tiers</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Money-Back Guarantee -->
+            <section style="background: linear-gradient(135deg, rgba(30, 136, 255, 0.1), rgba(255, 229, 0, 0.05)); padding: 3rem 2rem; border-radius: 12px; text-align: center; margin-bottom: 4rem;">
+                <h3 style="font-weight: 700; margin-bottom: 1rem;">30-Day Money-Back Guarantee</h3>
+                <p style="color: var(--text-secondary); margin: 0;">Not satisfied? Get a full refund within 30 days of purchase. No questions asked.</p>
+            </section>
+        </div>
+    </main>
+
+    <!-- FAQ Section -->
+    <section class="faq-section">
+        <div class="container">
+            <h2>Frequently Asked Questions</h2>
+
+            <div class="faq-item">
+                <h4><span class="toggle-icon">▼</span> Can I change my plan anytime?</h4>
+                <p>Yes! You can upgrade, downgrade, or cancel your subscription anytime. Changes take effect on your next billing cycle.</p>
+            </div>
+
+            <div class="faq-item">
+                <h4><span class="toggle-icon">▼</span> Is there a free trial?</h4>
+                <p>Yes, our FREE tier is available indefinitely, though with scan limits. For paid plans, we offer a 30-day money-back guarantee.</p>
+            </div>
+
+            <div class="faq-item">
+                <h4><span class="toggle-icon">▼</span> Do you offer volume discounts?</h4>
+                <p>Yes! We offer special pricing for teams and enterprise customers. Contact our sales team for custom quotes.</p>
+            </div>
+
+            <div class="faq-item">
+                <h4><span class="toggle-icon">▼</span> What payment methods do you accept?</h4>
+                <p>We accept all major credit cards (Visa, Mastercard, American Express), PayPal, and bank transfers for enterprise customers.</p>
+            </div>
+
+            <div class="faq-item">
+                <h4><span class="toggle-icon">▼</span> How does the scan limit work?</h4>
+                <p>Scan limits reset daily at midnight UTC. Each email or file scanned counts as one scan. Unlimited plans have no restrictions.</p>
+            </div>
+
+            <div class="faq-item">
+                <h4><span class="toggle-icon">▼</span> Can I share my account with family members?</h4>
+                <p>We recommend using our team features for this. PRO and MAX plans support multiple team members with their own accounts.</p>
+            </div>
+
+            <div class="faq-item">
+                <h4><span class="toggle-icon">▼</span> What happens to my data if I cancel?</h4>
+                <p>Your data is safely retained for 90 days. You can request export or deletion anytime. Read our privacy policy for details.</p>
+            </div>
+
+            <div class="faq-item">
+                <h4><span class="toggle-icon">▼</span> Do you offer custom enterprise solutions?</h4>
+                <p>Yes! Our MAX tier and custom enterprise plans support on-premises deployment, API whitelabeling, and more. Contact sales@blockstop.com</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="footer-section">
+                        <h5>Product</h5>
+                        <ul style="list-style: none;">
+                            <li><a href="features.html">Features</a></li>
+                            <li><a href="pricing.html">Pricing</a></li>
+                            <li><a href="setup.html">Getting Started</a></li>
+                            <li><a href="api-docs.html">API Docs</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="footer-section">
+                        <h5>Resources</h5>
+                        <ul style="list-style: none;">
+                            <li><a href="https://github.com/Yapdru/BlockStop-">GitHub</a></li>
+                            <li><a href="support.html">Support</a></li>
+                            <li><a href="api-docs.html">Docs</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="footer-section">
+                        <h5>Legal</h5>
+                        <ul style="list-style: none;">
+                            <li><a href="#">Privacy Policy</a></li>
+                            <li><a href="#">Terms of Service</a></li>
+                            <li><a href="support.html">Contact</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div style="border-top: 1px solid #333; padding-top: 2rem; margin-top: 2rem; text-align: center; color: #888;">
+                <p>&copy; 2024 BlockStop. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Toggle FAQ items
+        document.querySelectorAll('.faq-item h4').forEach(item => {
+            item.addEventListener('click', function() {
+                this.parentElement.classList.toggle('active');
+            });
+        });
+    </script>
+</body>
+</html>

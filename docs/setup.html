@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Get started with BlockStop PRO - Installation, setup, and initial configuration guide">
+    <title>Getting Started - BlockStop PRO</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #1E88FF;
+            --primary-dark: #1565C0;
+            --accent: #FFE500;
+            --success: #4CAF50;
+            --light-bg: #F5F7FA;
+            --text-primary: #1A1A1A;
+            --text-secondary: #666666;
+            --border-color: #E0E0E0;
+            --code-bg: #F8F9FA;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FFFFFF;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .navbar-nav .nav-link {
+            color: var(--text-secondary);
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .navbar-nav .nav-link:hover,
+        .navbar-nav .nav-link.active {
+            color: var(--primary);
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, rgba(30, 136, 255, 0.1), rgba(255, 229, 0, 0.05));
+            padding: 4rem 0 3rem;
+            text-align: center;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .content-section {
+            padding: 4rem 0;
+        }
+
+        .toc {
+            background: var(--light-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 3rem;
+            border-left: 4px solid var(--primary);
+        }
+
+        .toc h3 {
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            font-size: 1.25rem;
+        }
+
+        .toc ul {
+            list-style: none;
+            margin: 0;
+        }
+
+        .toc li {
+            margin-bottom: 0.75rem;
+        }
+
+        .toc a {
+            color: var(--primary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .toc a:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+
+        .guide-section {
+            margin-bottom: 4rem;
+        }
+
+        .guide-section h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .guide-section h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .step {
+            background: white;
+            border: 1px solid var(--border-color);
+            padding: 2rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-left: 3.5rem;
+        }
+
+        .step-number {
+            position: absolute;
+            left: 1rem;
+            top: 1.5rem;
+            width: 40px;
+            height: 40px;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .step h4 {
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .step p {
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+        }
+
+        .step ol,
+        .step ul {
+            margin-bottom: 0;
+            color: var(--text-secondary);
+        }
+
+        .step ol li,
+        .step ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background-color: var(--code-bg);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            color: var(--primary);
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        pre code {
+            background-color: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        .info-box {
+            background: #E3F2FD;
+            border-left: 4px solid var(--primary);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-box strong {
+            color: var(--primary);
+        }
+
+        .success-box {
+            background: #E8F5E9;
+            border-left: 4px solid var(--success);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .warning-box {
+            background: #FFF3E0;
+            border-left: 4px solid #FF9800;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(30, 136, 255, 0.3);
+            color: white;
+        }
+
+        footer {
+            background-color: #1A1A1A;
+            color: #FFFFFF;
+            padding: 3rem 0 1rem;
+            margin-top: 4rem;
+        }
+
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .page-header h1 {
+                font-size: 2rem;
+            }
+
+            .guide-section h2 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <i class="fas fa-shield-alt"></i> BlockStop PRO
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="features.html">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="pricing.html">Pricing</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="setup.html">Getting Started</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="api-docs.html">API Docs</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="support.html">Support</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <h1>Getting Started with BlockStop PRO</h1>
+            <p class="lead">Follow this guide to set up and start using BlockStop PRO in minutes</p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="content-section">
+        <div class="container">
+            <!-- Table of Contents -->
+            <div class="toc">
+                <h3><i class="fas fa-list"></i> Quick Navigation</h3>
+                <ul>
+                    <li><a href="#account-creation">1. Account Creation</a></li>
+                    <li><a href="#email-checker">2. Using Email Checker</a></li>
+                    <li><a href="#file-scanner">3. Using File Scanner</a></li>
+                    <li><a href="#gmail-integration">4. Gmail Integration</a></li>
+                    <li><a href="#desktop-app">5. Desktop Application</a></li>
+                    <li><a href="#mobile-app">6. Mobile Application</a></li>
+                    <li><a href="#settings">7. Configuration & Settings</a></li>
+                </ul>
+            </div>
+
+            <!-- Section 1: Account Creation -->
+            <section class="guide-section" id="account-creation">
+                <h2>1. Create Your Account</h2>
+
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h4>Sign Up</h4>
+                    <p>Visit our web app and click "Get Started" to create your account. You can use:</p>
+                    <ul>
+                        <li>Email address and password</li>
+                        <li>Google account (OAuth)</li>
+                    </ul>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h4>Verify Your Email</h4>
+                    <p>Check your email inbox for a verification link. Click the link to confirm your account.</p>
+                    <div class="info-box">
+                        <strong>Tip:</strong> Check your spam folder if you don't see the email within a few minutes.
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h4>Choose Your Plan</h4>
+                    <p>Select the plan that best fits your needs:</p>
+                    <ul>
+                        <li><strong>FREE:</strong> Perfect for testing (10 scans/day)</li>
+                        <li><strong>NEO:</strong> Unlimited scans, desktop app ($9.99/month)</li>
+                        <li><strong>PRO:</strong> Everything + mobile app ($19.99/month)</li>
+                        <li><strong>MAX:</strong> Full enterprise features ($49.99/month)</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Section 2: Email Checker -->
+            <section class="guide-section" id="email-checker">
+                <h2>2. Analyzing Emails with Email Checker</h2>
+
+                <div class="info-box">
+                    <strong>What is Email Checker?</strong> Our DRAR AI engine analyzes emails for phishing attempts, malicious links, spam indicators, and suspicious sender information.
+                </div>
+
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h4>Navigate to Email Checker</h4>
+                    <p>From the dashboard, click on "Email Checker" in the main menu.</p>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h4>Enter Email Address or Content</h4>
+                    <p>You can analyze emails in two ways:</p>
+                    <ul>
+                        <li><strong>Paste Email Content:</strong> Copy-paste the full email (headers included) into the text area</li>
+                        <li><strong>Enter Sender Email:</strong> Provide the sender's email address for reputation checking</li>
+                    </ul>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h4>Review Analysis Results</h4>
+                    <p>The report includes:</p>
+                    <ul>
+                        <li><strong>Risk Score:</strong> 0-100 threat level</li>
+                        <li><strong>Threat Categories:</strong> Phishing, spam, malware, etc.</li>
+                        <li><strong>Details:</strong> Specific indicators and recommendations</li>
+                        <li><strong>Sender Reputation:</strong> Historical sender analysis</li>
+                    </ul>
+                </div>
+
+                <h3>Understanding Threat Scores</h3>
+                <ul>
+                    <li><strong>0-20:</strong> Safe ✓</li>
+                    <li><strong>21-50:</strong> Caution ⚠️ (low risk)</li>
+                    <li><strong>51-80:</strong> Warning ⚠️ (medium risk)</li>
+                    <li><strong>81-100:</strong> Danger ❌ (high risk)</li>
+                </ul>
+            </section>
+
+            <!-- Section 3: File Scanner -->
+            <section class="guide-section" id="file-scanner">
+                <h2>3. Scanning Files with File Scanner</h2>
+
+                <div class="info-box">
+                    <strong>What is File Scanner?</strong> Our BetterBot PRO engine analyzes files for malware, trojans, ransomware, and other threats using signature and behavior analysis.
+                </div>
+
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h4>Navigate to File Scanner</h4>
+                    <p>From the dashboard, click on "File Scanner" in the main menu.</p>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h4>Upload a File</h4>
+                    <p>You can upload files in two ways:</p>
+                    <ul>
+                        <li><strong>Drag & Drop:</strong> Drag the file onto the upload area</li>
+                        <li><strong>Click to Browse:</strong> Click the upload area to select a file</li>
+                    </ul>
+                    <div class="success-box">
+                        <strong>Supported Formats:</strong> All common file types (ZIP, EXE, PDF, DOC, IMG, etc.)
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h4>Review Scan Results</h4>
+                    <p>The report includes:</p>
+                    <ul>
+                        <li><strong>File Information:</strong> Name, size, type, hash</li>
+                        <li><strong>Threat Level:</strong> Safe, Suspicious, or Dangerous</li>
+                        <li><strong>Detected Threats:</strong> Specific malware/virus names</li>
+                        <li><strong>Analysis Details:</strong> Entropy score, signatures matched</li>
+                    </ul>
+                </div>
+
+                <h3>File Scanning Best Practices</h3>
+                <ul>
+                    <li>Scan downloaded files before opening them</li>
+                    <li>Scan email attachments immediately</li>
+                    <li>Check archive contents before extracting</li>
+                    <li>Review detailed reports for suspicious indicators</li>
+                </ul>
+            </section>
+
+            <!-- Section 4: Gmail Integration -->
+            <section class="guide-section" id="gmail-integration">
+                <h2>4. Setting Up Gmail Integration</h2>
+
+                <div class="warning-box">
+                    <strong>Available on:</strong> NEO, PRO, and MAX tiers
+                </div>
+
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h4>Open Settings</h4>
+                    <p>Click the gear icon in the top-right corner of the dashboard.</p>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h4>Navigate to Integrations</h4>
+                    <p>In Settings, click on "Integrations" → "Gmail"</p>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h4>Connect Gmail Account</h4>
+                    <p>Click "Connect Gmail" and authorize BlockStop PRO to access your Gmail account. You'll be directed to Google's login page.</p>
+                    <div class="info-box">
+                        <strong>What permissions we request:</strong> Read emails, send labels, archive emails. We do NOT access passwords or send emails on your behalf.
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h4>Configure Scanning Settings</h4>
+                    <p>Choose how you want to handle threats:</p>
+                    <ul>
+                        <li><strong>Auto-scan:</strong> Automatically scan incoming emails</li>
+                        <li><strong>Auto-label:</strong> Label threats as "BlockStop Threat"</li>
+                        <li><strong>Auto-archive:</strong> Archive high-threat emails</li>
+                        <li><strong>Notifications:</strong> Get alerts for new threats</li>
+                    </ul>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">5</div>
+                    <h4>Save and Test</h4>
+                    <p>Click "Save Settings" and send a test email to verify integration is working.</p>
+                </div>
+            </section>
+
+            <!-- Section 5: Desktop App -->
+            <section class="guide-section" id="desktop-app">
+                <h2>5. Installing Desktop Application</h2>
+
+                <div class="warning-box">
+                    <strong>Available on:</strong> NEO, PRO, and MAX tiers
+                </div>
+
+                <h3>macOS Installation</h3>
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h4>Download</h4>
+                    <p>Go to Settings → "Downloads" and click "Download macOS App"</p>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h4>Install</h4>
+                    <p>Open the downloaded .dmg file and drag BlockStop to Applications folder</p>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h4>Launch</h4>
+                    <p>Open Applications folder and click BlockStop to start the app</p>
+                </div>
+
+                <h3>Windows Installation</h3>
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h4>Download</h4>
+                    <p>Go to Settings → "Downloads" and click "Download Windows App"</p>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h4>Run Installer</h4>
+                    <p>Run the .exe installer and follow the installation wizard</p>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h4>Login</h4>
+                    <p>Launch the app and sign in with your BlockStop account</p>
+                </div>
+
+                <h3>Desktop App Features</h3>
+                <ul>
+                    <li>Menu bar icon for quick access</li>
+                    <li>Drag-drop file scanning</li>
+                    <li>Keyboard shortcuts for quick scans</li>
+                    <li>Desktop notifications for threats</li>
+                    <li>Offline scanning capability</li>
+                </ul>
+            </section>
+
+            <!-- Section 6: Mobile App -->
+            <section class="guide-section" id="mobile-app">
+                <h2>6. Installing Mobile Application</h2>
+
+                <div class="warning-box">
+                    <strong>Available on:</strong> PRO and MAX tiers (iPhone)
+                </div>
+
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h4>Install from App Store</h4>
+                    <p>Open the Apple App Store and search for "BlockStop PRO"</p>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h4>Get the App</h4>
+                    <p>Click "Get" to install. You may need to authenticate with Face ID, Touch ID, or Apple ID</p>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h4>Launch and Login</h4>
+                    <p>Open BlockStop PRO and sign in with your account credentials</p>
+                </div>
+
+                <h3>Mobile Features</h3>
+                <ul>
+                    <li>Photo and file scanning from Photos app</li>
+                    <li>Quick email threat analysis</li>
+                    <li>Push notifications for threats</li>
+                    <li>Offline scanning for cached results</li>
+                    <li>Scan history access</li>
+                </ul>
+            </section>
+
+            <!-- Section 7: Settings -->
+            <section class="guide-section" id="settings">
+                <h2>7. Configuration & Settings</h2>
+
+                <h3>Account Settings</h3>
+                <ul>
+                    <li><strong>Profile:</strong> Update name, email, avatar</li>
+                    <li><strong>Password:</strong> Change your account password</li>
+                    <li><strong>Two-Factor Authentication:</strong> Enable 2FA for security</li>
+                    <li><strong>Session Management:</strong> View and manage active sessions</li>
+                </ul>
+
+                <h3>Scanning Settings</h3>
+                <ul>
+                    <li><strong>Auto-scan:</strong> Enable/disable automatic file scanning</li>
+                    <li><strong>Threat Sensitivity:</strong> Adjust detection strictness</li>
+                    <li><strong>File Type Filters:</strong> Choose which file types to scan</li>
+                    <li><strong>Max File Size:</strong> Set maximum file size for scanning</li>
+                </ul>
+
+                <h3>Notification Settings</h3>
+                <ul>
+                    <li><strong>Email Alerts:</strong> Get threat notifications via email</li>
+                    <li><strong>Push Notifications:</strong> Desktop/mobile alerts</li>
+                    <li><strong>Digest Mode:</strong> Summary emails of daily threats</li>
+                    <li><strong>Quiet Hours:</strong> Disable notifications during specific times</li>
+                </ul>
+
+                <h3>Privacy & Security</h3>
+                <ul>
+                    <li><strong>Data Retention:</strong> How long to keep scan history</li>
+                    <li><strong>Data Export:</strong> Export your data as JSON</li>
+                    <li><strong>Account Deletion:</strong> Permanently delete your account</li>
+                    <li><strong>Connected Apps:</strong> Manage app integrations</li>
+                </ul>
+
+                <h3>API Keys (PRO/MAX)</h3>
+                <ul>
+                    <li>Generate API keys for programmatic access</li>
+                    <li>View API documentation and integration guides</li>
+                    <li>Monitor API usage and rate limits</li>
+                </ul>
+            </section>
+
+            <!-- Next Steps -->
+            <section style="background: linear-gradient(135deg, rgba(30, 136, 255, 0.1), rgba(255, 229, 0, 0.05)); padding: 3rem 2rem; border-radius: 12px; text-align: center;">
+                <h2 style="font-size: 1.75rem; margin-bottom: 1rem;">Ready to Secure Your Data?</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 2rem;">Start with our FREE tier and upgrade anytime as your needs grow.</p>
+                <a href="index.html" class="btn btn-primary">Back to Home</a>
+                <a href="support.html" class="btn btn-primary" style="margin-left: 1rem;">Get Help</a>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="footer-section">
+                        <h5>Product</h5>
+                        <ul style="list-style: none;">
+                            <li><a href="features.html">Features</a></li>
+                            <li><a href="pricing.html">Pricing</a></li>
+                            <li><a href="setup.html">Getting Started</a></li>
+                            <li><a href="api-docs.html">API Docs</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="footer-section">
+                        <h5>Resources</h5>
+                        <ul style="list-style: none;">
+                            <li><a href="https://github.com/Yapdru/BlockStop-">GitHub</a></li>
+                            <li><a href="support.html">Support</a></li>
+                            <li><a href="api-docs.html">Docs</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="footer-section">
+                        <h5>Legal</h5>
+                        <ul style="list-style: none;">
+                            <li><a href="#">Privacy Policy</a></li>
+                            <li><a href="#">Terms of Service</a></li>
+                            <li><a href="support.html">Contact</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div style="border-top: 1px solid #333; padding-top: 2rem; margin-top: 2rem; text-align: center; color: #888;">
+                <p>&copy; 2024 BlockStop. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

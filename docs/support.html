@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="BlockStop PRO Support Center - Get help with your account, technical issues, and questions">
+    <title>Support - BlockStop PRO</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #1E88FF;
+            --primary-dark: #1565C0;
+            --accent: #FFE500;
+            --success: #4CAF50;
+            --light-bg: #F5F7FA;
+            --text-primary: #1A1A1A;
+            --text-secondary: #666666;
+            --border-color: #E0E0E0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FFFFFF;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .navbar-nav .nav-link {
+            color: var(--text-secondary);
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .navbar-nav .nav-link:hover,
+        .navbar-nav .nav-link.active {
+            color: var(--primary);
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, rgba(30, 136, 255, 0.1), rgba(255, 229, 0, 0.05));
+            padding: 4rem 0 3rem;
+            text-align: center;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .content-section {
+            padding: 4rem 0;
+        }
+
+        .support-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .support-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .support-card:hover {
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            transform: translateY(-4px);
+        }
+
+        .support-icon {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .support-card h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .support-card p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .support-card a {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .support-card a:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(30, 136, 255, 0.3);
+            color: white;
+        }
+
+        .contact-form {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2.5rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(30, 136, 255, 0.1);
+        }
+
+        .form-group textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .btn-submit:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(30, 136, 255, 0.3);
+        }
+
+        .faq-section {
+            margin-bottom: 4rem;
+        }
+
+        .faq-section h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .faq-item {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        .faq-header {
+            padding: 1.5rem;
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+
+        .faq-header:hover {
+            background-color: var(--light-bg);
+        }
+
+        .faq-toggle {
+            color: var(--primary);
+            transition: transform 0.3s ease;
+            font-size: 1.25rem;
+        }
+
+        .faq-item.active .faq-toggle {
+            transform: rotate(180deg);
+        }
+
+        .faq-content {
+            display: none;
+            padding: 0 1.5rem 1.5rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .faq-item.active .faq-content {
+            display: block;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .status-operational {
+            background-color: #E8F5E9;
+            color: var(--success);
+        }
+
+        .status-degraded {
+            background-color: #FFF3E0;
+            color: #FF9800;
+        }
+
+        footer {
+            background-color: #1A1A1A;
+            color: #FFFFFF;
+            padding: 3rem 0 1rem;
+            margin-top: 4rem;
+        }
+
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .page-header h1 {
+                font-size: 2rem;
+            }
+
+            .support-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <i class="fas fa-shield-alt"></i> BlockStop PRO
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="features.html">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="pricing.html">Pricing</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="setup.html">Getting Started</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="api-docs.html">API Docs</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="support.html">Support</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <h1>Support & Help Center</h1>
+            <p class="lead">Get help with your account and technical issues</p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="content-section">
+        <div class="container">
+            <!-- Support Options -->
+            <div class="support-grid">
+                <div class="support-card">
+                    <div class="support-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <h3>Email Support</h3>
+                    <p>Send us an email and we'll respond within 24 hours (PRO/MAX: 2 hours)</p>
+                    <a href="mailto:support@blockstop.io">support@blockstop.io</a>
+                </div>
+
+                <div class="support-card">
+                    <div class="support-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h3>Live Chat</h3>
+                    <p>Chat with our support team in real-time (available 9 AM - 6 PM UTC)</p>
+                    <a href="#">Start Chat</a>
+                </div>
+
+                <div class="support-card">
+                    <div class="support-icon">
+                        <i class="fas fa-github"></i>
+                    </div>
+                    <h3>GitHub Issues</h3>
+                    <p>Report bugs and feature requests on our GitHub repository</p>
+                    <a href="https://github.com/Yapdru/BlockStop-/issues">GitHub Issues</a>
+                </div>
+
+                <div class="support-card">
+                    <div class="support-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <h3>Documentation</h3>
+                    <p>Browse our comprehensive guides and API documentation</p>
+                    <a href="setup.html">View Docs</a>
+                </div>
+
+                <div class="support-card">
+                    <div class="support-icon">
+                        <i class="fas fa-sliders-h"></i>
+                    </div>
+                    <h3>Status Page</h3>
+                    <p>Check service status and incident history</p>
+                    <a href="#">Status Page</a>
+                </div>
+
+                <div class="support-card">
+                    <div class="support-icon">
+                        <i class="fas fa-bullhorn"></i>
+                    </div>
+                    <h3>Community</h3>
+                    <p>Join our community forum and connect with other users</p>
+                    <a href="#">Community Forum</a>
+                </div>
+            </div>
+
+            <!-- Contact Form -->
+            <section style="margin-bottom: 4rem;">
+                <h2 style="font-size: 2rem; font-weight: 700; margin-bottom: 2rem; text-align: center; font-family: 'Poppins', sans-serif;">Send us a Message</h2>
+
+                <form class="contact-form">
+                    <div class="form-group">
+                        <label for="name">Name *</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email Address *</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="category">Issue Category *</label>
+                        <select id="category" name="category" required>
+                            <option value="">Select a category</option>
+                            <option value="account">Account & Billing</option>
+                            <option value="technical">Technical Issues</option>
+                            <option value="feature">Feature Request</option>
+                            <option value="security">Security Report</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="subject">Subject *</label>
+                        <input type="text" id="subject" name="subject" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="message">Message *</label>
+                        <textarea id="message" name="message" required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-submit">Send Message</button>
+                </form>
+            </section>
+
+            <!-- Service Status -->
+            <section style="background: var(--light-bg); padding: 2rem; border-radius: 12px; margin-bottom: 4rem;">
+                <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem;">Service Status</h2>
+                <div style="display: grid; gap: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: white; border-radius: 8px;">
+                        <span>Web Application</span>
+                        <span class="status-badge status-operational">✓ Operational</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: white; border-radius: 8px;">
+                        <span>API Service</span>
+                        <span class="status-badge status-operational">✓ Operational</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: white; border-radius: 8px;">
+                        <span>Email Scanning</span>
+                        <span class="status-badge status-operational">✓ Operational</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: white; border-radius: 8px;">
+                        <span>File Scanning</span>
+                        <span class="status-badge status-operational">✓ Operational</span>
+                    </div>
+                </div>
+                <p style="color: var(--text-secondary); margin-top: 1rem; font-size: 0.9rem;">Last updated: Now | <a href="#" style="color: var(--primary);">View full status</a></p>
+            </section>
+
+            <!-- FAQ Section -->
+            <section class="faq-section">
+                <h2>Frequently Asked Questions</h2>
+
+                <div class="faq-item active">
+                    <div class="faq-header">
+                        <span>How do I reset my password?</span>
+                        <span class="faq-toggle">▼</span>
+                    </div>
+                    <div class="faq-content">
+                        <p>Click the "Forgot Password" link on the login page. Enter your email address and we'll send you a password reset link. Click the link and create a new password.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item active">
+                    <div class="faq-header">
+                        <span>How do I cancel my subscription?</span>
+                        <span class="faq-toggle">▼</span>
+                    </div>
+                    <div class="faq-content">
+                        <p>You can cancel anytime from Settings → Billing. Your access will continue until the end of your current billing period. We offer a 30-day money-back guarantee.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item active">
+                    <div class="faq-header">
+                        <span>What payment methods do you accept?</span>
+                        <span class="faq-toggle">▼</span>
+                    </div>
+                    <div class="faq-content">
+                        <p>We accept all major credit cards (Visa, Mastercard, American Express), PayPal, and bank transfers for enterprise customers.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item active">
+                    <div class="faq-header">
+                        <span>How long does file scanning take?</span>
+                        <span class="faq-toggle">▼</span>
+                    </div>
+                    <div class="faq-content">
+                        <p>Most files are scanned within 1-5 seconds. Large files (over 100MB) may take up to 30 seconds. Results are typically instant.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item active">
+                    <div class="faq-header">
+                        <span>Is my email data stored?</span>
+                        <span class="faq-toggle">▼</span>
+                    </div>
+                    <div class="faq-content">
+                        <p>No. We analyze email content in real-time but do NOT store the actual email text. Only metadata and threat analysis results are saved to your account for history purposes.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item active">
+                    <div class="faq-header">
+                        <span>Can I use BlockStop for work?</span>
+                        <span class="faq-toggle">▼</span>
+                    </div>
+                    <div class="faq-content">
+                        <p>Absolutely! Our PRO and MAX tiers include team features. You can add up to 5 team members on PRO, and unlimited on MAX.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item active">
+                    <div class="faq-header">
+                        <span>What happens if I find a security vulnerability?</span>
+                        <span class="faq-toggle">▼</span>
+                    </div>
+                    <div class="faq-content">
+                        <p>Please report security issues responsibly to security@blockstop.io. Include detailed information about the vulnerability and steps to reproduce it. Do not publicly disclose the issue.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item active">
+                    <div class="faq-header">
+                        <span>How do I export my data?</span>
+                        <span class="faq-toggle">▼</span>
+                    </div>
+                    <div class="faq-content">
+                        <p>Go to Settings → Privacy → Data Export. Select the data types you want to export (scans, history, etc.) and we'll prepare a JSON file for download.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Support Hours -->
+            <section style="background: linear-gradient(135deg, rgba(30, 136, 255, 0.1), rgba(255, 229, 0, 0.05)); padding: 3rem 2rem; border-radius: 12px; text-align: center;">
+                <h2 style="font-size: 1.75rem; margin-bottom: 1rem; font-family: 'Poppins', sans-serif;">Support Hours</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin-top: 2rem;">
+                    <div>
+                        <h4 style="font-weight: 600; margin-bottom: 0.5rem;">Email Support</h4>
+                        <p style="color: var(--text-secondary); margin: 0;">Available 24/7. Response time: 24 hours (2 hours for PRO/MAX)</p>
+                    </div>
+                    <div>
+                        <h4 style="font-weight: 600; margin-bottom: 0.5rem;">Live Chat</h4>
+                        <p style="color: var(--text-secondary); margin: 0;">9 AM - 6 PM UTC, Monday - Friday</p>
+                    </div>
+                    <div>
+                        <h4 style="font-weight: 600; margin-bottom: 0.5rem;">Phone Support (MAX)</h4>
+                        <p style="color: var(--text-secondary); margin: 0;">9 AM - 6 PM UTC, Monday - Friday</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="footer-section">
+                        <h5>Product</h5>
+                        <ul style="list-style: none;">
+                            <li><a href="features.html">Features</a></li>
+                            <li><a href="pricing.html">Pricing</a></li>
+                            <li><a href="setup.html">Getting Started</a></li>
+                            <li><a href="api-docs.html">API Docs</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="footer-section">
+                        <h5>Resources</h5>
+                        <ul style="list-style: none;">
+                            <li><a href="https://github.com/Yapdru/BlockStop-">GitHub</a></li>
+                            <li><a href="support.html">Support</a></li>
+                            <li><a href="api-docs.html">Docs</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="footer-section">
+                        <h5>Legal</h5>
+                        <ul style="list-style: none;">
+                            <li><a href="#">Privacy Policy</a></li>
+                            <li><a href="#">Terms of Service</a></li>
+                            <li><a href="support.html">Contact</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div style="border-top: 1px solid #333; padding-top: 2rem; margin-top: 2rem; text-align: center; color: #888;">
+                <p>&copy; 2024 BlockStop. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Toggle FAQ items
+        document.querySelectorAll('.faq-header').forEach(header => {
+            header.addEventListener('click', function() {
+                const item = this.parentElement;
+                item.classList.toggle('active');
+            });
+        });
+    </script>
+</body>
+</html>

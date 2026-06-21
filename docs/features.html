@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Explore BlockStop PRO's comprehensive security features including DRAR AI email analysis and BetterBot PRO malware detection">
+    <title>Features - BlockStop PRO</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #1E88FF;
+            --primary-dark: #1565C0;
+            --accent: #FFE500;
+            --success: #4CAF50;
+            --light-bg: #F5F7FA;
+            --text-primary: #1A1A1A;
+            --text-secondary: #666666;
+            --border-color: #E0E0E0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FFFFFF;
+            color: var(--text-primary);
+        }
+
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .navbar-nav .nav-link {
+            color: var(--text-secondary);
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .navbar-nav .nav-link:hover,
+        .navbar-nav .nav-link.active {
+            color: var(--primary);
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, rgba(30, 136, 255, 0.1), rgba(255, 229, 0, 0.05));
+            padding: 4rem 0 3rem;
+            text-align: center;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .feature-section {
+            padding: 4rem 0;
+        }
+
+        .feature-section h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 3rem;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .feature-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+            margin-bottom: 5rem;
+        }
+
+        .feature-row:nth-child(even) {
+            direction: rtl;
+        }
+
+        .feature-row:nth-child(even) > * {
+            direction: ltr;
+        }
+
+        .feature-content h3 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .feature-content p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+        }
+
+        .feature-list {
+            list-style: none;
+            margin: 1.5rem 0;
+        }
+
+        .feature-list li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .feature-list li::before {
+            content: '✓';
+            color: var(--success);
+            font-weight: 700;
+            margin-right: 1rem;
+            font-size: 1.25rem;
+        }
+
+        .feature-image {
+            background: linear-gradient(135deg, rgba(30, 136, 255, 0.1), rgba(255, 229, 0, 0.05));
+            border-radius: 12px;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            color: var(--primary);
+        }
+
+        .comparison-table {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 3rem;
+        }
+
+        .comparison-table table {
+            width: 100%;
+            margin: 0;
+        }
+
+        .comparison-table th {
+            background-color: var(--light-bg);
+            padding: 1.25rem;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .comparison-table td {
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .check-mark {
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .faq-section {
+            background-color: var(--light-bg);
+            padding: 4rem 0;
+        }
+
+        .faq-item {
+            background: white;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .faq-item h4 {
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+        }
+
+        .faq-item p {
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        footer {
+            background-color: #1A1A1A;
+            color: #FFFFFF;
+            padding: 3rem 0 1rem;
+            margin-top: 4rem;
+        }
+
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .feature-row {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .feature-row:nth-child(even) {
+                direction: ltr;
+            }
+
+            .page-header h1 {
+                font-size: 2rem;
+            }
+
+            .feature-section h2 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <i class="fas fa-shield-alt"></i> BlockStop PRO
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="features.html">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="pricing.html">Pricing</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="setup.html">Getting Started</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="api-docs.html">API Docs</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="support.html">Support</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <h1>Powerful Security Features</h1>
+            <p class="lead">Advanced threat detection with AI-powered analysis engines</p>
+        </div>
+    </section>
+
+    <!-- Features Content -->
+    <main class="feature-section">
+        <div class="container">
+            <!-- DRAR AI -->
+            <div class="feature-row">
+                <div class="feature-content">
+                    <h3>DRAR AI Email Analysis</h3>
+                    <p>Distributed Risk Analysis & Reputation - Our advanced email analysis engine uses heuristic-based detection to identify and block phishing emails, malicious links, and spam before they reach your inbox.</p>
+                    <ul class="feature-list">
+                        <li>Phishing detection with keyword analysis</li>
+                        <li>Suspicious sender reputation evaluation</li>
+                        <li>Malicious link detection and categorization</li>
+                        <li>Urgency tactic identification</li>
+                        <li>Pattern-based threat scoring (0-100)</li>
+                        <li>Real-time threat intelligence integration</li>
+                    </ul>
+                </div>
+                <div class="feature-image">
+                    <i class="fas fa-envelope"></i>
+                </div>
+            </div>
+
+            <!-- BetterBot PRO -->
+            <div class="feature-row">
+                <div class="feature-content">
+                    <h3>BetterBot PRO Malware Detection</h3>
+                    <p>Advanced file security with signature-based and behavior-based malware detection. Analyzes file entropy, extensions, and behavior patterns to identify ransomware, trojans, and other threats.</p>
+                    <ul class="feature-list">
+                        <li>File signature analysis (YARA-like rules)</li>
+                        <li>Entropy-based packing detection</li>
+                        <li>Dangerous extension classification</li>
+                        <li>Ransomware behavior indicators</li>
+                        <li>Trojan and backdoor pattern matching</li>
+                        <li>Support for 50+ file types</li>
+                    </ul>
+                </div>
+                <div class="feature-image">
+                    <i class="fas fa-file"></i>
+                </div>
+            </div>
+
+            <!-- Gmail Integration -->
+            <div class="feature-row">
+                <div class="feature-content">
+                    <h3>Gmail Integration & Alerts</h3>
+                    <p>Seamlessly integrate with your Gmail account for real-time threat detection and instant alerts. Receive notifications directly in your inbox when threats are detected.</p>
+                    <ul class="feature-list">
+                        <li>Gmail OAuth authentication</li>
+                        <li>Real-time email scanning</li>
+                        <li>Direct Gmail notifications</li>
+                        <li>Automatic threat quarantine</li>
+                        <li>Label-based organization</li>
+                        <li>Archive suspected emails</li>
+                    </ul>
+                </div>
+                <div class="feature-image">
+                    <i class="fas fa-bell"></i>
+                </div>
+            </div>
+
+            <!-- Comprehensive History -->
+            <div class="feature-row">
+                <div class="feature-content">
+                    <h3>Comprehensive Threat History</h3>
+                    <p>Track all your scans and threat detections with detailed reports, timelines, and historical analysis. Export reports for compliance and audit purposes.</p>
+                    <ul class="feature-list">
+                        <li>Detailed scan history with timestamps</li>
+                        <li>Threat timeline and progression tracking</li>
+                        <li>Custom report generation</li>
+                        <li>Export to PDF and CSV formats</li>
+                        <li>Advanced filtering and search</li>
+                        <li>Threat pattern analysis</li>
+                    </ul>
+                </div>
+                <div class="feature-image">
+                    <i class="fas fa-history"></i>
+                </div>
+            </div>
+
+            <!-- BlockOS -->
+            <div class="feature-row">
+                <div class="feature-content">
+                    <h3>BlockOS Containerized Platform</h3>
+                    <p>Enterprise-grade containerized security platform with custom CLI tools. Deploy BlockStop in your infrastructure for maximum control and security.</p>
+                    <ul class="feature-list">
+                        <li>Docker containerization</li>
+                        <li>Custom CLI shell interface</li>
+                        <li>On-premises deployment option</li>
+                        <li>Kubernetes orchestration support</li>
+                        <li>API-first architecture</li>
+                        <li>Custom rule and engine configuration</li>
+                    </ul>
+                </div>
+                <div class="feature-image">
+                    <i class="fas fa-docker"></i>
+                </div>
+            </div>
+
+            <!-- Multi-Platform -->
+            <div class="feature-row">
+                <div class="feature-content">
+                    <h3>Multi-Platform Support</h3>
+                    <p>Access BlockStop PRO from any device. Web app, desktop applications for macOS and Windows, and mobile apps for iOS with synchronized accounts.</p>
+                    <ul class="feature-list">
+                        <li>Web application (responsive design)</li>
+                        <li>macOS desktop app with menu bar</li>
+                        <li>Windows desktop application</li>
+                        <li>iPhone app (Pro/Max tiers)</li>
+                        <li>Cross-device account sync</li>
+                        <li>Offline capability</li>
+                    </ul>
+                </div>
+                <div class="feature-image">
+                    <i class="fas fa-cloud"></i>
+                </div>
+            </div>
+
+            <!-- Feature Comparison -->
+            <section style="margin-top: 5rem;">
+                <h2>Feature Comparison by Tier</h2>
+                <div class="comparison-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>FREE</th>
+                                <th>NEO</th>
+                                <th>PRO</th>
+                                <th>MAX</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Email Analysis (DRAR AI)</td>
+                                <td class="check-mark">✓</td>
+                                <td class="check-mark">✓</td>
+                                <td class="check-mark">✓</td>
+                                <td class="check-mark">✓</td>
+                            </tr>
+                            <tr>
+                                <td>File Scanning (BetterBot)</td>
+                                <td class="check-mark">✓</td>
+                                <td class="check-mark">✓</td>
+                                <td class="check-mark">✓</td>
+                                <td class="check-mark">✓</td>
+                            </tr>
+                            <tr>
+                                <td>Daily Scan Limit</td>
+                                <td>10</td>
+                                <td class="check-mark">Unlimited</td>
+                                <td class="check-mark">Unlimited</td>
+                                <td class="check-mark">Unlimited</td>
+                            </tr>
+                            <tr>
+                                <td>Gmail Integration</td>
+                                <td>—</td>
+                                <td class="check-mark">✓</td>
+                                <td class="check-mark">✓</td>
+                                <td class="check-mark">✓</td>
+                            </tr>
+                            <tr>
+                                <td>History Retention</td>
+                                <td>7 days</td>
+                                <td>90 days</td>
+                                <td>1 year</td>
+                                <td>Unlimited</td>
+                            </tr>
+                            <tr>
+                                <td>Web App</td>
+                                <td class="check-mark">✓</td>
+                                <td class="check-mark">✓</td>
+                                <td class="check-mark">✓</td>
+                                <td class="check-mark">✓</td>
+                            </tr>
+                            <tr>
+                                <td>Desktop App</td>
+                                <td>—</td>
+                                <td class="check-mark">✓</td>
+                                <td class="check-mark">✓</td>
+                                <td class="check-mark">✓</td>
+                            </tr>
+                            <tr>
+                                <td>Mobile App</td>
+                                <td>—</td>
+                                <td>—</td>
+                                <td>iPhone</td>
+                                <td>iPhone + iPad</td>
+                            </tr>
+                            <tr>
+                                <td>API Access</td>
+                                <td>—</td>
+                                <td>—</td>
+                                <td class="check-mark">✓</td>
+                                <td class="check-mark">✓</td>
+                            </tr>
+                            <tr>
+                                <td>Advanced Analytics</td>
+                                <td>—</td>
+                                <td>—</td>
+                                <td class="check-mark">✓</td>
+                                <td class="check-mark">✓</td>
+                            </tr>
+                            <tr>
+                                <td>Team Features</td>
+                                <td>—</td>
+                                <td>—</td>
+                                <td class="check-mark">✓</td>
+                                <td class="check-mark">✓</td>
+                            </tr>
+                            <tr>
+                                <td>Priority Support</td>
+                                <td>—</td>
+                                <td class="check-mark">✓</td>
+                                <td class="check-mark">✓</td>
+                                <td class="check-mark">✓</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Security & Privacy -->
+            <section style="margin-top: 4rem; margin-bottom: 4rem;">
+                <h2>Security & Privacy</h2>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4 class="mb-3">Enterprise Security</h4>
+                        <ul class="feature-list">
+                            <li>End-to-end encryption for sensitive data</li>
+                            <li>SOC 2 Type II compliance</li>
+                            <li>GDPR and CCPA compliant</li>
+                            <li>Regular security audits</li>
+                            <li>Penetration testing</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h4 class="mb-3">Privacy First</h4>
+                        <ul class="feature-list">
+                            <li>No email content stored</li>
+                            <li>Zero-knowledge architecture</li>
+                            <li>Open data export</li>
+                            <li>Account deletion on demand</li>
+                            <li>HIPAA-ready infrastructure</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="footer-section">
+                        <h5>Product</h5>
+                        <ul style="list-style: none;">
+                            <li><a href="features.html">Features</a></li>
+                            <li><a href="pricing.html">Pricing</a></li>
+                            <li><a href="setup.html">Getting Started</a></li>
+                            <li><a href="api-docs.html">API Docs</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="footer-section">
+                        <h5>Resources</h5>
+                        <ul style="list-style: none;">
+                            <li><a href="https://github.com/Yapdru/BlockStop-">GitHub</a></li>
+                            <li><a href="support.html">Support</a></li>
+                            <li><a href="api-docs.html">Docs</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="footer-section">
+                        <h5>Legal</h5>
+                        <ul style="list-style: none;">
+                            <li><a href="#">Privacy Policy</a></li>
+                            <li><a href="#">Terms of Service</a></li>
+                            <li><a href="support.html">Contact</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div style="border-top: 1px solid #333; padding-top: 2rem; margin-top: 2rem; text-align: center; color: #888;">
+                <p>&copy; 2024 BlockStop. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
