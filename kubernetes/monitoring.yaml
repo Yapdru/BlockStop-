@@ -1,0 +1,165 @@
+---
+# ServiceMonitor for Prometheus
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: blockstop-metrics
+  namespace: blockstop
+  labels:
+    app: blockstop
+    component: monitoring
+spec:
+  selector:
+    matchLabels:
+      app: blockstop-api
+  endpoints:
+    - port: metrics
+      interval: 30s
+      path: /metrics
+
+---
+# PrometheusRule for alerting
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: blockstop-alerts
+  namespace: blockstop
+  labels:
+    app: blockstop
+    component: monitoring
+spec:
+  groups:
+    - name: blockstop.rules
+      interval: 30s
+      rules:
+        # API Health Alerts
+        - alert: BlockStopAPIDown
+          expr: up{job="blockstop-api"} == 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "BlockStop API is down"
+            description: "BlockStop API has been down for more than 5 minutes"
+
+        - alert: BlockStopAPIHighErrorRate
+          expr: rate(http_requests_total{job="blockstop-api",status=~"5.."}[5m]) > 0.05
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "BlockStop API has high error rate"
+            description: "Error rate is above 5% for the last 5 minutes"
+
+        - alert: BlockStopAPIHighLatency
+          expr: histogram_quantile(0.99, rate(http_request_duration_seconds_bucket{job="blockstop-api"}[5m])) > 1
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "BlockStop API has high latency"
+            description: "99th percentile latency is above 1 second"
+
+        # Database Alerts
+        - alert: DatabaseConnectionPoolExhausted
+          expr: pg_stat_activity_count{job="blockstop-api"} / pg_settings_max_connections > 0.8
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Database connection pool is nearly exhausted"
+            description: "Database connections are above 80% of max limit"
+
+        - alert: DatabaseSlowQueries
+          expr: rate(pg_slow_queries_total[5m]) > 10
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High number of slow database queries"
+            description: "Slow query rate is above 10 per second"
+
+        # Resource Alerts
+        - alert: PodCPULimitApproaching
+          expr: (sum(rate(container_cpu_usage_seconds_total{pod=~"blockstop-.*"}[5m])) / sum(container_spec_cpu_quota{pod=~"blockstop-.*"})) > 0.9
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Pod CPU usage is approaching limit"
+            description: "CPU usage is above 90% of container limit"
+
+        - alert: PodMemoryLimitApproaching
+          expr: (sum(container_memory_usage_bytes{pod=~"blockstop-.*"}) / sum(container_spec_memory_limit_bytes{pod=~"blockstop-.*"})) > 0.9
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Pod memory usage is approaching limit"
+            description: "Memory usage is above 90% of container limit"
+
+        - alert: DiskSpaceLow
+          expr: (node_filesystem_avail_bytes / node_filesystem_size_bytes) < 0.1
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Disk space is running low"
+            description: "Less than 10% disk space remaining"
+
+        # Worker Alerts
+        - alert: WorkerQueueDepthHigh
+          expr: queue_depth{app="blockstop-worker"} > 1000
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Worker queue depth is high"
+            description: "Worker queue has more than 1000 pending jobs"
+
+---
+# AlertmanagerConfig
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: AlertmanagerConfig
+metadata:
+  name: blockstop-alerts
+  namespace: blockstop
+spec:
+  route:
+    receiver: blockstop-alerts
+    groupBy: ['alertname', 'cluster', 'service']
+    groupWait: 10s
+    groupInterval: 10s
+    repeatInterval: 12h
+    routes:
+      - receiver: blockstop-critical
+        matchers:
+          - name: severity
+            value: critical
+        repeatInterval: 5m
+      - receiver: blockstop-warning
+        matchers:
+          - name: severity
+            value: warning
+        repeatInterval: 1h
+
+  receivers:
+    - name: blockstop-alerts
+      slackConfigs:
+        - apiUrl: ${SLACK_WEBHOOK_URL}
+          channel: '#blockstop-alerts'
+          title: 'BlockStop Alert'
+          text: '{{ .GroupLabels.alertname }}'
+
+    - name: blockstop-critical
+      slackConfigs:
+        - apiUrl: ${SLACK_WEBHOOK_URL_CRITICAL}
+          channel: '#blockstop-critical'
+          title: 'CRITICAL: {{ .GroupLabels.alertname }}'
+          text: '{{ .Alerts.Firing | len }} alerts firing'
+
+    - name: blockstop-warning
+      slackConfigs:
+        - apiUrl: ${SLACK_WEBHOOK_URL}
+          channel: '#blockstop-alerts'
+          title: 'WARNING: {{ .GroupLabels.alertname }}'
