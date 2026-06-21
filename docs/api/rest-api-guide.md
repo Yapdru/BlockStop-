@@ -177,7 +177,7 @@ curl -X POST https://api.blockstop.io/v1/api-keys/create \
   "id": "key_2",
   "name": "Production Integration",
   "key": "sk_live_REDACTED_FOR_SECURITY",
-  "key_prefix": "sk_live_4eC39HqLyjWDarh",
+  "key_prefix": "sk_live_REDACTED",
   "scopes": ["api_keys:read", "webhooks:write"],
   "created_at": "2024-06-18T15:00:00Z",
   "expires_at": "2025-06-18T15:00:00Z"
