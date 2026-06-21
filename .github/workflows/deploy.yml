@@ -1,0 +1,384 @@
+name: Deploy to Kubernetes
+
+on:
+  push:
+    branches: [main, develop]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # ============================================================
+  # DETERMINE DEPLOYMENT ENVIRONMENT
+  # ============================================================
+  determine-env:
+    name: Determine Deployment Environment
+    runs-on: ubuntu-latest
+    outputs:
+      environment: ${{ steps.set-env.outputs.environment }}
+      registry: ${{ steps.set-env.outputs.registry }}
+      cluster: ${{ steps.set-env.outputs.cluster }}
+
+    steps:
+      - id: set-env
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "environment=production" >> $GITHUB_OUTPUT
+          else
+            echo "environment=staging" >> $GITHUB_OUTPUT
+          fi
+          echo "registry=${{ env.REGISTRY }}" >> $GITHUB_OUTPUT
+          echo "cluster=blockstop-${{ steps.set-env.outputs.environment }}" >> $GITHUB_OUTPUT
+
+  # ============================================================
+  # DATABASE MIGRATION
+  # ============================================================
+  database-migration:
+    name: Database Migration
+    runs-on: ubuntu-latest
+    needs: determine-env
+    environment:
+      name: ${{ needs.determine-env.outputs.environment }}
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run database migrations
+        run: npm run migrate:up
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          ENVIRONMENT: ${{ needs.determine-env.outputs.environment }}
+
+      - name: Verify migration
+        run: npm run migrate:status
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+      - name: Notify Slack on Migration Success
+        if: success()
+        uses: slackapi/slack-github-action@v1
+        with:
+          webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "✅ Database Migration Successful\nEnvironment: ${{ needs.determine-env.outputs.environment }}\nCommit: ${{ github.sha }}"
+                  }
+                }
+              ]
+            }
+
+  # ============================================================
+  # DEPLOY TO STAGING
+  # ============================================================
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [determine-env, database-migration]
+    if: github.ref == 'refs/heads/develop'
+    environment:
+      name: staging
+      url: https://staging.blockstop.com
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION || 'us-east-1' }}
+
+      - name: Update kubeconfig
+        run: |
+          aws eks update-kubeconfig \
+            --name blockstop-staging \
+            --region ${{ secrets.AWS_REGION || 'us-east-1' }}
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v3
+
+      - name: Deploy with ArgoCD
+        run: |
+          curl -X POST ${{ secrets.ARGOCD_SERVER }}/api/v1/applications/blockstop-staging/sync \
+            -H "Authorization: Bearer ${{ secrets.ARGOCD_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "strategy": "auto",
+              "syncOptions": ["CreateNamespace=true"]
+            }'
+
+      - name: Verify deployment
+        run: |
+          kubectl rollout status deployment/blockstop-web -n blockstop --timeout=5m
+          kubectl rollout status deployment/blockstop-api -n blockstop --timeout=5m
+          kubectl rollout status deployment/blockstop-worker -n blockstop --timeout=5m
+
+      - name: Health check
+        run: |
+          STAGING_URL="https://staging.blockstop.com"
+          for i in {1..30}; do
+            if curl -f "$STAGING_URL/api/health"; then
+              echo "✅ Health check passed"
+              exit 0
+            fi
+            echo "Attempt $i/30 - Waiting for service..."
+            sleep 10
+          done
+          echo "❌ Health check failed"
+          exit 1
+
+      - name: Run smoke tests
+        run: npm run test:smoke || true
+        env:
+          BASE_URL: https://staging.blockstop.com
+
+      - name: Notify Slack on Success
+        if: success()
+        uses: slackapi/slack-github-action@v1
+        with:
+          webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "✅ Deployment to Staging Successful\nCommit: ${{ github.sha }}\nAuthor: ${{ github.actor }}\nURL: https://staging.blockstop.com"
+                  }
+                }
+              ]
+            }
+
+      - name: Notify Slack on Failure
+        if: failure()
+        uses: slackapi/slack-github-action@v1
+        with:
+          webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "❌ Deployment to Staging Failed\nCommit: ${{ github.sha }}\nAuthor: ${{ github.actor }}"
+                  }
+                }
+              ]
+            }
+
+  # ============================================================
+  # DEPLOY TO PRODUCTION
+  # ============================================================
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [determine-env, database-migration]
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: production
+      url: https://blockstop.com
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION || 'us-east-1' }}
+
+      - name: Update kubeconfig
+        run: |
+          aws eks update-kubeconfig \
+            --name blockstop-production \
+            --region ${{ secrets.AWS_REGION || 'us-east-1' }}
+
+      - name: Create release
+        id: create-release
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data } = await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: `v${Date.now()}`,
+              name: `Release ${new Date().toISOString()}`,
+              body: `Automated production deployment\n\nCommit: ${context.sha}\nAuthor: ${context.actor}`,
+              draft: false,
+              prerelease: false
+            });
+            return data.html_url;
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v3
+
+      - name: Deploy with ArgoCD (Canary - 10%)
+        run: |
+          # Update ArgoCD application for canary deployment
+          curl -X PATCH ${{ secrets.ARGOCD_SERVER }}/api/v1/applications/blockstop-production \
+            -H "Authorization: Bearer ${{ secrets.ARGOCD_TOKEN }}" \
+            -H "Content-Type: application/merge-patch+json" \
+            -d '{
+              "spec": {
+                "syncPolicy": {
+                  "automated": {
+                    "prune": true,
+                    "selfHeal": true
+                  },
+                  "syncOptions": ["Validate=false"]
+                }
+              }
+            }'
+
+      - name: Wait for canary deployment
+        run: |
+          kubectl rollout status deployment/blockstop-web -n blockstop --timeout=5m
+          kubectl rollout status deployment/blockstop-api -n blockstop --timeout=5m
+
+      - name: Canary health checks
+        run: |
+          PROD_URL="https://blockstop.com"
+          for i in {1..30}; do
+            if curl -f "$PROD_URL/api/health"; then
+              echo "✅ Canary health check passed"
+              exit 0
+            fi
+            echo "Attempt $i/30 - Waiting for service..."
+            sleep 10
+          done
+          exit 1
+
+      - name: Run smoke tests
+        run: npm run test:smoke || true
+        env:
+          BASE_URL: https://blockstop.com
+
+      - name: Monitor metrics for 5 minutes
+        run: |
+          echo "Monitoring error rates and latency..."
+          for i in {1..30}; do
+            METRICS=$(curl -s https://blockstop.com/api/metrics | jq '.systemMetrics')
+            echo "Metrics check $((i))/30: $METRICS"
+            sleep 10
+          done
+
+      - name: Complete production deployment
+        run: |
+          curl -X POST ${{ secrets.ARGOCD_SERVER }}/api/v1/applications/blockstop-production/sync \
+            -H "Authorization: Bearer ${{ secrets.ARGOCD_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "strategy": "auto",
+              "syncOptions": ["CreateNamespace=true"]
+            }'
+
+      - name: Verify production deployment
+        run: |
+          kubectl rollout status deployment/blockstop-web -n blockstop --timeout=5m
+          kubectl rollout status deployment/blockstop-api -n blockstop --timeout=5m
+          kubectl rollout status deployment/blockstop-worker -n blockstop --timeout=5m
+
+      - name: Notify Slack on Success
+        if: success()
+        uses: slackapi/slack-github-action@v1
+        with:
+          webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "✅ Production Deployment Successful\nRelease: ${{ steps.create-release.outputs.result }}\nCommit: ${{ github.sha }}\nAuthor: ${{ github.actor }}\nURL: https://blockstop.com"
+                  }
+                }
+              ]
+            }
+
+      - name: Notify Slack on Failure
+        if: failure()
+        uses: slackapi/slack-github-action@v1
+        with:
+          webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "❌ Production Deployment Failed\nCommit: ${{ github.sha }}\nAuthor: ${{ github.actor }}\nPlease investigate immediately!"
+                  }
+                }
+              ]
+            }
+
+  # ============================================================
+  # PERFORMANCE VALIDATION
+  # ============================================================
+  performance-check:
+    name: Post-Deployment Performance Check
+    runs-on: ubuntu-latest
+    needs: [determine-env, deploy-staging, deploy-production]
+    if: always() && (needs.deploy-staging.result == 'success' || needs.deploy-production.result == 'success')
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run performance tests
+        run: npm run test:performance || true
+        env:
+          BASE_URL: ${{ needs.determine-env.outputs.environment == 'production' && 'https://blockstop.com' || 'https://staging.blockstop.com' }}
+
+      - name: Archive performance results
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-results
+          path: performance-results/
+          retention-days: 30

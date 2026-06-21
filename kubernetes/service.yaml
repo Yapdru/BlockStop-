@@ -1,0 +1,147 @@
+---
+# Web Service (LoadBalancer)
+apiVersion: v1
+kind: Service
+metadata:
+  name: blockstop-web-lb
+  namespace: blockstop
+  labels:
+    app: blockstop
+    component: web
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: nlb
+    service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
+
+spec:
+  type: LoadBalancer
+  selector:
+    app: blockstop
+    component: web
+  ports:
+    - name: http
+      port: 80
+      targetPort: 3000
+      protocol: TCP
+    - name: https
+      port: 443
+      targetPort: 3000
+      protocol: TCP
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800
+
+---
+# Web ClusterIP Service (Internal)
+apiVersion: v1
+kind: Service
+metadata:
+  name: blockstop-web
+  namespace: blockstop
+  labels:
+    app: blockstop
+    component: web
+
+spec:
+  type: ClusterIP
+  selector:
+    app: blockstop
+    component: web
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
+      protocol: TCP
+
+---
+# API Service (ClusterIP)
+apiVersion: v1
+kind: Service
+metadata:
+  name: blockstop-api
+  namespace: blockstop
+  labels:
+    app: blockstop
+    component: api
+
+spec:
+  type: ClusterIP
+  selector:
+    app: blockstop
+    component: api
+  ports:
+    - name: http
+      port: 4000
+      targetPort: 4000
+      protocol: TCP
+    - name: metrics
+      port: 9090
+      targetPort: 9090
+      protocol: TCP
+
+---
+# Worker Service (Headless)
+apiVersion: v1
+kind: Service
+metadata:
+  name: blockstop-worker
+  namespace: blockstop
+  labels:
+    app: blockstop
+    component: worker
+
+spec:
+  type: ClusterIP
+  clusterIP: None
+  selector:
+    app: blockstop
+    component: worker
+  ports:
+    - name: metrics
+      port: 9090
+      targetPort: 9090
+      protocol: TCP
+
+---
+# Database Service (ClusterIP)
+apiVersion: v1
+kind: Service
+metadata:
+  name: blockstop-postgres
+  namespace: blockstop
+  labels:
+    app: blockstop
+    component: database
+
+spec:
+  type: ClusterIP
+  selector:
+    app: blockstop
+    component: database
+  ports:
+    - name: postgresql
+      port: 5432
+      targetPort: 5432
+      protocol: TCP
+
+---
+# Redis Service (ClusterIP)
+apiVersion: v1
+kind: Service
+metadata:
+  name: blockstop-redis
+  namespace: blockstop
+  labels:
+    app: blockstop
+    component: cache
+
+spec:
+  type: ClusterIP
+  selector:
+    app: blockstop
+    component: cache
+  ports:
+    - name: redis
+      port: 6379
+      targetPort: 6379
+      protocol: TCP
