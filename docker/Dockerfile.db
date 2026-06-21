@@ -1,0 +1,42 @@
+# BlockStop Database - PostgreSQL with Custom Configuration
+# Production-grade PostgreSQL database container with encryption and backup support
+
+FROM postgres:16-alpine AS base
+
+# Install additional tools
+RUN apk add --no-cache \
+    curl \
+    postgresql-client \
+    pg-stat-kcache \
+    pgtap
+
+# Create a custom entrypoint
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+# PostgreSQL configuration optimizations
+COPY postgres.conf /etc/postgresql/postgresql.conf
+COPY pg_hba.conf /etc/postgresql/pg_hba.conf
+
+ENV POSTGRES_INITDB_ARGS="-c config_file=/etc/postgresql/postgresql.conf"
+
+# Security
+RUN chown -R postgres:postgres /etc/postgresql && \
+    chmod 600 /etc/postgresql/postgresql.conf && \
+    chmod 600 /etc/postgresql/pg_hba.conf
+
+VOLUME ["/var/lib/postgresql/data"]
+
+EXPOSE 5432
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD pg_isready -U postgres
+
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+CMD ["postgres", "-c", "config_file=/etc/postgresql/postgresql.conf"]
+
+LABEL org.blockstop.image="blockstop-db" \
+      org.blockstop.version="1.0.0" \
+      org.blockstop.description="BlockStop PostgreSQL Database" \
+      maintainer="BlockStop Team <dev@blockstop.io>"
