@@ -2,56 +2,217 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Card, Button } from '@/components';
+import {
+  Card,
+  Badge,
+  Button,
+  Input,
+  Tabs,
+  LineChart,
+  BarChart,
+  PieChart,
+  Table,
+  Modal,
+  Alert,
+  Loading,
+  Select,
+  DateRange
+} from '@/components';
 import { a11y } from '@/lib/a11y';
 
+/**
+ * Partner Portal - Comprehensive partner dashboard
+ * Revenue tracking, commission breakdown, performance analytics, resource library, support tickets
+ */
+
 interface PartnerProfile {
-  type: 'affiliate' | 'reseller' | 'white-label';
+  id: string;
+  companyName: string;
+  tier: string;
+  status: 'active' | 'suspended' | 'trial' | 'inactive';
+  joinedAt: Date;
+  contactEmail: string;
+}
+
+interface RevenueData {
+  period: string;
+  totalEarnings: number;
+  bySource: {
+    plugin: number;
+    affiliate: number;
+    whiteLabelLicensing: number;
+    reseller: number;
+  };
+  pending: number;
+  paid: number;
+}
+
+interface CommissionBreakdown {
+  source: string;
+  commission: number;
+  rate: number;
+  customers: number;
+  trend: 'up' | 'down' | 'flat';
+}
+
+interface PerformanceMetric {
   name: string;
-  email: string;
-  status: string;
-  joinDate: string;
-  earnings?: number;
-  customers?: number;
+  value: number;
+  target: number;
+  unit: string;
+  trend: 'up' | 'down' | 'flat';
+}
+
+interface Resource {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  type: 'document' | 'video' | 'template' | 'tool';
+  url: string;
+  updatedAt: Date;
+}
+
+interface SupportTicket {
+  id: string;
+  subject: string;
+  status: 'open' | 'in-progress' | 'resolved' | 'closed';
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  createdAt: Date;
+  lastUpdatedAt: Date;
 }
 
 export default function PartnerPortal() {
   const [partner, setPartner] = useState<PartnerProfile | null>(null);
+  const [activeTab, setActiveTab] = useState<'overview' | 'revenue' | 'commissions' | 'analytics' | 'resources' | 'support'>('overview');
+  const [revenueData, setRevenueData] = useState<RevenueData | null>(null);
+  const [commissions, setCommissions] = useState<CommissionBreakdown[]>([]);
+  const [metrics, setMetrics] = useState<PerformanceMetric[]>([]);
+  const [resources, setResources] = useState<Resource[]>([]);
+  const [tickets, setTickets] = useState<SupportTicket[]>([]);
+  const [dateRange, setDateRange] = useState({ start: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), end: new Date() });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [selectedTicket, setSelectedTicket] = useState<SupportTicket | null>(null);
+  const [showTicketModal, setShowTicketModal] = useState(false);
+  const [showNewTicketForm, setShowNewTicketForm] = useState(false);
 
   useEffect(() => {
-    const fetchPartnerProfile = async () => {
-      try {
-        const userId = localStorage.getItem('userId');
-
-        const res = await fetch('/api/partner/profile', {
-          headers: { 'x-user-id': userId || '' },
-        });
-
-        if (res.ok) {
-          setPartner(await res.json());
-        }
-      } catch (error) {
-        console.error('Failed to fetch partner profile:', error);
-        a11y.announce('Failed to load partner profile', 'polite');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPartnerProfile();
+    fetchPartnerData();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg text-neutral-600 font-medium">Loading partner portal...</div>
-      </div>
-    );
-  }
+  useEffect(() => {
+    if (activeTab === 'revenue' || activeTab === 'overview') {
+      fetchRevenueData();
+    }
+    if (activeTab === 'commissions' || activeTab === 'overview') {
+      fetchCommissionData();
+    }
+    if (activeTab === 'analytics' || activeTab === 'overview') {
+      fetchMetrics();
+    }
+    if (activeTab === 'resources') {
+      fetchResources();
+    }
+    if (activeTab === 'support') {
+      fetchTickets();
+    }
+  }, [activeTab, dateRange]);
+
+  const fetchPartnerData = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/partner/profile');
+      if (!response.ok) throw new Error('Failed to fetch partner profile');
+      const data = await response.json();
+      setPartner(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load partner data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchRevenueData = async () => {
+    try {
+      const response = await fetch(
+        `/api/partner/revenue?start=${dateRange.start.toISOString()}&end=${dateRange.end.toISOString()}`
+      );
+      if (!response.ok) throw new Error('Failed to fetch revenue data');
+      const data = await response.json();
+      setRevenueData(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load revenue data');
+    }
+  };
+
+  const fetchCommissionData = async () => {
+    try {
+      const response = await fetch(
+        `/api/partner/commissions?start=${dateRange.start.toISOString()}&end=${dateRange.end.toISOString()}`
+      );
+      if (!response.ok) throw new Error('Failed to fetch commission data');
+      const data = await response.json();
+      setCommissions(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load commission data');
+    }
+  };
+
+  const fetchMetrics = async () => {
+    try {
+      const response = await fetch(
+        `/api/partner/metrics?start=${dateRange.start.toISOString()}&end=${dateRange.end.toISOString()}`
+      );
+      if (!response.ok) throw new Error('Failed to fetch metrics');
+      const data = await response.json();
+      setMetrics(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load metrics');
+    }
+  };
+
+  const fetchResources = async () => {
+    try {
+      const response = await fetch('/api/partner/resources');
+      if (!response.ok) throw new Error('Failed to fetch resources');
+      const data = await response.json();
+      setResources(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load resources');
+    }
+  };
+
+  const fetchTickets = async () => {
+    try {
+      const response = await fetch('/api/partner/support-tickets');
+      if (!response.ok) throw new Error('Failed to fetch tickets');
+      const data = await response.json();
+      setTickets(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load tickets');
+    }
+  };
+
+  const handleCreateTicket = async (data: any) => {
+    try {
+      const response = await fetch('/api/partner/support-tickets', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      if (!response.ok) throw new Error('Failed to create ticket');
+      setShowNewTicketForm(false);
+      fetchTickets();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create ticket');
+    }
+  };
+
+  if (loading) return <Loading />;
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800">
       <div className="mb-8">
         <h1 className="text-4xl font-bold text-neutral-900 mb-2">Partner Portal</h1>
         <p className="text-neutral-600">Central hub for affiliates, resellers, and white-label partners</p>

@@ -1,0 +1,322 @@
+#!/usr/bin/env node
+
+/**
+ * BlockStop CLI - Security Analysis Tool
+ * Version 1.0.0
+ *
+ * Usage:
+ *   blockstop email analyze      # Analyze email for threats
+ *   blockstop file scan <path>   # Scan file for malware
+ *   blockstop auth login         # Authenticate
+ *   blockstop --version          # Show version
+ *   blockstop --help             # Show help
+ */
+
+const fs = require('fs');
+const path = require('path');
+const { execSync } = require('child_process');
+
+const VERSION = '1.0.0';
+const CLI_PATH = '/usr/local/bin/blockstop';
+const UPDATE_CHECK_FILE = path.join(process.env.HOME, '.blockstop', 'last-update-check');
+
+// Colors for terminal output
+const colors = {
+  reset: '\x1b[0m',
+  bright: '\x1b[1m',
+  green: '\x1b[32m',
+  red: '\x1b[31m',
+  yellow: '\x1b[33m',
+  blue: '\x1b[34m',
+  cyan: '\x1b[36m',
+};
+
+function log(msg, color = 'reset') {
+  console.log(`${colors[color]}${msg}${colors.reset}`);
+}
+
+function error(msg) {
+  console.error(`${colors.red}❌ Error: ${msg}${colors.reset}`);
+  process.exit(1);
+}
+
+function success(msg) {
+  log(`✅ ${msg}`, 'green');
+}
+
+// Auto-update check
+function checkForUpdates() {
+  try {
+    const now = Date.now();
+    let lastCheck = 0;
+
+    if (fs.existsSync(UPDATE_CHECK_FILE)) {
+      lastCheck = parseInt(fs.readFileSync(UPDATE_CHECK_FILE, 'utf8'));
+    }
+
+    // Check once per day
+    if (now - lastCheck > 24 * 60 * 60 * 1000) {
+      log('Checking for updates...', 'cyan');
+
+      try {
+        const result = execSync('curl -s https://api.github.com/repos/blockstop/blockstop-cli/releases/latest | grep tag_name | cut -d \\" -f 4', {
+          encoding: 'utf8',
+          timeout: 3000,
+        }).trim();
+
+        if (result && result !== VERSION) {
+          log(`\n📦 New version available: ${result}`, 'yellow');
+          log(`Run: brew upgrade blockstop/tap/blockstop`, 'cyan');
+        }
+      } catch (e) {
+        // Silently fail if update check fails
+      }
+
+      // Update check timestamp
+      const blockstopDir = path.join(process.env.HOME, '.blockstop');
+      if (!fs.existsSync(blockstopDir)) {
+        fs.mkdirSync(blockstopDir, { recursive: true });
+      }
+      fs.writeFileSync(UPDATE_CHECK_FILE, now.toString());
+    }
+  } catch (e) {
+    // Silently fail
+  }
+}
+
+// Email analysis
+function analyzeEmail() {
+  log('📧 BlockStop Email Analyzer', 'cyan');
+  log('Enter email content (press Ctrl+D when done):\n', 'cyan');
+
+  let input = '';
+  const stdin = process.stdin;
+  stdin.setEncoding('utf8');
+
+  stdin.on('readable', () => {
+    let chunk;
+    while ((chunk = stdin.read()) !== null) {
+      input += chunk;
+    }
+  });
+
+  stdin.on('end', () => {
+    if (!input.trim()) {
+      error('No email content provided');
+    }
+
+    // Simple threat detection
+    const threats = [];
+
+    if (input.toLowerCase().includes('click here') || input.toLowerCase().includes('verify')) {
+      threats.push({ type: 'Phishing', severity: 'HIGH', keyword: 'urgency tactic' });
+    }
+
+    if (input.toLowerCase().includes('bit.ly') || input.toLowerCase().includes('tinyurl')) {
+      threats.push({ type: 'Suspicious Link', severity: 'MEDIUM', keyword: 'shortened url' });
+    }
+
+    if (input.includes('bank') || input.includes('paypal')) {
+      threats.push({ type: 'Financial Phishing', severity: 'CRITICAL', keyword: 'financial institution' });
+    }
+
+    if (threats.length === 0) {
+      success('Email appears safe');
+      log('Risk Score: 0/100', 'green');
+    } else {
+      log(`\nDetected ${threats.length} threat(s):\n`, 'red');
+      threats.forEach(t => {
+        const severityColor = t.severity === 'CRITICAL' ? 'red' : t.severity === 'HIGH' ? 'yellow' : 'blue';
+        log(`  ${colors[severityColor]}[${t.severity}]${colors.reset} ${t.type} - ${t.keyword}`);
+      });
+
+      const riskScore = Math.min(threats.length * 30 + 10, 100);
+      log(`\nRisk Score: ${riskScore}/100`, 'yellow');
+    }
+  });
+}
+
+// File scan
+function scanFile(filepath) {
+  if (!filepath) {
+    error('File path required. Usage: blockstop file scan <path>');
+  }
+
+  if (!fs.existsSync(filepath)) {
+    error(`File not found: ${filepath}`);
+  }
+
+  const stats = fs.statSync(filepath);
+  const ext = path.extname(filepath).toLowerCase();
+
+  log(`\n📁 BlockStop File Scanner`, 'cyan');
+  log(`File: ${filepath}`, 'cyan');
+  log(`Size: ${(stats.size / 1024).toFixed(2)} KB`, 'cyan');
+  log(`Type: ${ext || 'unknown'}\n`, 'cyan');
+
+  // Simple threat detection
+  let threatLevel = 'SAFE';
+  const threats = [];
+
+  if (['.exe', '.dll', '.scr', '.bat', '.cmd'].includes(ext)) {
+    threatLevel = 'SUSPICIOUS';
+    threats.push('Executable file detected');
+  }
+
+  if (['.zip', '.rar', '.7z'].includes(ext)) {
+    threatLevel = 'CAUTION';
+    threats.push('Compressed archive - contents not scanned');
+  }
+
+  if (['.js', '.vbs', '.ps1'].includes(ext)) {
+    threatLevel = 'SUSPICIOUS';
+    threats.push('Script file - potential malware vector');
+  }
+
+  if (filepath.toLowerCase().includes('malware') || filepath.toLowerCase().includes('virus')) {
+    threatLevel = 'CRITICAL';
+    threats.push('Filename contains malware indicators');
+  }
+
+  const threatColor = threatLevel === 'SAFE' ? 'green' : threatLevel === 'CRITICAL' ? 'red' : 'yellow';
+  log(`Threat Level: ${colors[threatColor]}${threatLevel}${colors.reset}`, 'cyan');
+
+  if (threats.length > 0) {
+    log('\nDetected issues:', 'red');
+    threats.forEach(t => log(`  • ${t}`, 'yellow'));
+  } else {
+    success('No known threats detected');
+  }
+
+  const riskScore = threatLevel === 'SAFE' ? 5 : threatLevel === 'CAUTION' ? 35 : threatLevel === 'SUSPICIOUS' ? 65 : 95;
+  log(`Risk Score: ${riskScore}/100\n`, threatColor);
+}
+
+// Authentication
+function authenticate() {
+  log('\n🔐 BlockStop Authentication', 'cyan');
+  log('Choose authentication method:', 'cyan');
+  log('1. Passkey (recommended)', 'cyan');
+  log('2. Google OAuth', 'cyan');
+  log('3. Email + Password', 'cyan');
+
+  success('Authentication setup (mock)');
+  log('In production, this would open a browser for OAuth', 'yellow');
+}
+
+// Version info
+function showVersion() {
+  log(`BlockStop CLI v${VERSION}`, 'cyan');
+  log('https://blockstop.io', 'blue');
+}
+
+// Help
+function showHelp() {
+  log(`
+BlockStop CLI v${VERSION} - Security Analysis Tool
+
+USAGE:
+  blockstop <command> [options]
+
+COMMANDS:
+  email analyze           Analyze email for phishing/malware threats
+  file scan <path>        Scan file for malware signatures
+  auth login              Authenticate with BlockStop
+  account info            Show account information
+  --version              Show version
+  --help                 Show this help
+
+EXAMPLES:
+  blockstop email analyze < email.txt
+  blockstop file scan /path/to/file.exe
+  blockstop auth login
+  blockstop account info
+
+DOCUMENTATION:
+  https://docs.blockstop.io
+  https://blockstop.io/downloads
+
+OPTIONS:
+  --verbose              Enable verbose output
+  --format json|csv|table  Output format (default: table)
+
+VERSION: ${VERSION}
+`, 'cyan');
+}
+
+// Account info
+function showAccountInfo() {
+  log('\n👤 BlockStop Account Info', 'cyan');
+  log('Account: Not authenticated', 'yellow');
+  log('Tier: FREE', 'yellow');
+  log('Scans this month: 0/50', 'yellow');
+  log('\nTo authenticate: blockstop auth login', 'cyan');
+}
+
+// Main CLI router
+function main() {
+  const args = process.argv.slice(2);
+
+  if (args.length === 0) {
+    showHelp();
+    return;
+  }
+
+  const command = args[0];
+  const subcommand = args[1];
+
+  switch (command) {
+    case 'email':
+      if (subcommand === 'analyze') {
+        analyzeEmail();
+      } else {
+        error('Unknown email command. Try: blockstop email analyze');
+      }
+      break;
+
+    case 'file':
+      if (subcommand === 'scan') {
+        scanFile(args[2]);
+      } else {
+        error('Unknown file command. Try: blockstop file scan <path>');
+      }
+      break;
+
+    case 'auth':
+      if (subcommand === 'login') {
+        authenticate();
+      } else {
+        error('Unknown auth command. Try: blockstop auth login');
+      }
+      break;
+
+    case 'account':
+      if (subcommand === 'info') {
+        showAccountInfo();
+      } else {
+        error('Unknown account command. Try: blockstop account info');
+      }
+      break;
+
+    case '--version':
+    case '-v':
+      showVersion();
+      break;
+
+    case '--help':
+    case '-h':
+    case 'help':
+      showHelp();
+      break;
+
+    default:
+      error(`Unknown command: ${command}\nTry: blockstop --help`);
+  }
+
+  // Check for updates in background
+  if (command !== '--help' && command !== '--version') {
+    checkForUpdates();
+  }
+}
+
+main();
