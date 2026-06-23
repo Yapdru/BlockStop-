@@ -1,5 +1,5 @@
 export type AuthMethod = 'password' | 'google' | 'passkey';
-export type TierType = 'free' | 'pro';
+export type TierType = 'free' | 'pro' | 'enterprise';
 
 export interface User {
   id: number;
