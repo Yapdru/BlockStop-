@@ -32,9 +32,7 @@ jobs:
           GITHUB_PAGES: "true"
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v2
-        with:
-          path: ./out
+        uses: actions/upload-pages-artifact@v3  # ✅ Updated from v2 to v3
 
   deploy:
     if: github.ref == 'refs/heads/main'
@@ -49,4 +47,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v2
+        uses: actions/deploy-pages@v4  # ✅ Updated from v2 to v4
