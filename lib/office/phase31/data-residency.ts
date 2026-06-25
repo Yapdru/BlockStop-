@@ -124,7 +124,7 @@ export class DataResidencyManager {
     };
 
     // Check policy compliance for transfer
-    const applicable Policy = this.management.policies.find(
+    const applicablePolicy = this.management.policies.find(
       (p) => p.allowedProcessingCountries.includes(toRegion)
     );
 

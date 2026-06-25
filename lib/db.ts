@@ -2,7 +2,7 @@ import { Pool } from "pg";
 import { queryOptimizer } from "./db/query-optimizer";
 
 // Create a connection pool to PostgreSQL with optimized settings
-const pool = new Pool({
+export const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false,
   // Optimized pool settings for performance
@@ -42,6 +42,10 @@ export async function query(text: string, params?: unknown[]) {
 
 export async function getClient() {
   return pool.connect();
+}
+
+export async function getDb() {
+  return pool;
 }
 
 export default pool;

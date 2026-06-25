@@ -133,7 +133,7 @@ export interface EmailAnalysis extends TextAnalysisResult {
   // Sender reputation
   senderReputation: {
     knownPhisher: boolean;
-    domain Age: number; // days
+    domainAge: number; // days
     domainReputation: number; // 0-100
     isFreeemail: boolean;
   };
@@ -345,7 +345,7 @@ export class AdvancedNLPAnalyzer {
     // Sender reputation
     const senderReputation = {
       knownPhisher: this.isKnownPhisher(emailData.sender),
-      domain Age: this.estimateDomainAge(senderDomain),
+      domainAge: this.estimateDomainAge(senderDomain),
       domainReputation: this.calculateDomainReputation(senderDomain),
       isFreeemail: this.isFreemailDomain(senderDomain),
     };

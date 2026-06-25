@@ -4,6 +4,7 @@ export { Card } from './Card';
 export { Input } from './Input';
 export { Badge } from './Badge';
 export { BottomNav } from './BottomNav';
+export { Loading } from './Loading';
 
 // Tier-Specific Components (MAX/PRO/OFFICE)
 export { CommandPalette } from './CommandPalette';
