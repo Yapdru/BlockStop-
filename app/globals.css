@@ -67,11 +67,11 @@ body {
 
   /* Screen reader only content */
   .sr-only {
-    @apply absolute -inset-1 h-1 w-1 overflow-hidden whitespace-nowrap border-0 p-0 clip;
+    @apply absolute -inset-1 h-1 w-1 overflow-hidden whitespace-nowrap border-0 p-0;
   }
 
   .sr-only:focus {
-    @apply relative inset-auto h-auto w-auto overflow-visible whitespace-normal border-0 p-auto clip-auto bg-primary-500 text-white px-4 py-2 rounded z-50;
+    @apply relative inset-auto h-auto w-auto overflow-visible whitespace-normal border-0 bg-primary-500 text-white px-4 py-2 rounded z-50;
   }
 
   /* Focus visible for skip links */

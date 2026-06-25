@@ -334,7 +334,7 @@ class NLPAnalyzer {
   ): Promise<NLPResponse> {
     let response = '';
     let responseType: NLPResponse['responseType'] = 'information';
-    const threatData: ThreatIndicator[] = [];
+    let threatData: ThreatIndicator[] = [];
     const sources = ['BlockStop AI', 'Threat Intelligence Engine'];
 
     switch (parsed.intent) {
