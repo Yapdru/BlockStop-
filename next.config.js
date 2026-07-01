@@ -1,6 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
   eslint: {
     // Ignores the unescaped apostrophes
     ignoreDuringBuilds: true,
@@ -12,10 +11,6 @@ const nextConfig = {
   images: {
     unoptimized: true, 
   },
-  experimental: {
-    // Allows dynamic features in static export
-    dynamicIO: true,
-  }
 };
 
 module.exports = nextConfig;
