@@ -3,6 +3,8 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
 import { authService } from '@/lib/auth/auth-service';
 
+export const dynamic = 'force-dynamic';
+
 const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
