@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth/next';
 import { teamService } from '@/lib/teams/team-service';
 import { authService } from '@/lib/auth/auth-service';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(
   req: NextRequest,
   { params }: { params: { teamId: string } }
