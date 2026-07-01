@@ -3,6 +3,18 @@ import { getServerSession } from 'next-auth/next';
 import { teamService } from '@/lib/teams/team-service';
 import { authService } from '@/lib/auth/auth-service';
 
+export async function generateStaticParams() {
+  try {
+    const teams = await teamService.getAllTeams();
+    return teams.map(team => ({
+      teamId: team.id.toString(),
+    }));
+  } catch (error) {
+    console.error('Error generating static params:', error);
+    return [];
+  }
+}
+
 export async function GET(
   req: NextRequest,
   { params }: { params: { teamId: string } }
