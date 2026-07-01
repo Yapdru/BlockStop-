@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'export',
   eslint: {
     // Ignores the unescaped apostrophes
     ignoreDuringBuilds: true,
