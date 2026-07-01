@@ -3,8 +3,6 @@ import { getServerSession } from 'next-auth/next';
 import { teamService } from '@/lib/teams/team-service';
 import { authService } from '@/lib/auth/auth-service';
 
-export const dynamic = 'force-dynamic';
-
 export async function generateStaticParams() {
   try {
     const teams = await teamService.getAllTeams();
