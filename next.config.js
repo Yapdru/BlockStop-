@@ -11,6 +11,10 @@ const nextConfig = {
   },
   images: {
     unoptimized: true, 
+  },
+  experimental: {
+    // Allows dynamic features in static export
+    dynamicIO: true,
   }
 };
 
